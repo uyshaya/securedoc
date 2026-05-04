@@ -84,7 +84,7 @@ CREATE TABLE requesters
     date_of_birth  DATE         NOT NULL,
     contact_number VARCHAR(20),
     id_type        VARCHAR(50),
-    id_image_path  VARCHAR(500), -- file path (store files on disk/S3?, not in DB for better performance)
+    id_image_path  VARCHAR(500),          -- file path (store files on disk/S3?, not in DB for better performance)
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -117,15 +117,29 @@ CREATE TABLE documents
     id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
     request_id         BIGINT       NOT NULL UNIQUE,
     org_certificate_id BIGINT       NOT NULL,
-    issued_by          BIGINT       NOT NULL, -- which staff member approved it
+    issued_by          BIGINT       NOT NULL,        -- which staff member approved it
     file_name          VARCHAR(255) NOT NULL,
-    document_data      LONGBLOB     NOT NULL, -- PDF bytes
+    document_data      LONGBLOB     NOT NULL,        -- PDF bytes
     file_size          INT,
-    file_hash          VARCHAR(64)  NOT NULL, -- SHA-256 hash of document_data (tamper detection)
-    digital_signature  TEXT, -- signature over file_hash
+    file_hash          VARCHAR(64)  NOT NULL,        -- SHA-256 hash of document_data (tamper detection)
+    digital_signature  TEXT,                         -- signature over file_hash
     verification_token VARCHAR(128) NOT NULL UNIQUE, -- encoded as the QR image
     issued_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (request_id) REFERENCES requests (id),
     FOREIGN KEY (org_certificate_id) REFERENCES org_certificates (id),
     FOREIGN KEY (issued_by) REFERENCES staff (id)
+);
+
+--  9. AUDIT LOGS
+CREATE TABLE audit_logs
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    actor_id    BIGINT,                -- staff who performed the action (NULL if system)
+    actor_role  ENUM('staff', 'admin', 'system'),
+    action      VARCHAR(100) NOT NULL, -- e.g. 'REQUEST_APPROVED', 'DOCUMENT_ISSUED'
+    entity_type VARCHAR(50),           -- e.g. 'requests', 'documents', 'staff'
+    entity_id   BIGINT,                -- the row that was affected
+    ip_address  VARCHAR(45),
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (actor_id) REFERENCES staff (id) ON DELETE SET NULL
 );
