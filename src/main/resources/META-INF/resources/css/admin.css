@@ -1,0 +1,618 @@
+html, body {
+    font-size: 13px;
+}
+
+.ui-panel .ui-panel-content {
+    padding: 0 !important;
+}
+
+.ui-panel.no-chrome {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.ui-panel.no-chrome .ui-panel-titlebar {
+    display: none !important;
+}
+
+/* ── Auth scene ── */
+.auth-scene {
+    min-height: 100vh;
+    background: var(--bg);
+    background-image: radial-gradient(circle at 15% 20%, var(--bg-g1) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, var(--bg-g2) 0%, transparent 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.auth-wrap {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    background: var(--white);
+    border-radius: 16px;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    min-height: 560px;
+}
+
+/* ── Brand panel ── */
+.auth-brand {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--navy);
+    padding: 48px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.auth-brand.ui-outputpanel,
+.auth-form-panel.ui-outputpanel { display: flex !important; }
+.auth-panel.ui-outputpanel      { display: flex !important; }
+
+.auth-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-brand-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--white);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.auth-brand-logo .brand-name {
+    font-size: 20px;
+    color: var(--white);
+}
+
+.auth-brand-tag {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.32);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.auth-brand-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 28px;
+    padding: 40px 0 20px;
+}
+
+.auth-brand-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--white);
+    line-height: 1.25;
+}
+
+.auth-brand-headline em {
+    font-style: normal;
+    color: var(--sky);
+}
+
+.auth-brand-desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.48);
+    line-height: 1.65;
+}
+
+/* Feature list — p:dataList overrides */
+.brand-features.ui-datalist {
+    border: none !important;
+    background: transparent !important;
+}
+
+.brand-features .ui-datalist-data {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.brand-features .ui-datalist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.auth-feature-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sky);
+    flex-shrink: 0;
+}
+
+.auth-feature-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.52);
+}
+
+.auth-brand-footer {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Form panel ── */
+.auth-form-panel {
+    flex: 1;
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    animation: fadein 0.2s ease;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-step-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--navy);
+    letter-spacing: -0.3px;
+}
+
+.auth-step-sub {
+    font-size: 13px;
+    color: var(--tx-m);
+    margin-top: 4px;
+    line-height: 1.55;
+}
+
+/* ── Fields ── */
+.af-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--tx-2);
+    display: flex;
+    align-items: center;
+}
+
+.af-label .ui-outputlabel-rfi {
+    color: red;
+}
+
+.af-hint {
+    font-size: 11px;
+    color: var(--tx-f);
+}
+
+.ui-inputfield {
+    width: 100%;
+    background: var(--white);
+    border: 0.5px solid #C2CDD9 !important;
+    border-radius: 8px !important;
+    padding: 10px 13px;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 13.5px !important;
+    color: var(--tx-1);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ui-inputfield:focus {
+    border-color: var(--navy-mid) !important;
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1) !important;
+    outline: none;
+}
+
+.ui-inputfield.ui-state-error {
+    border-color: var(--red) !important;
+}
+
+.ui-inputfield::placeholder {
+    color: #ADBAC8;
+}
+
+.ui-password {
+    width: 100%;
+}
+
+.ui-password .ui-inputfield {
+    width: 100%;
+}
+
+/* ── Two-column field row ── */
+.af-row.ui-panelgrid {
+    border: none !important;
+    width: 100% !important;
+}
+
+.af-row.ui-panelgrid td {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    vertical-align: top;
+}
+
+.af-row.ui-panelgrid td:first-child {
+    padding-right: 6px !important;
+}
+
+.af-row.ui-panelgrid td:last-child {
+    padding-left: 6px !important;
+}
+
+/* Forgot-password label row */
+.label-row.ui-panelgrid {
+    border: none !important;
+    width: 100% !important;
+    margin-bottom: -4px;
+}
+
+.label-row.ui-panelgrid td {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+/* ── OTP ── */
+.ui-inputotp {
+    gap: 8px;
+    justify-content: center;
+}
+
+.ui-inputotp-input {
+    width: 50px !important;
+    height: 56px !important;
+    background: var(--white);
+    border: 0.5px solid #C2CDD9 !important;
+    border-radius: 10px !important;
+    font-family: 'DM Serif Display', serif !important;
+    font-size: 26px !important;
+    color: var(--navy) !important;
+    text-align: center;
+    caret-color: var(--navy-mid);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ui-inputotp-input:focus {
+    border-color: var(--navy-mid) !important;
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.12) !important;
+}
+
+.otp-resend {
+    text-align: center;
+    font-size: 12px;
+    color: var(--tx-f);
+}
+
+/* ── Error / Notice ── */
+.af-error {
+    background: var(--red-tint);
+    border: 0.5px solid var(--red-bdr);
+    border-left: 3px solid var(--red);
+    border-radius: 7px;
+    padding: 9px 12px;
+    font-size: 12px;
+    color: #7F1D1D;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.af-notice {
+    background: var(--blue-tint);
+    border: 0.5px solid var(--blue-bdr);
+    border-left: 3px solid var(--navy-mid);
+    border-radius: 7px;
+    padding: 10px 13px;
+    font-size: 12.5px;
+    color: #0C447C;
+    line-height: 1.6;
+}
+
+.af-notice.ui-panel .ui-panel-titlebar {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 0 2px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    color: #0C447C !important;
+}
+
+.af-notice.ui-panel .ui-panel-content {
+    padding: 0 !important;
+}
+
+/* ── Buttons ── */
+.af-btn {
+    width: 100%;
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    justify-content: center;
+}
+
+.af-btn:hover {
+    background: var(--navy-mid) !important;
+    box-shadow: 0 4px 14px rgba(12, 59, 110, 0.2) !important;
+}
+
+.af-btn:active {
+    transform: scale(0.98);
+}
+
+.af-btn .ui-button-text {
+    padding: 0 !important;
+}
+
+.af-btn-ghost {
+    width: 100%;
+    background: var(--white) !important;
+    color: var(--navy) !important;
+    border: 0.5px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+}
+
+.af-btn-ghost:hover {
+    background: var(--field-bg) !important;
+}
+
+.auth-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--tx-m);
+    cursor: pointer;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 4px;
+}
+
+.auth-back-link:hover {
+    color: var(--navy);
+}
+
+.auth-back-link .ui-button-text {
+    padding: 0 !important;
+}
+
+.auth-footer-link {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--tx-m);
+}
+
+.auth-footer-link a {
+    color: var(--navy-mid);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer-link a:hover {
+    text-decoration: underline;
+}
+
+/* ── Success state ── */
+.auth-success-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--green-tint);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.auth-success-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    text-align: center;
+}
+
+.auth-success-sub {
+    font-size: 13px;
+    color: var(--tx-m);
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* ── p:separator ── */
+.ui-separator-horizontal {
+    border-top: 0.5px solid var(--border-soft) !important;
+    margin: 4px 0 !important;
+}
+
+/* ── p:message ── */
+.ui-message-error, .ui-messages-error {
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 12px !important;
+    color: #7F1D1D !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 2px 0 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Admin Console layout (post-auth) — navy sidebar + content area
+   ═══════════════════════════════════════════════════════════════ */
+
+.console-body {
+    background: var(--bg);
+}
+
+.console {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.console-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--navy);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.console-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.console-brand-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--white);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.console-brand .brand-name {
+    font-size: 18px;
+    color: var(--white);
+}
+
+.console-brand-tag {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 4px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+/* ── Nav ── */
+.console-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 12px;
+    gap: 2px;
+    flex: 1;
+}
+
+.console-nav-item {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 120ms, color 120ms;
+}
+
+.console-nav-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--white);
+}
+
+.console-nav-item.active {
+    background: rgba(126, 200, 245, 0.12);
+    color: var(--white);
+    box-shadow: inset 2px 0 0 var(--sky);
+}
+
+.console-nav-icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+}
+
+/* ── Sidebar footer ── */
+.console-sidebar-footer {
+    padding: 16px 24px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 11px;
+}
+
+.console-version {
+    letter-spacing: 0.5px;
+}
+
+/* ── Main content ── */
+.console-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.console-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 36px;
+    background: var(--white);
+    border-bottom: 0.5px solid var(--border);
+}
+
+.console-page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--tx-1);
+    font-weight: 400;
+}
+
+.console-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.console-content {
+    padding: 32px 36px;
+    flex: 1;
+}

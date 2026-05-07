@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/verifier-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>Verify Document – SecureDoc</title>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <div>
+            <div class="sec-title">How would you like to verify?</div>
+            <div class="sec-sub">Choose the method that best matches how the document was presented to you.</div>
+        </div>
+
+        <div class="verify-options">
+
+            <button type="button" class="verify-option">
+                <span class="verify-option-letter">A</span>
+                <span class="verify-option-body">
+                    <span class="verify-option-eyebrow">Option A</span>
+                    <span class="verify-option-title">Digital Scan</span>
+                    <span class="portal-desc">Scan the QR code on the physical document to check authenticity.</span>
+                </span>
+                <span class="verify-option-arrow">
+                    <i class="pi pi-angle-right"></i>
+                </span>
+            </button>
+
+            <button type="button" class="verify-option">
+                <span class="verify-option-letter">B</span>
+                <span class="verify-option-body">
+                    <span class="verify-option-eyebrow">Option B</span>
+                    <span class="verify-option-title">Full Proof Check</span>
+                    <span class="portal-desc">Upload a digital copy of the document to run a deep integrity and authenticity check.</span>
+                </span>
+                <span class="verify-option-arrow">
+                    <i class="pi pi-angle-right"></i>
+                </span>
+            </button>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>

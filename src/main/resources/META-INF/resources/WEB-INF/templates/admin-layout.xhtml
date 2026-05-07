@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      lang="en">
+
+<h:head>
+    <f:facet name="first">
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </f:facet>
+
+    <ui:insert name="pageTitle">
+        <title>Admin Console – SecureDoc</title>
+    </ui:insert>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&amp;display=swap"
+          rel="stylesheet"/>
+
+    <h:outputStylesheet library="css" name="global.css"/>
+    <h:outputStylesheet library="css" name="admin.css"/>
+
+    <ui:insert name="extraStyles"/>
+</h:head>
+
+<h:body styleClass="console-body">
+    <div class="console">
+
+        <!-- ══ Sidebar ══ -->
+        <aside class="console-sidebar">
+            <div class="console-brand">
+                <div class="console-brand-icon">
+                    <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                        <path d="M14 3L5 7V14C5 18.97 9.02 23.57 14 24.93C18.98 23.57 23 18.97 23 14V7L14 3Z"
+                              fill="#fff"/>
+                        <path d="M9.5 14L12.5 17L18.5 11" stroke="#0C3B6E" stroke-width="2.2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-name">Secure<em>Doc</em></span>
+                    <div class="console-brand-tag">Admin Console</div>
+                </div>
+            </div>
+
+            <nav class="console-nav">
+                <ui:insert name="navItems">
+                    <h:link outcome="/admin/dashboard" styleClass="console-nav-item">
+                        <span class="console-nav-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 12L12 4l9 8M5 10v10h14V10"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        Dashboard
+                    </h:link>
+                    <h:link outcome="/admin/requests" styleClass="console-nav-item">
+                        <span class="console-nav-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <rect x="5" y="3" width="14" height="18" rx="2"
+                                      stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M9 8h6M9 12h6M9 16h4"
+                                      stroke="currentColor" stroke-width="1.5"
+                                      stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        Requests
+                    </h:link>
+                    <h:link outcome="/admin/templates" styleClass="console-nav-item">
+                        <span class="console-nav-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M4 6h16M4 12h16M4 18h10"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        Templates
+                    </h:link>
+                    <h:link outcome="/admin/audit" styleClass="console-nav-item">
+                        <span class="console-nav-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="9"
+                                        stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M12 7v5l3 2"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        Audit Log
+                    </h:link>
+                </ui:insert>
+            </nav>
+
+            <div class="console-sidebar-footer">
+                <ui:insert name="sidebarFooter">
+                    <span class="console-version">v1.0.0</span>
+                </ui:insert>
+            </div>
+        </aside>
+
+        <!-- ══ Main ══ -->
+        <main class="console-main">
+            <header class="console-topbar">
+                <ui:insert name="pageHeader">
+                    <h1 class="console-page-title">Admin Console</h1>
+                </ui:insert>
+                <div class="console-topbar-actions">
+                    <ui:insert name="topbarActions"/>
+                </div>
+            </header>
+
+            <div class="console-content">
+                <ui:insert name="content"/>
+            </div>
+        </main>
+
+    </div>
+</h:body>
+</html>

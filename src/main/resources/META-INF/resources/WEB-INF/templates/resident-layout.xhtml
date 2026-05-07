@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      lang="en">
+
+<h:head>
+    <f:facet name="first">
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </f:facet>
+
+    <ui:insert name="pageTitle">
+        <title>SecureDoc – Official Document Services</title>
+    </ui:insert>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&amp;display=swap"
+          rel="stylesheet"/>
+
+    <h:outputStylesheet library="css" name="global.css"/>
+    <h:outputStylesheet library="css" name="request.css"/>
+</h:head>
+
+<h:body>
+    <f:loadBundle basename="messages" var="msg"/>
+
+    <div class="scene">
+        <ui:insert name="content"/>
+    </div>
+
+    <h:outputScript library="js" name="request.js" target="body"/>
+</h:body>
+</html>
