@@ -1,22 +1,39 @@
 USE securedoc;
 
---  1. STAFF / ADMIN
+--  1. BARANGAYS  (multi-tenant root — staff, templates, requests, etc. will scope to a barangay)
+CREATE TABLE barangays
+(
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name           VARCHAR(255) NOT NULL,
+    code           VARCHAR(50)  NOT NULL UNIQUE,
+    address        TEXT,
+    contact_number VARCHAR(20),
+    email          VARCHAR(255),
+    is_active      BOOLEAN   DEFAULT TRUE,
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+--  2. STAFF / ADMIN
 CREATE TABLE staff
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    barangay_id   BIGINT       NOT NULL,
     first_name    VARCHAR(100) NOT NULL,
     middle_name   VARCHAR(100),
     last_name     VARCHAR(100) NOT NULL,
-    email         VARCHAR(255) NOT NULL UNIQUE,
+    email         VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role          ENUM('staff', 'admin') DEFAULT 'staff',
     is_active     BOOLEAN   DEFAULT TRUE,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login    DATETIME
+    last_login    DATETIME,
+    UNIQUE (barangay_id, email),
+    FOREIGN KEY (barangay_id) REFERENCES barangays (id)
 );
 
---  2. STAFF OTP  (login 2FA)
+--  3. STAFF OTP  (login 2FA)
 CREATE TABLE staff_otps
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -31,7 +48,7 @@ CREATE TABLE staff_otps
 );
 
 
---  3. RESIDENT OTP  (email verification before submitting)
+--  4. RESIDENT OTP  (email verification before submitting)
 CREATE TABLE resident_otps
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +60,7 @@ CREATE TABLE resident_otps
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---  4. ORGANIZATION CERTIFICATE
+--  5. ORGANIZATION CERTIFICATE
 CREATE TABLE org_certificates
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -56,7 +73,7 @@ CREATE TABLE org_certificates
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---  5. DOCUMENT TEMPLATES
+--  6. DOCUMENT TEMPLATES
 CREATE TABLE document_templates
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -72,7 +89,7 @@ CREATE TABLE document_templates
     updated_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
---  6. REQUESTERS  (resident personal info per submission)
+--  7. REQUESTERS  (resident personal info per submission)
 CREATE TABLE requesters
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -88,10 +105,11 @@ CREATE TABLE requesters
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---  7. REQUESTS
+--  8. REQUESTS
 CREATE TABLE requests
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    barangay_id      BIGINT      NOT NULL,
     reference_number VARCHAR(20) NOT NULL UNIQUE,
     requester_id     BIGINT      NOT NULL,
     template_id      BIGINT      NOT NULL,
@@ -106,12 +124,13 @@ CREATE TABLE requests
     request_note     TEXT,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (barangay_id) REFERENCES barangays (id),
     FOREIGN KEY (requester_id) REFERENCES requesters (id),
     FOREIGN KEY (template_id) REFERENCES document_templates (id),
     FOREIGN KEY (processed_by) REFERENCES staff (id)
 );
 
---  8. ISSUED DOCUMENTS  (tamper-evident layer)
+--  9. ISSUED DOCUMENTS  (tamper-evident layer)
 CREATE TABLE documents
 (
     id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -130,7 +149,7 @@ CREATE TABLE documents
     FOREIGN KEY (issued_by) REFERENCES staff (id)
 );
 
---  9. AUDIT LOGS
+--  10. AUDIT LOGS
 CREATE TABLE audit_logs
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
