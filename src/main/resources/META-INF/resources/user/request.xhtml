@@ -1,0 +1,582 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/resident-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>Request a Document – SecureDoc</title>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <!-- ══════════════════════════════════════
+             P1 · LANDING — Select Certificate
+        ═══════════════════════════════════════ -->
+        <div class="page active" id="p-landing">
+            <div class="card">
+                <div class="hd">
+                    <div class="logo-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                            <path d="M14 3L5 7V14C5 18.97 9.02 23.57 14 24.93C18.98 23.57 23 18.97 23 14V7L14 3Z" fill="#0C3B6E"/>
+                            <path d="M9.5 14L12.5 17L18.5 11" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="tagline">Official Document Services</div>
+                    </div>
+                </div>
+
+                <div class="bd">
+                    <div>
+                        <div class="hours-hd">
+                            <span class="section-lbl">Business Hours</span>
+                            <span class="badge-open"><span class="dot"></span>Open now</span>
+                        </div>
+                        <div class="hours-grid">
+                            <div class="hours-pill"><span class="hours-day">Mon – Fri</span><span class="hours-time">8:00 AM – 5:00 PM</span></div>
+                            <div class="hours-pill"><span class="hours-day">Saturday</span><span class="hours-time">8:00 AM – 12:00 PM</span></div>
+                            <div class="hours-pill"><span class="hours-day">Sunday</span><span class="hours-closed">Closed</span></div>
+                        </div>
+                    </div>
+
+                    <hr class="div"/>
+
+                    <div class="notice">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
+                            <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
+                            <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
+                            <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
+                        </svg>
+                        <div class="notice-text">
+                            <strong>Valid ID required for all requests</strong>
+                            All certificate requests require a valid proof of identification to ensure authenticity and protect against unauthorized access.
+                        </div>
+                    </div>
+
+                    <hr class="div"/>
+
+                    <div class="fwrap">
+                        <label class="flabel" for="certType">Certificate type</label>
+                        <select id="certType" onchange="onCertChange()">
+                            <option value="" disabled="disabled" selected="selected">Select a certificate type…</option>
+                            <optgroup label="Barangay Documents">
+                                <option value="brgy-clearance">Barangay Clearance</option>
+                                <option value="brgy-residency">Certificate of Residency</option>
+                                <option value="brgy-indigency">Certificate of Indigency</option>
+                            </optgroup>
+                        </select>
+                        <span class="cert-hint" id="certHint">Choose the document you need to request.</span>
+                    </div>
+
+                    <div class="cta-row">
+                        <button type="button" class="btn-primary" id="btnProceed" disabled="disabled" onclick="goToEmail()">
+                            Proceed to Request
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="goTo('p-track')">Track request</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             P2 · EMAIL — Enter email address
+        ═══════════════════════════════════════ -->
+        <div class="page" id="p-email">
+            <div class="card">
+                <div class="hd-nav">
+                    <button type="button" class="btn-back" onclick="goTo('p-landing')">
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Back
+                    </button>
+                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
+                        <div class="brand-name">Secure<em>Doc</em></div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">Verify</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                </div>
+
+                <div class="bd">
+                    <div>
+                        <div class="sec-title">Verify your email</div>
+                        <div class="sec-sub">Enter your email address. We'll send a one-time code to confirm it's yours — we'll use this to notify you when your certificate is ready.</div>
+                    </div>
+
+                    <div class="fwrap">
+                        <label class="flabel" for="emailInput">Email address <span class="req">*</span></label>
+                        <div class="email-send-row">
+                            <input type="email" id="emailInput" placeholder="e.g. juan.delacruz@email.com"
+                                   oninput="onEmailInput()" onkeydown="if(event.key==='Enter') sendOtp()"/>
+                            <button type="button" class="btn-inline" id="btnSendOtp" disabled="disabled" onclick="sendOtp()">Send code</button>
+                        </div>
+                        <span class="fhint">A 6-digit verification code will be sent to this address.</span>
+                    </div>
+
+                    <div class="notice-error" id="emailErr">
+                        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
+                            <circle cx="8" cy="8" r="7" stroke="#C0392B" stroke-width="1.3"/>
+                            <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
+                            <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
+                        </svg>
+                        <span id="emailErrMsg">Please enter a valid email address.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             P3 · OTP — Enter code
+        ═══════════════════════════════════════ -->
+        <div class="page" id="p-otp">
+            <div class="card">
+                <div class="hd-nav">
+                    <button type="button" class="btn-back" onclick="goTo('p-email')">
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Back
+                    </button>
+                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
+                        <div class="brand-name">Secure<em>Doc</em></div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">Verify</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                </div>
+
+                <div class="bd">
+                    <div>
+                        <div class="sec-title">Enter verification code</div>
+                        <div class="sec-sub">We sent a 6-digit code to <strong id="otpEmailDisplay" style="color:var(--navy);font-weight:600"></strong>. It expires in 10 minutes.</div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+                        <div class="otp-row" id="otpRow">
+                            <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp0"/>
+                            <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp1"/>
+                            <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp2"/>
+                            <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp3"/>
+                            <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp4"/>
+                            <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp5"/>
+                        </div>
+
+                        <div class="notice-error" id="otpErr" style="width:100%">
+                            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
+                                <circle cx="8" cy="8" r="7" stroke="#C0392B" stroke-width="1.3"/>
+                                <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
+                                <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
+                            </svg>
+                            Incorrect code. Please try again.
+                        </div>
+
+                        <p class="otp-resend">Didn't receive it? <button type="button" id="btnResend" onclick="resendOtp()" disabled="disabled">Resend code</button> <span id="resendTimer"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             P4 · FORM — Request details
+        ═══════════════════════════════════════ -->
+        <div class="page" id="p-form">
+            <div class="card">
+                <div class="hd-nav">
+                    <button type="button" class="btn-back" onclick="goTo('p-otp')">
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Back
+                    </button>
+                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
+                        <div class="brand-name">Secure<em>Doc</em></div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step now"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                </div>
+
+                <div class="bd">
+
+                    <div class="cert-pill">
+                        <div class="cert-icon">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                                <rect x="4" y="2" width="12" height="16" rx="2" stroke="#7EC8F5" stroke-width="1.4"/>
+                                <path d="M7 7h6M7 10h4" stroke="#7EC8F5" stroke-width="1.4" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cert-name" id="formCertName">—</div>
+                            <div class="cert-category" id="formCertCat">—</div>
+                        </div>
+                    </div>
+
+                    <hr class="div"/>
+
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                        <div class="sec-lbl">Personal Information</div>
+
+                        <div class="frow">
+                            <div class="fwrap">
+                                <label class="flabel" for="fFirst">First Name <span class="req">*</span></label>
+                                <input type="text" id="fFirst" placeholder="e.g. Juan"/>
+                            </div>
+                            <div class="fwrap">
+                                <label class="flabel" for="fMiddle">Middle Name</label>
+                                <input type="text" id="fMiddle" placeholder="(optional)"/>
+                            </div>
+                        </div>
+
+                        <div class="fwrap">
+                            <label class="flabel" for="fLast">Last Name <span class="req">*</span></label>
+                            <input type="text" id="fLast" placeholder="e.g. Dela Cruz"/>
+                        </div>
+
+                        <div class="frow">
+                            <div class="fwrap">
+                                <label class="flabel" for="fDob">Date of Birth <span class="req">*</span></label>
+                                <input type="date" id="fDob"/>
+                            </div>
+                            <div class="fwrap">
+                                <label class="flabel" for="fSex">Sex <span class="req">*</span></label>
+                                <select id="fSex">
+                                    <option value="" disabled="disabled" selected="selected">Select…</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="div"/>
+
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                        <div class="sec-lbl">Contact &amp; Purpose</div>
+
+                        <div class="fwrap">
+                            <label class="flabel" for="fPhone">Contact Number <span class="req">*</span></label>
+                            <input type="tel" id="fPhone" placeholder="e.g. 09XX XXX XXXX"/>
+                        </div>
+
+                        <div class="fwrap">
+                            <label class="flabel" style="justify-content:space-between">
+                                Email Address
+                                <span class="email-verified-badge">
+                                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    Verified
+                                </span>
+                            </label>
+                            <input type="email" id="fEmail" class="email-locked" readonly="readonly"/>
+                        </div>
+
+                        <div class="fwrap">
+                            <label class="flabel" for="fPurpose">Purpose of Request <span class="req">*</span></label>
+                            <select id="fPurpose" onchange="onPurposeChange()">
+                                <option value="" disabled="disabled" selected="selected">Select purpose…</option>
+                                <option value="employment">Employment / Job Application</option>
+                                <option value="travel">Travel / Passport / Visa</option>
+                                <option value="school">School Enrollment / Scholarship</option>
+                                <option value="loan">Bank / Loan Application</option>
+                                <option value="legal">Legal / Court Proceedings</option>
+                                <option value="insurance">Insurance / Benefits</option>
+                                <option value="personal">Personal Record / Reference</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="fwrap" id="otherPurposeWrap" style="display:none">
+                            <label class="flabel" for="fOtherPurpose">Please specify <span class="req">*</span></label>
+                            <input type="text" id="fOtherPurpose" placeholder="Describe your purpose…"/>
+                        </div>
+                    </div>
+
+                    <hr class="div"/>
+
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                        <div class="sec-lbl">Proof of Identification</div>
+
+                        <div class="fwrap">
+                            <label class="flabel" for="fIdType">ID Type <span class="req">*</span></label>
+                            <select id="fIdType">
+                                <option value="" disabled="disabled" selected="selected">Select ID type…</option>
+                                <option>Philippine Passport</option>
+                                <option>Driver's License</option>
+                                <option>PhilSys (National ID)</option>
+                                <option>Voter's ID / COMELEC Card</option>
+                                <option>SSS / GSIS Card</option>
+                                <option>PRC ID</option>
+                                <option>Postal ID</option>
+                                <option>Barangay ID</option>
+                            </select>
+                        </div>
+
+                        <div class="fwrap">
+                            <label class="flabel">Upload Valid ID <span class="req">*</span></label>
+                            <div class="upload-zone" id="uploadZone">
+                                <input type="file" accept="image/*,.pdf" onchange="onFileSelected(event)"/>
+                                <div class="upload-icon">
+                                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                                        <path d="M10 13V4M6 8l4-4 4 4" stroke="#6B7A8D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M3 14v2a1 1 0 001 1h12a1 1 0 001-1v-2" stroke="#6B7A8D" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="upload-lbl">Click to upload or drag &amp; drop</div>
+                                <div class="upload-sub">JPG, PNG or PDF · Max 5MB</div>
+                                <div class="upload-fname" id="uploadFname"></div>
+                            </div>
+                            <span class="fhint">Front and back must be visible if applicable.</span>
+                        </div>
+                    </div>
+
+                    <div class="cta-row">
+                        <button type="button" class="btn-primary" onclick="goToReview()">
+                            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Review &amp; Submit
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             P5 · REVIEW
+        ═══════════════════════════════════════ -->
+        <div class="page" id="p-review">
+            <div class="card">
+                <div class="hd-nav">
+                    <button type="button" class="btn-back" onclick="goTo('p-form')">
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Back
+                    </button>
+                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
+                        <div class="brand-name">Secure<em>Doc</em></div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Details</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step now"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                </div>
+
+                <div class="bd">
+                    <div>
+                        <div class="sec-title">Review your request</div>
+                        <div class="sec-sub">Confirm all details are correct before submitting.</div>
+                    </div>
+
+                    <div class="review-list" id="reviewList"></div>
+
+                    <div class="notice">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
+                            <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
+                            <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
+                            <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
+                        </svg>
+                        <div class="notice-text">
+                            <strong>Ready to submit?</strong>
+                            By submitting you confirm all information is accurate. Falsification of documents is punishable by law.
+                        </div>
+                    </div>
+
+                    <div class="cta-row">
+                        <button type="button" class="btn-primary" onclick="submitRequest()">
+                            Submit Request
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             P6 · CONFIRMATION
+        ═══════════════════════════════════════ -->
+        <div class="page" id="p-confirm">
+            <div class="card">
+                <div class="hd">
+                    <div class="logo-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                            <path d="M14 3L5 7V14C5 18.97 9.02 23.57 14 24.93C18.98 23.57 23 18.97 23 14V7L14 3Z" fill="#0C3B6E"/>
+                            <path d="M9.5 14L12.5 17L18.5 11" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="tagline">Official Document Services</div>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Details</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Review</span></div>
+                    <div class="step-sep"></div>
+                    <div class="step now"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                </div>
+
+                <div class="bd" style="align-items:center">
+                    <div style="text-align:center;padding:8px 0 4px">
+                        <div class="confirm-icon">
+                            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+                                <path d="M8 16l5.5 5.5L24 10" stroke="#1A7A45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="confirm-title">Request Submitted!</div>
+                        <div class="confirm-sub">Your certificate request has been received. A confirmation and status updates will be sent to <strong id="confirmEmail" style="color:var(--navy)"></strong>.</div>
+                    </div>
+
+                    <div class="ref-badge" style="width:100%">
+                        <div>
+                            <div class="ref-lbl">Reference No.</div>
+                            <div class="ref-num" id="refNum">SC-2025-00000</div>
+                        </div>
+                        <button type="button" class="btn-ghost" onclick="copyRef()" id="btnCopy">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="6" y="6" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 10H3a1 1 0 01-1-1V3a1 1 0 011-1h6a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                            Copy
+                        </button>
+                    </div>
+
+                    <div class="notice" style="width:100%">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
+                            <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
+                            <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
+                            <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
+                        </svg>
+                        <div class="notice-text">
+                            <strong>Processing time: 3–5 business days</strong>
+                            Bring this reference number and your original valid ID when claiming your document at the office.
+                        </div>
+                    </div>
+
+                    <div class="cta-row" style="width:100%">
+                        <button type="button" class="btn-primary" onclick="startOver()">Make another request</button>
+                        <button type="button" class="btn-secondary" onclick="goToTrackFromConfirm()">Track status</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             P-TRACK · Track Request Status
+        ═══════════════════════════════════════ -->
+        <div class="page" id="p-track">
+            <div class="card">
+                <div class="hd-nav">
+                    <button type="button" class="btn-back" onclick="goTo('p-landing')">
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Back
+                    </button>
+                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
+                        <div class="brand-name">Secure<em>Doc</em></div>
+                    </div>
+                </div>
+
+                <div class="bd">
+                    <div>
+                        <div class="sec-title">Track your request</div>
+                        <div class="sec-sub">Enter the reference number from your confirmation to check the current status of your document request.</div>
+                    </div>
+
+                    <div class="fwrap">
+                        <label class="flabel" for="trackInput">Reference number <span class="req">*</span></label>
+                        <div class="track-input-row">
+                            <input type="text"
+                                   id="trackInput"
+                                   placeholder="e.g. SC-2025-00291"
+                                   oninput="onTrackInput()"
+                                   onkeydown="if(event.key==='Enter') doTrack()"
+                                   autocomplete="off"
+                                   style="text-transform:uppercase;letter-spacing:0.5px"/>
+                            <button type="button" class="btn-inline" id="btnTrack" disabled="disabled" onclick="doTrack()">
+                                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                                Check
+                            </button>
+                        </div>
+                        <span class="fhint">Format: SC-YYYY-NNNNN (found on your confirmation receipt)</span>
+                    </div>
+
+                    <div class="notice-error" id="trackErr" style="display:none">
+                        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
+                            <circle cx="8" cy="8" r="7" stroke="#C0392B" stroke-width="1.3"/>
+                            <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
+                            <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
+                        </svg>
+                        Reference number not found. Please check and try again.
+                    </div>
+
+                    <div id="trackResult" style="display:none">
+                        <div class="track-status-banner" id="trackBanner">
+                            <div class="track-status-icon" id="trackIcon"></div>
+                            <div style="flex:1">
+                                <div class="track-status-label" id="trackStatusLabel"></div>
+                                <div class="track-status-desc"  id="trackStatusDesc"></div>
+                            </div>
+                        </div>
+
+                        <div class="review-list" style="margin-top:14px">
+                            <div class="review-item">
+                                <span class="rv-key">Reference No.</span>
+                                <span class="rv-val" id="trackRefDisplay" style="font-family:'DM Serif Display',serif;font-size:14px;letter-spacing:0.5px"></span>
+                            </div>
+                            <div class="review-item">
+                                <span class="rv-key">Document Type</span>
+                                <span class="rv-val" id="trackDocType"></span>
+                            </div>
+                            <div class="review-item">
+                                <span class="rv-key">Date Submitted</span>
+                                <span class="rv-val" id="trackSubmitted"></span>
+                            </div>
+                            <div class="review-item" id="trackLastUpdateRow">
+                                <span class="rv-key">Last Updated</span>
+                                <span class="rv-val" id="trackLastUpdate"></span>
+                            </div>
+                        </div>
+
+                        <div class="notice" id="trackNotice" style="margin-top:14px">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
+                                <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
+                                <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
+                                <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
+                            </svg>
+                            <div class="notice-text" id="trackNoticeText"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

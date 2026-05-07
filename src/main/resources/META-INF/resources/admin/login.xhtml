@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/admin-auth-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>Sign In – SecureDoc Admin</title>
+    </ui:define>
+
+    <ui:define name="formContent">
+        <h:form id="loginForm">
+
+            <!-- ══ Sign-in panel ══ -->
+            <p:outputPanel id="signinPanel"
+                           rendered="#{empty authBean or not authBean.otpSent}"
+                           layout="block"
+                           styleClass="auth-panel">
+
+                <div>
+                    <div class="auth-step-title">Sign in</div>
+                    <div class="auth-step-sub">
+                        Enter your admin credentials to continue.
+                    </div>
+                </div>
+
+                <p:outputLabel for="email"
+                               styleClass="af-label"
+                               value="Email address"/>
+                <p:inputText id="email"
+                             value="#{empty authBean ? '' : authBean.email}"
+                             type="email"
+                             placeholder="admin@securedoc.gov.ph"
+                             styleClass="ui-inputfield"
+                             required="true"
+                             requiredMessage="Email is required."/>
+                <p:message for="email"/>
+
+                <p:outputLabel for="password"
+                               styleClass="af-label"
+                               value="Password"/>
+                <p:password id="password"
+                            value="#{empty authBean ? '' : authBean.password}"
+                            placeholder="••••••••"
+                            feedback="false"
+                            toggleMask="true"
+                            styleClass="ui-inputfield"
+                            required="true"
+                            requiredMessage="Password is required."/>
+                <p:message for="password"/>
+
+                <p:commandButton value="Continue"
+                                 styleClass="af-btn"
+                                 iconPos="right"
+                                 action="/admin/dashboard.xhtml?faces-redirect=true"
+                                 ajax="false"
+                                 process="@this"/>
+
+                <div class="auth-footer-link">
+                    Don't have an account?&#160;
+                    <h:link outcome="register">Create one</h:link>
+                </div>
+
+            </p:outputPanel>
+
+            <!-- ══ OTP panel ══ -->
+            <p:outputPanel id="otpPanel"
+                           rendered="#{not empty authBean and authBean.otpSent}"
+                           layout="block"
+                           styleClass="auth-panel">
+
+                <div>
+                    <p:commandButton styleClass="auth-back-link"
+                                     action="#{authBean.cancelOtp}"
+                                     update="loginForm"
+                                     ajax="true"
+                                     immediate="true">
+                        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                            <path d="M9 2L4 7l5 5" stroke="currentColor"
+                                  stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                        </svg>
+                        &#160;Back
+                    </p:commandButton>
+                    <div class="auth-step-title">Verify it's you</div>
+                    <div class="auth-step-sub">
+                        We sent a 6-digit code to
+                        <strong style="color:var(--navy)">
+                            <h:outputText value="#{authBean.email}"/>
+                        </strong>.
+                        Enter it below to continue.
+                    </div>
+                </div>
+
+                <p:inputText id="otpInput"
+                             value="#{authBean.otpInput}"
+                             maxlength="6"
+                             placeholder="• • • • • •"
+                             styleClass="ui-inputfield"
+                             style="text-align:center;letter-spacing:8px;
+                                font-family:'DM Serif Display',serif;
+                                font-size:26px;width:100%"/>
+                <p:message for="otpInput"/>
+
+                <p:messages styleClass="af-error"
+                            globalOnly="true"
+                            showSummary="true"
+                            showDetail="false"/>
+
+                <div class="otp-resend">
+                    Didn't receive it?&#160;
+                    <p:commandButton value="Resend code"
+                                     style="background:none;border:none;
+                                        color:var(--navy-mid);font-weight:500;
+                                        font-size:12px;text-decoration:underline;
+                                        cursor:pointer;padding:0"
+                                     action="#{authBean.resendOtp}"
+                                     update="loginForm"
+                                     immediate="true"
+                                     ajax="true"/>
+                </div>
+
+                <p:commandButton value="Verify &amp; Sign In"
+                                 styleClass="af-btn"
+                                 action="#{authBean.verifyOtp}"
+                                 ajax="false"
+                                 process="loginForm:otpInput"/>
+
+            </p:outputPanel>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

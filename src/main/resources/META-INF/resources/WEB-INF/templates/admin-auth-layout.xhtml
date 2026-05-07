@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets"
+      lang="en">
+
+<h:head>
+    <f:facet name="first">
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </f:facet>
+
+    <ui:insert name="pageTitle">
+        <title>Admin Console – SecureDoc</title>
+    </ui:insert>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&amp;display=swap"
+          rel="stylesheet"/>
+
+    <h:outputStylesheet library="css" name="global.css"/>
+    <h:outputStylesheet library="css" name="admin.css"/>
+
+    <ui:insert name="extraStyles"/>
+</h:head>
+
+<h:body>
+    <div class="auth-scene">
+        <div class="auth-wrap">
+
+            <!-- ══ Brand panel ══ -->
+            <p:outputPanel styleClass="auth-brand" layout="block">
+
+                <!-- Logo -->
+                <p:outputPanel styleClass="auth-brand-logo" layout="block">
+                    <p:outputPanel styleClass="auth-brand-icon" layout="block">
+                        <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                            <path d="M14 3L5 7V14C5 18.97 9.02 23.57 14 24.93
+                             C18.98 23.57 23 18.97 23 14V7L14 3Z" fill="#0C3B6E"/>
+                            <path d="M9.5 14L12.5 17L18.5 11" stroke="#fff" stroke-width="2"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </p:outputPanel>
+                    <p:outputPanel layout="block">
+                        <span class="brand-name">Secure<em>Doc</em></span><br/>
+                        <p:outputLabel styleClass="auth-brand-tag" value="Admin Console"/>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <!-- Body -->
+                <p:outputPanel styleClass="auth-brand-body" layout="block">
+                    <p:outputPanel layout="block">
+                <span class="auth-brand-headline">
+                    Document management, <em>simplified.</em>
+                </span>
+                        <p:outputLabel styleClass="auth-brand-desc"
+                                       style="display:block;margin-top:12px"
+                                       value="Authorized access only. All activity is logged and monitored."/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="auth-brand-features" layout="block">
+                        <p:outputPanel styleClass="auth-feature" layout="block">
+                            <p:outputLabel styleClass="auth-feature-text"
+                                           value="• Review and approve document requests"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="auth-feature" layout="block">
+                            <p:outputLabel styleClass="auth-feature-text"
+                                           value="• Manage official document templates"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="auth-feature" layout="block">
+                            <p:outputLabel styleClass="auth-feature-text"
+                                           value="• Generate and export operational reports"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="auth-feature" layout="block">
+                            <p:outputLabel styleClass="auth-feature-text"
+                                           value="• Audit trail of all admin actions"/>
+                        </p:outputPanel>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <!-- Footer -->
+                <p:outputLabel styleClass="auth-brand-footer"
+                               value="&#169; 2026 SecureDoc | All Rights Reserved"/>
+
+            </p:outputPanel>
+
+            <!-- ══ Form panel ══ -->
+            <p:outputPanel styleClass="auth-form-panel" layout="block">
+                <ui:insert name="formContent"/>
+            </p:outputPanel>
+
+        </div>
+    </div>
+</h:body>
+</html>
