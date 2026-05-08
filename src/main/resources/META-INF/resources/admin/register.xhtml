@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/admin-auth-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>Create Account – SecureDoc Admin</title>
+    </ui:define>
+
+    <ui:define name="formContent">
+        <h:form id="registerForm">
+
+            <p:outputPanel id="registerPanel"
+                           layout="block"
+                           styleClass="auth-panel">
+
+                <div>
+                    <div class="auth-step-title">Create an account</div>
+                    <div class="auth-step-sub">
+                        Set up your admin profile to manage document requests.
+                    </div>
+                </div>
+
+                <p:outputLabel for="firstName"
+                               styleClass="af-label"
+                               value="First name"/>
+                <p:inputText id="firstName"
+                             value="#{registerBean.firstName}"
+                             placeholder="Juan"
+                             styleClass="ui-inputfield"
+                             required="true"
+                             requiredMessage="First name is required."/>
+                <p:message for="firstName"/>
+
+                <p:outputLabel for="lastName"
+                               styleClass="af-label"
+                               value="Last name"/>
+                <p:inputText id="lastName"
+                             value="#{registerBean.lastName}"
+                             placeholder="Dela Cruz"
+                             styleClass="ui-inputfield"
+                             required="true"
+                             requiredMessage="Last name is required."/>
+                <p:message for="lastName"/>
+
+                <p:outputLabel for="email"
+                               styleClass="af-label"
+                               value="Email address"/>
+                <p:inputText id="email"
+                             value="#{registerBean.email}"
+                             type="email"
+                             placeholder="admin@securedoc.gov.ph"
+                             styleClass="ui-inputfield"
+                             required="true"
+                             requiredMessage="Email is required."/>
+                <p:message for="email"/>
+
+                <p:outputLabel for="barangayId"
+                               styleClass="af-label"
+                               value="Barangay"/>
+                <h:selectOneMenu id="barangayId"
+                                 value="#{registerBean.barangayId}"
+                                 styleClass="ui-inputfield"
+                                 required="true"
+                                 requiredMessage="Please select your barangay.">
+                    <f:selectItem itemValue="#{null}"
+                                  itemLabel="Select your barangay…"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{systemConfigBean.barangays}"
+                                   var="b"
+                                   itemValue="#{b.id}"
+                                   itemLabel="#{b.name}"/>
+                </h:selectOneMenu>
+                <p:message for="barangayId"/>
+
+                <p:outputLabel for="password"
+                               styleClass="af-label"
+                               value="Password"/>
+                <p:password id="password"
+                            value="#{registerBean.password}"
+                            placeholder="••••••••"
+                            feedback="false"
+                            toggleMask="true"
+                            styleClass="ui-inputfield"
+                            required="true"
+                            requiredMessage="Password is required."/>
+                <p:message for="password"/>
+
+                <p:outputLabel for="confirmPassword"
+                               styleClass="af-label"
+                               value="Confirm password"/>
+                <p:password id="confirmPassword"
+                            value="#{registerBean.confirmPassword}"
+                            placeholder="••••••••"
+                            feedback="false"
+                            toggleMask="true"
+                            styleClass="ui-inputfield"
+                            required="true"
+                            requiredMessage="Please confirm your password."/>
+                <p:message for="confirmPassword"/>
+
+                <p:messages globalOnly="true"
+                            showSummary="true"
+                            showDetail="false"/>
+
+                <p:commandButton value="Create Account"
+                                 styleClass="af-btn"
+                                 action="#{registerBean.register}"
+                                 update="registerForm"
+                                 process="@form"/>
+
+                <div class="auth-footer-link">
+                    Already have an account?&#160;
+                    <h:link outcome="login">Sign in</h:link>
+                </div>
+
+            </p:outputPanel>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

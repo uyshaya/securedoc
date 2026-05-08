@@ -14,7 +14,7 @@
 
             <!-- ══ Sign-in panel ══ -->
             <p:outputPanel id="signinPanel"
-                           rendered="#{empty authBean or not authBean.otpSent}"
+                           rendered="#{not authBean.otpSent}"
                            layout="block"
                            styleClass="auth-panel">
 
@@ -29,33 +29,31 @@
                                styleClass="af-label"
                                value="Email address"/>
                 <p:inputText id="email"
-                             value="#{empty authBean ? '' : authBean.email}"
+                             value="#{authBean.email}"
                              type="email"
                              placeholder="admin@securedoc.gov.ph"
-                             styleClass="ui-inputfield"
-                             required="true"
-                             requiredMessage="Email is required."/>
-                <p:message for="email"/>
+                             styleClass="ui-inputfield"/>
 
                 <p:outputLabel for="password"
                                styleClass="af-label"
                                value="Password"/>
                 <p:password id="password"
-                            value="#{empty authBean ? '' : authBean.password}"
+                            value="#{authBean.password}"
                             placeholder="••••••••"
                             feedback="false"
                             toggleMask="true"
-                            styleClass="ui-inputfield"
-                            required="true"
-                            requiredMessage="Password is required."/>
-                <p:message for="password"/>
+                            styleClass="ui-inputfield"/>
+
+                <p:messages globalOnly="true"
+                            showSummary="true"
+                            showDetail="false"/>
 
                 <p:commandButton value="Continue"
                                  styleClass="af-btn"
                                  iconPos="right"
-                                 action="/admin/dashboard.xhtml?faces-redirect=true"
-                                 ajax="false"
-                                 process="@this"/>
+                                 action="#{authBean.signIn}"
+                                 update="loginForm"
+                                 process="@form"/>
 
                 <div class="auth-footer-link">
                     Don't have an account?&#160;
@@ -66,23 +64,18 @@
 
             <!-- ══ OTP panel ══ -->
             <p:outputPanel id="otpPanel"
-                           rendered="#{not empty authBean and authBean.otpSent}"
+                           rendered="#{authBean.otpSent}"
                            layout="block"
                            styleClass="auth-panel">
 
                 <div>
                     <p:commandButton styleClass="auth-back-link"
+                                     icon="pi pi-angle-left"
+                                     value="Back"
                                      action="#{authBean.cancelOtp}"
                                      update="loginForm"
                                      ajax="true"
-                                     immediate="true">
-                        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                            <path d="M9 2L4 7l5 5" stroke="currentColor"
-                                  stroke-width="1.5" stroke-linecap="round"
-                                  stroke-linejoin="round"/>
-                        </svg>
-                        &#160;Back
-                    </p:commandButton>
+                                     immediate="true"/>
                     <div class="auth-step-title">Verify it's you</div>
                     <div class="auth-step-sub">
                         We sent a 6-digit code to
@@ -93,20 +86,64 @@
                     </div>
                 </div>
 
-                <p:inputText id="otpInput"
-                             value="#{authBean.otpInput}"
-                             maxlength="6"
-                             placeholder="• • • • • •"
-                             styleClass="ui-inputfield"
-                             style="text-align:center;letter-spacing:8px;
-                                font-family:'DM Serif Display',serif;
-                                font-size:26px;width:100%"/>
-                <p:message for="otpInput"/>
-
-                <p:messages styleClass="af-error"
-                            globalOnly="true"
+                <div class="otp-row">
+                    <input type="text" class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+                    <input type="text" class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+                    <input type="text" class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+                    <input type="text" class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+                    <input type="text" class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+                    <input type="text" class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+                </div>
+                <h:inputHidden id="otpInput" value="#{authBean.otpInput}"/>
+                <p:messages globalOnly="true"
                             showSummary="true"
                             showDetail="false"/>
+
+                <script>
+                    //<![CDATA[
+                    (function () {
+                        var cells = document.querySelectorAll('#loginForm .otp-cell');
+                        var hidden = document.getElementById('loginForm:otpInput');
+                        if (!cells.length || !hidden) return;
+
+                        function sync() {
+                            hidden.value = Array.prototype.map.call(cells, function (c) { return c.value || ''; }).join('');
+                        }
+
+                        Array.prototype.forEach.call(cells, function (c, i) {
+                            c.addEventListener('input', function (e) {
+                                var v = e.target.value.replace(/\D/g, '');
+                                c.value = v ? v.slice(-1) : '';
+                                if (c.value) {
+                                    c.classList.add('filled');
+                                    if (i < cells.length - 1) cells[i + 1].focus();
+                                } else {
+                                    c.classList.remove('filled');
+                                }
+                                sync();
+                            });
+                            c.addEventListener('keydown', function (e) {
+                                if (e.key === 'Backspace' && !c.value && i > 0) cells[i - 1].focus();
+                                if (e.key === 'ArrowLeft' && i > 0) cells[i - 1].focus();
+                                if (e.key === 'ArrowRight' && i < cells.length - 1) cells[i + 1].focus();
+                            });
+                            c.addEventListener('paste', function (e) {
+                                e.preventDefault();
+                                var pasted = (e.clipboardData || window.clipboardData).getData('text')
+                                    .replace(/\D/g, '').slice(0, cells.length);
+                                for (var j = 0; j < pasted.length; j++) {
+                                    cells[j].value = pasted[j];
+                                    cells[j].classList.add('filled');
+                                }
+                                sync();
+                                if (pasted.length > 0) {
+                                    cells[Math.min(pasted.length, cells.length - 1)].focus();
+                                }
+                            });
+                        });
+                    })();
+                    //]]>
+                </script>
 
                 <div class="otp-resend">
                     Didn't receive it?&#160;
@@ -124,8 +161,8 @@
                 <p:commandButton value="Verify &amp; Sign In"
                                  styleClass="af-btn"
                                  action="#{authBean.verifyOtp}"
-                                 ajax="false"
-                                 process="loginForm:otpInput"/>
+                                 update="loginForm"
+                                 process="@form"/>
 
             </p:outputPanel>
 
