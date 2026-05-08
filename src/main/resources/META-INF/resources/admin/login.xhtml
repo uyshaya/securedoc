@@ -25,6 +25,12 @@
                     </div>
                 </div>
 
+                <h:panelGroup layout="block"
+                              styleClass="af-error"
+                              rendered="#{param.expired == '1'}">
+                    Your session expired. Please sign in again.
+                </h:panelGroup>
+
                 <p:outputLabel for="email"
                                styleClass="af-label"
                                value="Email address"/>
@@ -82,7 +88,7 @@
                         <strong style="color:var(--navy)">
                             <h:outputText value="#{authBean.email}"/>
                         </strong>.
-                        Enter it below to continue.
+                        #{msg['otp.expiry.info']}
                     </div>
                 </div>
 

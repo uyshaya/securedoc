@@ -43,4 +43,9 @@
         <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
 
+    <!-- Inactivity timeout — drops the HTTP session after 15 minutes of no requests. Check AdminAuthFilter.java -->
+    <session-config>
+        <session-timeout>15</session-timeout>
+    </session-config>
+
 </web-app>
