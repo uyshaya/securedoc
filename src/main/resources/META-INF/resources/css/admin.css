@@ -277,29 +277,36 @@ html, body {
     background: transparent !important;
 }
 
-/* ── OTP ── */
-.ui-inputotp {
-    gap: 8px;
+/* ── OTP (custom 6-cell row, mirrors request.css) ── */
+.otp-row {
+    display: flex;
+    gap: 10px;
     justify-content: center;
 }
 
-.ui-inputotp-input {
-    width: 50px !important;
-    height: 56px !important;
+.otp-cell {
+    width: 50px;
+    height: 56px;
     background: var(--white);
-    border: 0.5px solid #C2CDD9 !important;
-    border-radius: 10px !important;
-    font-family: 'DM Serif Display', serif !important;
-    font-size: 26px !important;
-    color: var(--navy) !important;
+    border: 0.5px solid #C2CDD9;
+    border-radius: 10px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--navy);
     text-align: center;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
     caret-color: var(--navy-mid);
-    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.ui-inputotp-input:focus {
-    border-color: var(--navy-mid) !important;
-    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.12) !important;
+.otp-cell:focus {
+    outline: none;
+    border-color: var(--navy-mid);
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.12);
+}
+
+.otp-cell.filled {
+    background: var(--blue-tint);
+    border-color: var(--blue-bdr);
 }
 
 .otp-resend {
