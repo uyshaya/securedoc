@@ -1,6 +1,6 @@
 package com.oppshan.securedoc.bean;
 
-import com.oppshan.securedoc.service.AuthService;
+import com.oppshan.securedoc.service.AdminAuthService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -11,18 +11,18 @@ import org.jboss.logging.Logger;
 /**
  * Backs /admin/register.xhtml. Self-service staff registration:
  * collects basic fields + the applicant's barangay, validates, hashes
- * the password (via {@link AuthService} → PasswordService), and
+ * the password (via {@link AdminAuthService} → PasswordService), and
  * persists the Staff row with {@code is_active = false}.
  *
  * <p>An admin must approve the account (flip the flag) before sign-in
- * is allowed; that's enforced in {@code AuthBean.signIn()}.
+ * is allowed; that's enforced in {@code AdminAuthBean.signIn}.
  */
-@Named
+@Named("registerBean")
 @RequestScoped
-public class RegisterBean {
+public class AdminRegistrationBean {
 
     @Inject
-    private AuthService authService;
+    private AdminAuthService authService;
 
     @Inject
     private SystemConfigBean system;

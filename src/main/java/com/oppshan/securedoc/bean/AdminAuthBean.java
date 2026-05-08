@@ -1,7 +1,7 @@
 package com.oppshan.securedoc.bean;
 
 import com.oppshan.securedoc.model.Staff;
-import com.oppshan.securedoc.service.AuthService;
+import com.oppshan.securedoc.service.AdminAuthService;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -17,15 +17,15 @@ import java.util.Optional;
  * <p>
  * email + password -> email otp -> /admin/dashboard
  */
-@Named
+@Named("authBean")
 @SessionScoped
-public class AuthBean implements Serializable {
+public class AdminAuthBean implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Inject
-    transient AuthService authService;
+    transient AdminAuthService authService;
 
     @Inject
     BarangayBean barangayBean;
@@ -39,7 +39,6 @@ public class AuthBean implements Serializable {
     private Long authenticatedId;  // set after successful OTP verify
 
     // ── step 1: email + password ──────────────────────────────────
-
     public String signIn() {
         FacesContext fc = FacesContext.getCurrentInstance();
 
@@ -81,7 +80,6 @@ public class AuthBean implements Serializable {
     }
 
     // ── step 2: OTP ───────────────────────────────────────────────
-
     public String verifyOtp() {
         FacesContext fc = FacesContext.getCurrentInstance();
 

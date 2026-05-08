@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @ApplicationScoped
-public class AuthService {
+public class AdminAuthService {
 
     private static final int OTP_VALIDITY_MINUTES = 5;
     private static final int MAX_OTP_ATTEMPTS = 5;
