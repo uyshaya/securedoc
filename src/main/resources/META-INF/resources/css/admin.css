@@ -589,6 +589,33 @@ html, body {
     letter-spacing: 0.5px;
 }
 
+.console-signout-btn.ui-button {
+    background: transparent !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.16) !important;
+    color: rgba(255, 255, 255, 0.78) !important;
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 12px !important;
+    box-shadow: none !important;
+}
+
+.console-signout-btn.ui-button:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--white) !important;
+    border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* PrimeFaces button icon spans get both .ui-icon and .pi classes; a
+   .ui-icon rule from the theme wins on specificity over .pi and drops
+   font-family back to the body font, rendering icons as tofu. */
+.ui-button > .ui-button-icon-left.pi,
+.ui-button > .ui-button-icon-right.pi,
+.ui-button > .ui-button-icon-only.pi {
+    font-family: "primeicons" !important;
+    text-indent: 0 !important;
+    overflow: visible !important;
+}
+
 /* ── Main content ── */
 .console-main {
     flex: 1;

@@ -31,6 +31,12 @@
                     Your session expired. Please sign in again.
                 </h:panelGroup>
 
+                <h:panelGroup layout="block"
+                              styleClass="af-error"
+                              rendered="#{param.inactive == '1'}">
+                    Your account has been deactivated. Contact your barangay administrator.
+                </h:panelGroup>
+
                 <p:outputLabel for="email"
                                styleClass="af-label"
                                value="Email address"/>

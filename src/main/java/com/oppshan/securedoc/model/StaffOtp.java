@@ -12,9 +12,12 @@ import java.util.Objects;
 public class StaffOtp implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4225984107533782641L;
 
-    public enum Type {LOGIN, PASSWORD_RESET}
+    public enum Type {
+        LOGIN,
+        PASSWORD_RESET
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

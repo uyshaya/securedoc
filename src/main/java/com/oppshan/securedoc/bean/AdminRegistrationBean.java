@@ -1,5 +1,6 @@
 package com.oppshan.securedoc.bean;
 
+import com.oppshan.securedoc.dto.StaffRegistrationCreate;
 import com.oppshan.securedoc.service.AdminAuthService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
@@ -70,7 +71,13 @@ public class AdminRegistrationBean {
         }
 
         try {
-            authService.createStaff(firstName, lastName, email, password, barangayId);
+            StaffRegistrationCreate form = new StaffRegistrationCreate();
+            form.setFirstName(firstName);
+            form.setLastName(lastName);
+            form.setEmail(email);
+            form.setPassword(password);
+            form.setBarangayId(barangayId);
+            authService.createStaff(form);
         } catch (RuntimeException e) {
             fc.addMessage(null, error("Could not create account: " + e.getMessage()));
             return null;

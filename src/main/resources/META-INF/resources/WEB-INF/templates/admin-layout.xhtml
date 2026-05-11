@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
       xmlns:ui="jakarta.faces.facelets"
       lang="en">
 
@@ -19,6 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&amp;display=swap"
           rel="stylesheet"/>
 
+    <h:outputStylesheet library="primefaces" name="primeicons/primeicons.css"/>
     <h:outputStylesheet library="css" name="global.css"/>
     <h:outputStylesheet library="css" name="admin.css"/>
 
@@ -49,53 +51,47 @@
                 <ui:insert name="navItems">
                     <h:link outcome="/admin/dashboard" styleClass="console-nav-item">
                         <span class="console-nav-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 12L12 4l9 8M5 10v10h14V10"
-                                      stroke="currentColor" stroke-width="1.6"
-                                      stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <i class="pi pi-home"></i>
                         </span>
                         Dashboard
                     </h:link>
                     <h:link outcome="/admin/requests" styleClass="console-nav-item">
                         <span class="console-nav-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <rect x="5" y="3" width="14" height="18" rx="2"
-                                      stroke="currentColor" stroke-width="1.6"/>
-                                <path d="M9 8h6M9 12h6M9 16h4"
-                                      stroke="currentColor" stroke-width="1.5"
-                                      stroke-linecap="round"/>
-                            </svg>
+                            <i class="pi pi-inbox"></i>
                         </span>
                         Requests
                     </h:link>
                     <h:link outcome="/admin/templates" styleClass="console-nav-item">
                         <span class="console-nav-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M4 6h16M4 12h16M4 18h10"
-                                      stroke="currentColor" stroke-width="1.6"
-                                      stroke-linecap="round"/>
-                            </svg>
+                            <i class="pi pi-file-edit"></i>
                         </span>
                         Templates
                     </h:link>
                     <h:link outcome="/admin/audit" styleClass="console-nav-item">
                         <span class="console-nav-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="9"
-                                        stroke="currentColor" stroke-width="1.6"/>
-                                <path d="M12 7v5l3 2"
-                                      stroke="currentColor" stroke-width="1.6"
-                                      stroke-linecap="round"/>
-                            </svg>
+                            <i class="pi pi-history"></i>
                         </span>
                         Audit Log
+                    </h:link>
+                    <h:link outcome="/admin/staff/staff-management" styleClass="console-nav-item"
+                            rendered="#{authBean.admin}">
+                        <span class="console-nav-icon">
+                            <i class="pi pi-users"></i>
+                        </span>
+                        Staff
                     </h:link>
                 </ui:insert>
             </nav>
 
             <div class="console-sidebar-footer">
                 <ui:insert name="sidebarFooter">
+                    <h:form id="signOutForm">
+                        <p:commandButton value="Sign out"
+                                         icon="pi pi-sign-out"
+                                         action="#{authBean.signOut}"
+                                         ajax="false"
+                                         styleClass="console-signout-btn"/>
+                    </h:form>
                     <span class="console-version">v1.0.0</span>
                 </ui:insert>
             </div>
