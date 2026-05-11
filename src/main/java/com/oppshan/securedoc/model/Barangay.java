@@ -1,5 +1,6 @@
 package com.oppshan.securedoc.model;
 
+import com.oppshan.securedoc.dto.BarangayView;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -113,6 +114,10 @@ public class Barangay implements Serializable {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public BarangayView toView() {
+        return new BarangayView(id, name, code, address);
     }
 
     @Override

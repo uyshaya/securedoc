@@ -1,6 +1,6 @@
 package com.oppshan.securedoc.bean;
 
-import com.oppshan.securedoc.model.Barangay;
+import com.oppshan.securedoc.dto.BarangayView;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -18,18 +18,18 @@ public class BarangayBean implements Serializable {
     @Inject
     SystemConfigBean system;
 
-    private Barangay active;
+    private BarangayView active;
 
-    public Barangay getActive() {
+    public BarangayView getActive() {
         return active;
     }
 
-    public void setActive(Barangay barangay) {
+    public void setActive(BarangayView barangay) {
         this.active = barangay;
     }
 
     public boolean selectById(Long id) {
-        Barangay found = system.findById(id);
+        BarangayView found = system.findById(id);
         if (found == null) {
             return false;
         }

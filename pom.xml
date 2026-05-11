@@ -65,6 +65,15 @@
             <artifactId>quarkus-hibernate-orm</artifactId>
         </dependency>
 
+        <!-- Jakarta Data API — Hibernate ORM 7 generates the repository
+             impls at compile time via hibernate-jpamodelgen (annotation
+             processor wired below in maven-compiler-plugin). -->
+        <dependency>
+            <groupId>jakarta.data</groupId>
+            <artifactId>jakarta.data-api</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
         <!-- MySQL JDBC driver -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -131,6 +140,13 @@
                 <version>${compiler-plugin.version}</version>
                 <configuration>
                     <parameters>true</parameters>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.hibernate.orm</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>7.1.4.Final</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>

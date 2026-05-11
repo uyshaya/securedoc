@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/admin-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>Staff Management – SecureDoc Admin</title>
+    </ui:define>
+
+    <ui:define name="pageHeader">
+        <h1 class="console-page-title">Staff Management</h1>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:messages globalOnly="true" showSummary="true" showDetail="false" closable="true"/>
+
+        <h:form id="staffForm">
+
+            <p:dataTable id="staffTable"
+                         value="#{staffManagementBean.staffList}"
+                         var="s"
+                         emptyMessage="No staff in this barangay yet.">
+
+                <p:column headerText="Name">
+                    <h:outputText value="#{s.fullName}"/>
+                </p:column>
+
+                <p:column headerText="Email">
+                    <h:outputText value="#{s.email}"/>
+                </p:column>
+
+                <p:column headerText="Role">
+                    <p:selectOneMenu value="#{s.role}"
+                                     disabled="#{s.id == authBean.authenticatedId}">
+                        <f:selectItems value="#{staffManagementBean.roleOptions}"/>
+                        <p:ajax listener="#{staffManagementBean.changeRole(s)}"
+                                update="staffForm"/>
+                    </p:selectOneMenu>
+                </p:column>
+
+                <p:column headerText="Status">
+                    <h:outputText value="#{s.isActive ? 'Active' : 'Pending / Inactive'}"
+                                  style="color:#{s.isActive ? 'var(--green)' : 'var(--tx-m)'}"/>
+                </p:column>
+
+                <p:column headerText="Actions" style="white-space:nowrap">
+                    <p:commandButton value="#{s.isActive ? 'Deactivate' : 'Approve'}"
+                                     action="#{staffManagementBean.toggleActive(s)}"
+                                     update="staffForm"
+                                     process="@this"
+                                     icon="#{s.isActive ? 'pi pi-ban' : 'pi pi-check'}"
+                                     styleClass="ui-button-flat"/>
+
+                    <p:commandButton value="Delete"
+                                     action="#{staffManagementBean.deleteStaff(s)}"
+                                     update="staffForm"
+                                     process="@this"
+                                     icon="pi pi-trash"
+                                     styleClass="ui-button-flat"
+                                     rendered="#{s.id != authBean.authenticatedId}"
+                                     onclick="return confirm('Delete #{s.fullName}? This cannot be undone.');"/>
+                </p:column>
+            </p:dataTable>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

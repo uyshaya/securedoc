@@ -1,6 +1,6 @@
 package com.oppshan.securedoc.bean;
 
-import com.oppshan.securedoc.model.Barangay;
+import com.oppshan.securedoc.dto.BarangayView;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -23,25 +23,25 @@ public class SystemConfigBean {
     // @ConfigProperty(name = "securedoc.crypto.ecdsa.private-key-path")
     // String ecdsaPrivateKeyPath;
 
-    private final List<Barangay> barangays = new CopyOnWriteArrayList<>();
+    private final List<BarangayView> barangays = new CopyOnWriteArrayList<>();
 
     @PostConstruct
     void init() {
         // TODO: replace with DB-backed loading once the Barangay table is populated.
-        barangays.add(new Barangay(1L, "Brgy. Apas", "AP-001", "Cebu City"));
-        barangays.add(new Barangay(2L, "Brgy. Maligaya", "MA-002", "Caloocan City"));
-        barangays.add(new Barangay(3L, "Brgy. Bagumbayan", "BA-003", "Manila"));
+        barangays.add(new BarangayView(1L, "Brgy. Apas", "AP-001", "Cebu City"));
+        barangays.add(new BarangayView(2L, "Brgy. Maligaya", "MA-002", "Caloocan City"));
+        barangays.add(new BarangayView(3L, "Brgy. Bagumbayan", "BA-003", "Manila"));
     }
 
-    public List<Barangay> getBarangays() {
+    public List<BarangayView> getBarangays() {
         return List.copyOf(barangays);
     }
 
-    public Barangay findById(Long id) {
+    public BarangayView findById(Long id) {
         if (id == null) {
             return null;
         }
-        for (Barangay b : barangays) {
+        for (BarangayView b : barangays) {
             if (id.equals(b.getId())) return b;
         }
         return null;

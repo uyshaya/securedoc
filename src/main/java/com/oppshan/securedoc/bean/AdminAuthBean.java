@@ -1,5 +1,6 @@
 package com.oppshan.securedoc.bean;
 
+import com.oppshan.securedoc.dto.StaffView;
 import com.oppshan.securedoc.model.Staff;
 import com.oppshan.securedoc.service.AdminAuthService;
 import jakarta.enterprise.context.SessionScoped;
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class AdminAuthBean implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1052852303714482777L;
 
     @Inject
     transient AdminAuthService authService;
@@ -37,6 +38,7 @@ public class AdminAuthBean implements Serializable {
     private boolean otpSent;
     private Long pendingStaffId;   // set after step 1, cleared after step 2
     private Long authenticatedId;  // set after successful OTP verify
+    private Staff.Role role;       // cached at successful OTP verify
 
     // ── step 1: email + password ──────────────────────────────────
     public String signIn() {
@@ -47,19 +49,19 @@ public class AdminAuthBean implements Serializable {
             return null;
         }
 
-        Optional<Staff> match = authService.findByEmail(email);
-        if (match.isEmpty() || !authService.verifyPassword(match.get(), password)) {
+        Optional<StaffView> match = authService.authenticate(email, password);
+        if (match.isEmpty()) {
             fc.addMessage(null, error("Email or password is invalid."));
             return null;
         }
 
-        Staff staff = match.get();
+        StaffView staff = match.get();
         if (!Boolean.TRUE.equals(staff.getIsActive())) {
             fc.addMessage(null, error("Account is inactive. Contact your barangay administrator."));
             return null;
         }
 
-        authService.issueLoginOtp(staff);
+        authService.issueLoginOtp(staff.getId());
         this.pendingStaffId = staff.getId();
         this.password = null;          // clear plaintext from session
         this.otpInput = null;
@@ -75,7 +77,7 @@ public class AdminAuthBean implements Serializable {
 
     public void resendOtp() {
         if (pendingStaffId == null) return;
-        authService.findById(pendingStaffId).ifPresent(authService::issueLoginOtp);
+        authService.issueLoginOtp(pendingStaffId);
         this.otpInput = null;
     }
 
@@ -95,20 +97,21 @@ public class AdminAuthBean implements Serializable {
             return null;
         }
 
-        Optional<Staff> match = authService.findById(pendingStaffId);
+        Optional<StaffView> match = authService.findById(pendingStaffId);
         if (match.isEmpty()) {
             fc.addMessage(null, error("Account no longer exists."));
             cancelOtp();
             return null;
         }
 
-        Staff staff = match.get();
+        StaffView staff = match.get();
         authService.recordLogin(staff.getId());
 
         // Promote: set the active barangay for this session and remember
         // who we are. Forget the pending step.
-        barangayBean.setActive(staff.getBarangay());
+        barangayBean.selectById(staff.getBarangayId());
         this.authenticatedId = staff.getId();
+        this.role = staff.getRole();
         this.pendingStaffId = null;
         this.otpSent = false;
         this.otpInput = null;
@@ -123,6 +126,7 @@ public class AdminAuthBean implements Serializable {
         this.otpSent = false;
         this.pendingStaffId = null;
         this.authenticatedId = null;
+        this.role = null;
         barangayBean.clear();
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "/admin/login.xhtml?faces-redirect=true";
@@ -130,6 +134,37 @@ public class AdminAuthBean implements Serializable {
 
     public boolean isAuthenticated() {
         return authenticatedId != null;
+    }
+
+    /**
+     * Re-reads the persisted Staff row and refreshes the cached role.
+     * Returns false if the account no longer exists or has been
+     * deactivated — in that case the bean self-clears its authenticated
+     * state so the caller (typically {@code AdminAuthFilter}) can
+     * bounce the request to login.
+     */
+    public boolean refreshFromDb() {
+        if (authenticatedId == null) return false;
+        Optional<StaffView> match = authService.findById(authenticatedId);
+        if (match.isEmpty() || !Boolean.TRUE.equals(match.get().getIsActive())) {
+            this.authenticatedId = null;
+            this.role = null;
+            return false;
+        }
+        this.role = match.get().getRole();
+        return true;
+    }
+
+    public boolean isAdmin() {
+        return role == Staff.Role.ADMIN;
+    }
+
+    public Staff.Role getRole() {
+        return role;
+    }
+
+    public Long getAuthenticatedId() {
+        return authenticatedId;
     }
 
     // ── getters / setters ─────────────────────────────────────────

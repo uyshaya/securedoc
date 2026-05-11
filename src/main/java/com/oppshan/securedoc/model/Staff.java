@@ -1,17 +1,8 @@
 package com.oppshan.securedoc.model;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Converter;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.oppshan.securedoc.dto.StaffRegistrationView;
+import com.oppshan.securedoc.dto.StaffView;
+import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,9 +14,12 @@ import java.util.Objects;
 public class Staff implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1130888729109415175L;
 
-    public enum Role {STAFF, ADMIN}
+    public enum Role {
+        ADMIN,
+        STAFF
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -169,6 +163,32 @@ public class Staff implements Serializable {
             sb.append(lastName.trim());
         }
         return sb.toString();
+    }
+
+    public StaffView toView() {
+        StaffView view = new StaffView();
+        view.setId(id);
+        view.setFirstName(firstName);
+        view.setMiddleName(middleName);
+        view.setLastName(lastName);
+        view.setFullName(getFullName());
+        view.setEmail(email);
+        view.setRole(role);
+        view.setIsActive(isActive);
+        view.setBarangayId(barangay != null ? barangay.getId() : null);
+        view.setLastLogin(lastLogin);
+        return view;
+    }
+
+    /** Narrow projection — just enough to confirm the persisted registration. */
+    public StaffRegistrationView toRegistrationView() {
+        StaffRegistrationView view = new StaffRegistrationView();
+        view.setId(id);
+        view.setFullName(getFullName());
+        view.setEmail(email);
+        view.setBarangayId(barangay != null ? barangay.getId() : null);
+        view.setIsActive(isActive);
+        return view;
     }
 
     @Override
