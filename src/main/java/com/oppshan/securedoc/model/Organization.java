@@ -1,6 +1,6 @@
 package com.oppshan.securedoc.model;
 
-import com.oppshan.securedoc.dto.BarangayView;
+import com.oppshan.securedoc.dto.OrganizationView;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -8,16 +8,34 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Tenant root. A single deployment hosts one organization type
+ * (barangay, school, city, …) selected via the
+ * {@code securedoc.org.active-type} application property; the
+ * {@link Type} discriminator on each row keeps the table open
+ * to additional types being added without a schema rewrite.
+ */
 @Entity
-@Table(name = "barangays")
-public class Barangay implements Serializable {
+@Table(name = "organizations")
+public class Organization implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 2723256079779038097L;
 
+    public enum Type {
+        BARANGAY,
+        SCHOOL,
+        CITY
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Convert(converter = TypeConverter.class)
+    @Column(nullable = false,
+            columnDefinition = "ENUM('barangay','school','city') NOT NULL DEFAULT 'barangay'")
+    private Type type = Type.BARANGAY;
 
     @Column(nullable = false)
     private String name;
@@ -42,11 +60,12 @@ public class Barangay implements Serializable {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
-    public Barangay() {
+    public Organization() {
     }
 
-    public Barangay(Long id, String name, String code, String address) {
+    public Organization(Long id, Type type, String name, String code, String address) {
         this.id = id;
+        this.type = type;
         this.name = name;
         this.code = code;
         this.address = address;
@@ -58,6 +77,14 @@ public class Barangay implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public String getName() {
@@ -116,8 +143,8 @@ public class Barangay implements Serializable {
         return updatedAt;
     }
 
-    public BarangayView toView() {
-        return new BarangayView(id, name, code, address);
+    public OrganizationView toView() {
+        return new OrganizationView(id, type, name, code, address);
     }
 
     @Override
@@ -125,10 +152,10 @@ public class Barangay implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Barangay)) {
+        if (!(o instanceof Organization)) {
             return false;
         }
-        return Objects.equals(id, ((Barangay) o).id);
+        return Objects.equals(id, ((Organization) o).id);
     }
 
     @Override
@@ -139,5 +166,24 @@ public class Barangay implements Serializable {
     @Override
     public String toString() {
         return name + " (" + code + ")";
+    }
+
+    /**
+     * Bridges the Java {@link Type} (uppercase, JVM convention) with the
+     * lowercase MySQL ENUM('barangay','school','city') in the
+     * organizations.type column. Mirrors {@code Staff.RoleConverter}.
+     */
+    @Converter
+    public static class TypeConverter implements AttributeConverter<Type, String> {
+
+        @Override
+        public String convertToDatabaseColumn(Type type) {
+            return type == null ? null : type.name().toLowerCase();
+        }
+
+        @Override
+        public Type convertToEntityAttribute(String s) {
+            return s == null ? null : Type.valueOf(s.toUpperCase());
+        }
     }
 }

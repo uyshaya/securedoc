@@ -1,6 +1,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
                 xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/resident-layout.xhtml">
 
@@ -57,25 +58,60 @@
 
                     <hr class="div"/>
 
-                    <div class="fwrap">
-                        <label class="flabel" for="certType">Certificate type</label>
-                        <select id="certType" onchange="onCertChange()">
-                            <option value="" disabled="disabled" selected="selected">Select a certificate type…</option>
-                            <optgroup label="Barangay Documents">
-                                <option value="brgy-clearance">Barangay Clearance</option>
-                                <option value="brgy-residency">Certificate of Residency</option>
-                                <option value="brgy-indigency">Certificate of Indigency</option>
-                            </optgroup>
-                        </select>
-                        <span class="cert-hint" id="certHint">Choose the document you need to request.</span>
-                    </div>
+                    <h:form id="landingForm">
+                        <div class="fwrap">
+                            <label class="flabel" for="orgPicker">#{systemConfigBean.orgLabel}</label>
+                            <p:autoComplete id="orgPicker"
+                                            value="#{requestBean.selectedOrganization}"
+                                            completeMethod="#{requestBean.completeOrganization}"
+                                            converter="organizationConverter"
+                                            var="o"
+                                            itemLabel="#{o.name}"
+                                            itemValue="#{o}"
+                                            forceSelection="true"
+                                            minQueryLength="2"
+                                            queryDelay="200"
+                                            placeholder="Search your #{systemConfigBean.orgLabelLower} by name or code…">
+                                <p:ajax event="itemSelect"
+                                        listener="#{requestBean.onOrganizationSelected}"
+                                        update="certTypeWrap"/>
+                                <p:ajax event="clear"
+                                        listener="#{requestBean.onOrganizationSelected}"
+                                        update="certTypeWrap"/>
+                            </p:autoComplete>
+                            <span class="cert-hint">Pick the office that will issue your document.</span>
+                        </div>
 
-                    <div class="cta-row">
-                        <button type="button" class="btn-primary" id="btnProceed" disabled="disabled" onclick="goToEmail()">
-                            Proceed to Request
-                        </button>
-                        <button type="button" class="btn-secondary" onclick="goTo('p-track')">Track request</button>
-                    </div>
+                        <h:panelGroup layout="block" styleClass="fwrap" id="certTypeWrap">
+                            <label class="flabel" for="certType">Certificate type</label>
+                            <h:selectOneMenu id="certType"
+                                             value="#{requestBean.selectedTemplateId}"
+                                             disabled="#{requestBean.selectedOrganization == null}">
+                                <f:selectItem itemValue="#{null}"
+                                              itemLabel="#{requestBean.certTypePlaceholder}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{requestBean.availableTemplates}"
+                                               var="t"
+                                               itemValue="#{t.id}"
+                                               itemLabel="#{t.name}"/>
+                            </h:selectOneMenu>
+                            <span class="cert-hint">Choose the document you need to request.</span>
+                        </h:panelGroup>
+
+                        <p:messages globalOnly="true"
+                                    showSummary="true"
+                                    showDetail="false"/>
+
+                        <div class="cta-row">
+                            <p:commandButton value="Proceed to Request"
+                                             styleClass="btn-primary"
+                                             action="#{requestBean.proceedFromLanding}"
+                                             process="@form"
+                                             update="@form"
+                                             oncomplete="if (args &amp;&amp; !args.validationFailed) { populateFromLanding(); goTo('p-email'); }"/>
+                            <button type="button" class="btn-secondary" onclick="goTo('p-track')">Track request</button>
+                        </div>
+                    </h:form>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>

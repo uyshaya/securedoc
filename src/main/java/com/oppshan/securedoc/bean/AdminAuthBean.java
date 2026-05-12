@@ -29,7 +29,10 @@ public class AdminAuthBean implements Serializable {
     transient AdminAuthService authService;
 
     @Inject
-    BarangayBean barangayBean;
+    OrganizationBean organizationBean;
+
+    @Inject
+    SystemConfigBean system;
 
     private String email;
     private String password;
@@ -57,7 +60,7 @@ public class AdminAuthBean implements Serializable {
 
         StaffView staff = match.get();
         if (!Boolean.TRUE.equals(staff.getIsActive())) {
-            fc.addMessage(null, error("Account is inactive. Contact your barangay administrator."));
+            fc.addMessage(null, error("Account is inactive. Contact your " + system.getOrgLabelLower() + " administrator."));
             return null;
         }
 
@@ -107,9 +110,9 @@ public class AdminAuthBean implements Serializable {
         StaffView staff = match.get();
         authService.recordLogin(staff.getId());
 
-        // Promote: set the active barangay for this session and remember
+        // Promote: set the active organization for this session and remember
         // who we are. Forget the pending step.
-        barangayBean.selectById(staff.getBarangayId());
+        organizationBean.selectById(staff.getOrganizationId());
         this.authenticatedId = staff.getId();
         this.role = staff.getRole();
         this.pendingStaffId = null;
@@ -127,7 +130,7 @@ public class AdminAuthBean implements Serializable {
         this.pendingStaffId = null;
         this.authenticatedId = null;
         this.role = null;
-        barangayBean.clear();
+        organizationBean.clear();
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "/admin/login.xhtml?faces-redirect=true";
     }

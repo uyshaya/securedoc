@@ -34,7 +34,7 @@
                 <h:panelGroup layout="block"
                               styleClass="af-error"
                               rendered="#{param.inactive == '1'}">
-                    Your account has been deactivated. Contact your barangay administrator.
+                    Your account has been deactivated. Contact your #{systemConfigBean.orgLabelLower} administrator.
                 </h:panelGroup>
 
                 <p:outputLabel for="email"

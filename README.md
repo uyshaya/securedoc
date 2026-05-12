@@ -5,9 +5,9 @@
 
 ## Overview
 
-**SecureDoc** is a web-based system designed to modernize and secure the document issuance and verification processes of barangay offices in the Philippines. It addresses the widespread reliance on paper-based workflows that are vulnerable to forgery, loss, and inefficiency — replacing them with a unified digital platform backed by cryptographic security.
+**SecureDoc** is a web-based system designed to modernize and secure the document issuance and verification processes of organizations (initially Philippine barangay offices; extensible to schools, cities, and other tenant types). It addresses the widespread reliance on paper-based workflows that are vulnerable to forgery, loss, and inefficiency — replacing them with a unified digital platform backed by cryptographic security.
 
-The system's core innovation is a **tamper-evident verification portal** that allows any third party (employers, government agencies, institutions) to authenticate a barangay-issued document's integrity and confirm the legitimacy of the issuing entity — **without requiring user registration**.
+The system's core innovation is a **tamper-evident verification portal** that allows any third party (employers, government agencies, institutions) to authenticate an organization-issued document's integrity and confirm the legitimacy of the issuing entity — **without requiring user registration**.
 
 ---
 
@@ -145,9 +145,11 @@ SecureDoc/
 ## Database Schema (Core Tables)
 
 ```sql
-staff                  -- Barangay staff accounts
+organizations          -- Tenant root (barangay/school/city) — discriminated by `type`
+staff                  -- Organization staff accounts (FK organization_id)
 staff_otps             -- OTP records for two-factor login
-document_requests      -- Resident document requests
+org_certificates       -- Per-organization signing certificate metadata
+document_requests      -- Resident document requests (FK organization_id)
 document_templates     -- Issuable document types and layouts
 issued_documents       -- Finalized, cryptographically signed documents
 verification_log       -- Audit trail of all third-party verification attempts
