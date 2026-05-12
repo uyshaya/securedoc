@@ -22,7 +22,7 @@
             <p:dataTable id="staffTable"
                          value="#{staffManagementBean.staffList}"
                          var="s"
-                         emptyMessage="No staff in this barangay yet.">
+                         emptyMessage="No staff in this #{systemConfigBean.orgLabelLower} yet.">
 
                 <p:column headerText="Name">
                     <h:outputText value="#{s.fullName}"/>

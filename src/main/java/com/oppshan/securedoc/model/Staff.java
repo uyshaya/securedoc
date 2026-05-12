@@ -26,8 +26,8 @@ public class Staff implements Serializable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "barangay_id", nullable = false)
-    private Barangay barangay;
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
 
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
@@ -71,12 +71,12 @@ public class Staff implements Serializable {
         this.id = id;
     }
 
-    public Barangay getBarangay() {
-        return barangay;
+    public Organization getOrganization() {
+        return organization;
     }
 
-    public void setBarangay(Barangay barangay) {
-        this.barangay = barangay;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public String getFirstName() {
@@ -175,7 +175,7 @@ public class Staff implements Serializable {
         view.setEmail(email);
         view.setRole(role);
         view.setIsActive(isActive);
-        view.setBarangayId(barangay != null ? barangay.getId() : null);
+        view.setOrganizationId(organization != null ? organization.getId() : null);
         view.setLastLogin(lastLogin);
         return view;
     }
@@ -186,7 +186,7 @@ public class Staff implements Serializable {
         view.setId(id);
         view.setFullName(getFullName());
         view.setEmail(email);
-        view.setBarangayId(barangay != null ? barangay.getId() : null);
+        view.setOrganizationId(organization != null ? organization.getId() : null);
         view.setIsActive(isActive);
         return view;
     }

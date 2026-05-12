@@ -19,7 +19,7 @@ public class StaffRegistrationCreate implements Serializable {
     private String lastName;
     private String email;
     private String password;
-    private Long barangayId;
+    private Long organizationId;
 
     public StaffRegistrationCreate() {
     }
@@ -56,11 +56,11 @@ public class StaffRegistrationCreate implements Serializable {
         this.password = password;
     }
 
-    public Long getBarangayId() {
-        return barangayId;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setBarangayId(Long barangayId) {
-        this.barangayId = barangayId;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 }

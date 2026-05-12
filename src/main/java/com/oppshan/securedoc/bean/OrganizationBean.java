@@ -1,6 +1,6 @@
 package com.oppshan.securedoc.bean;
 
-import com.oppshan.securedoc.dto.BarangayView;
+import com.oppshan.securedoc.dto.OrganizationView;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Named
 @SessionScoped
-public class BarangayBean implements Serializable {
+public class OrganizationBean implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -4968282673847231166L;
@@ -18,18 +18,18 @@ public class BarangayBean implements Serializable {
     @Inject
     SystemConfigBean system;
 
-    private BarangayView active;
+    private OrganizationView active;
 
-    public BarangayView getActive() {
+    public OrganizationView getActive() {
         return active;
     }
 
-    public void setActive(BarangayView barangay) {
-        this.active = barangay;
+    public void setActive(OrganizationView organization) {
+        this.active = organization;
     }
 
     public boolean selectById(Long id) {
-        BarangayView found = system.findById(id);
+        OrganizationView found = system.findOrganizationById(id);
         if (found == null) {
             return false;
         }

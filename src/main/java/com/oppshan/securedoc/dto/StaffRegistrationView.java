@@ -17,7 +17,7 @@ public class StaffRegistrationView implements Serializable {
     private Long id;
     private String fullName;
     private String email;
-    private Long barangayId;
+    private Long organizationId;
     private Boolean isActive;
 
     public StaffRegistrationView() {
@@ -47,12 +47,12 @@ public class StaffRegistrationView implements Serializable {
         this.email = email;
     }
 
-    public Long getBarangayId() {
-        return barangayId;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setBarangayId(Long barangayId) {
-        this.barangayId = barangayId;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 
     public Boolean getIsActive() {

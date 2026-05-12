@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 
 /**
- * Admin-driven staff CRUD scoped to a single barangay. Self-service
+ * Admin-driven staff CRUD scoped to a single organization. Self-service
  * staff creation lives in {@link AdminAuthService#createStaff} (called
  * from {@code AdminRegistrationBean}); this service only handles
  * activation / deactivation and role / deletion changes for existing rows.
@@ -21,8 +21,8 @@ public class StaffManagementService {
     @Inject
     StaffRepository staffRepo;
 
-    public List<StaffView> listByBarangay(Long barangayId) {
-        return staffRepo.listByBarangayId(barangayId).stream()
+    public List<StaffView> listByOrganization(Long organizationId) {
+        return staffRepo.listByOrganizationId(organizationId).stream()
                 .map(Staff::toView)
                 .toList();
     }

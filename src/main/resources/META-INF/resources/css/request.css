@@ -716,6 +716,132 @@ textarea {
     box-shadow: none;
 }
 
+/* ─── PrimeFaces saga override ─── */
+.ui-button.btn-primary,
+.ui-button.btn-primary.ui-state-default {
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    border: none !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+.ui-button.btn-primary:enabled:hover,
+.ui-button.btn-primary.ui-state-hover {
+    background: var(--navy-mid) !important;
+    box-shadow: 0 4px 16px rgba(12, 59, 110, 0.2) !important;
+}
+
+.ui-button.btn-primary:enabled:active,
+.ui-button.btn-primary.ui-state-active {
+    background: var(--navy-mid) !important;
+    transform: scale(0.98);
+}
+
+.ui-button.btn-primary:enabled:focus,
+.ui-button.btn-primary.ui-state-focus {
+    background: var(--navy) !important;
+    box-shadow: 0 0 0 3px rgba(12, 59, 110, 0.25) !important;
+    outline: none !important;
+}
+
+.ui-button.btn-primary:disabled,
+.ui-button.btn-primary.ui-state-disabled {
+    background: #A0ADB8 !important;
+    color: var(--white) !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+.ui-button.btn-primary .ui-button-text {
+    color: var(--white) !important;
+    padding: 0 !important;
+}
+
+/* ─── PrimeFaces saga override: theme.css ships ~1rem (≈16px) on inputs
+       and dropdown panels, update to 13.5px scale. */
+.ui-inputfield,
+.ui-autocomplete-input,
+.ui-autocomplete-panel,
+.ui-autocomplete-panel .ui-autocomplete-item,
+.ui-messages,
+.ui-messages-error-summary,
+.ui-messages-info-summary,
+select {
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 13.5px !important;
+}
+
+.ui-autocomplete-input {
+    width: 100% !important;
+    background: var(--white) !important;
+    border: 0.5px solid #C2CDD9 !important;
+    border-radius: var(--r-sm) !important;
+    padding: 11px 13px !important;
+    color: var(--tx-1) !important;
+}
+
+.ui-autocomplete-input:focus {
+    outline: none !important;
+    border-color: var(--navy-mid) !important;
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1) !important;
+}
+
+/* AutoComplete suggestion panel. */
+.ui-autocomplete-panel {
+    border: 0.5px solid var(--border) !important;
+    border-radius: var(--r-sm) !important;
+    box-shadow: 0 6px 18px rgba(12, 59, 110, 0.08) !important;
+}
+
+.ui-autocomplete-panel .ui-autocomplete-item {
+    padding: 9px 13px !important;
+    color: var(--tx-1) !important;
+}
+
+.ui-autocomplete-panel .ui-autocomplete-item:hover,
+.ui-autocomplete-panel .ui-autocomplete-item.ui-state-highlight {
+    background: var(--blue-tint) !important;
+    color: var(--navy) !important;
+}
+
+/* ─── p:messages — match the admin's minimal inline red-text error style
+       (admin.css :470). The default saga rendering is a chunky banner; we
+       want a quiet inline hint that sits above the submit button. */
+.ui-messages,
+.ui-message {
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+.ui-message-error,
+.ui-messages-error {
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 12px !important;
+    color: #7F1D1D !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 2px 0 0 !important;
+    margin: 0 !important;
+}
+
+.ui-messages-error ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.ui-messages-error-summary {
+    color: #7F1D1D !important;
+    font-weight: 500 !important;
+}
+
+/* Hide the default close icon */
+.ui-messages-close {
+    display: none !important;
+}
+
 .btn-secondary {
     background: transparent;
     color: #5A6A7A;
@@ -812,6 +938,7 @@ textarea {
     font-size: 12px;
     color: var(--tx-f);
     min-height: 16px;
+    margin-bottom: 16px;
 }
 
 @media (max-width: 480px) {

@@ -319,3 +319,32 @@ html, body {
         display: none;
     }
 }
+
+/* Shared PrimeFaces overrides */
+
+body .ui-selectonemenu {
+    border: none;
+}
+
+/* Shrink the saga severity icons (PrimeIcons font) so they don't
+   dwarf the message text. Default is ~2em (≈24px). */
+.ui-messages-error-icon,
+.ui-messages-info-icon {
+    font-size: 15px !important;
+    width: 12px !important;
+    height: 12px !important;
+    line-height: 1 !important;
+    margin-right: 7px !important;
+    vertical-align: middle !important;
+}
+
+/* Strip the saga info-banner panel chrome so info messages render as
+   inline text (mirrors the error treatment used in request.css /
+   admin.css). Text color is left to each portal's stylesheet. */
+.ui-message-info,
+.ui-messages-info {
+    background: transparent !important;
+    border: none !important;
+    padding: 2px 0 0 !important;
+    margin: 0 !important;
+}

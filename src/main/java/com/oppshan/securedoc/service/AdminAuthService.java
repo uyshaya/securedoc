@@ -3,10 +3,10 @@ package com.oppshan.securedoc.service;
 import com.oppshan.securedoc.dto.StaffRegistrationCreate;
 import com.oppshan.securedoc.dto.StaffRegistrationView;
 import com.oppshan.securedoc.dto.StaffView;
-import com.oppshan.securedoc.model.Barangay;
+import com.oppshan.securedoc.model.Organization;
 import com.oppshan.securedoc.model.Staff;
 import com.oppshan.securedoc.model.StaffOtp;
-import com.oppshan.securedoc.repository.BarangayRepository;
+import com.oppshan.securedoc.repository.OrganizationRepository;
 import com.oppshan.securedoc.repository.StaffOtpRepository;
 import com.oppshan.securedoc.repository.StaffRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -30,7 +30,7 @@ public class AdminAuthService {
     StaffOtpRepository otpRepo;
 
     @Inject
-    BarangayRepository barangayRepo;
+    OrganizationRepository organizationRepo;
 
     @Inject
     PasswordService passwordService;
@@ -124,25 +124,25 @@ public class AdminAuthService {
 
     // ── Registration ─────────────────────────────────────────────
 
-    public boolean emailTakenInBarangay(String email, Long barangayId) {
-        return staffRepo.countByEmailAndBarangayId(email, barangayId) > 0;
+    public boolean emailTakenInOrganization(String email, Long organizationId) {
+        return staffRepo.countByEmailAndOrganizationId(email, organizationId) > 0;
     }
 
     /**
      * Creates a self-service staff registration. The row is persisted with
-     * {@code is_active = false} so a barangay administrator must approve
-     * the account before sign-in is accepted.
+     * {@code is_active = false} so an organization administrator must
+     * approve the account before sign-in is accepted.
      */
     @Transactional
     public StaffRegistrationView createStaff(StaffRegistrationCreate form) {
-        Barangay barangay = barangayRepo.findById(form.getBarangayId())
-                .orElseThrow(() -> new IllegalArgumentException("Unknown barangay: " + form.getBarangayId()));
+        Organization organization = organizationRepo.findById(form.getOrganizationId())
+                .orElseThrow(() -> new IllegalArgumentException("Unknown organization: " + form.getOrganizationId()));
         Staff staff = new Staff();
         staff.setFirstName(form.getFirstName().trim());
         staff.setLastName(form.getLastName().trim());
         staff.setEmail(form.getEmail().trim());
         staff.setPasswordHash(passwordService.hash(form.getPassword()));
-        staff.setBarangay(barangay);
+        staff.setOrganization(organization);
         staff.setRole(Staff.Role.STAFF);
         staff.setIsActive(Boolean.FALSE);   // pending admin approval
         staffRepo.save(staff);

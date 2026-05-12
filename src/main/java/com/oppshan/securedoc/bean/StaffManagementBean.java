@@ -33,7 +33,7 @@ public class StaffManagementBean implements Serializable {
     StaffManagementService service;
 
     @Inject
-    BarangayBean barangayBean;
+    OrganizationBean organizationBean;
 
     private List<StaffView> staffList;
 
@@ -43,8 +43,8 @@ public class StaffManagementBean implements Serializable {
     }
 
     private void reload() {
-        Long bid = barangayBean.getActiveId();
-        staffList = service.listByBarangay(bid);
+        Long orgId = organizationBean.getActiveId();
+        staffList = service.listByOrganization(orgId);
     }
 
     public void toggleActive(StaffView s) {

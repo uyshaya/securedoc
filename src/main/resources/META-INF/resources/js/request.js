@@ -11,12 +11,6 @@ const hints = {
   'late-reg': 'Registration of a civil event recorded past the deadline.',
 };
 
-function onCertChange() {
-  const v = document.getElementById('certType').value;
-  document.getElementById('btnProceed').disabled = !v;
-  document.getElementById('certHint').textContent = v ? hints[v] : 'Choose the document you need to request.';
-}
-
 /* ─ NAVIGATION ─ */
 function goTo(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -24,12 +18,21 @@ function goTo(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function goToEmail() {
-  const sel = document.getElementById('certType');
-  const opt = sel.options[sel.selectedIndex];
-  document.getElementById('formCertName').textContent = opt.text;
-  document.getElementById('formCertCat').textContent = opt.closest('optgroup')?.label || '—';
-  goTo('p-email');
+/* Called from the JSF p:commandButton oncomplete on the landing scene.
+   Pulls the picked cert + org from the JSF-rendered DOM and writes them
+   into the static display elements on the later Details scene. */
+function populateFromLanding() {
+  const sel = document.getElementById('landingForm:certType');
+  if (sel) {
+    const opt = sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+    if (opt && opt.value) {
+      document.getElementById('formCertName').textContent = opt.text;
+    }
+  }
+  const orgInput = document.getElementById('landingForm:orgPicker_input');
+  if (orgInput && orgInput.value) {
+    document.getElementById('formCertCat').textContent = orgInput.value;
+  }
 }
 
 /* ─ EMAIL STEP ─ */
@@ -168,8 +171,8 @@ function onFileSelected(e) {
 
 /* ─ REVIEW STEP ─ */
 function goToReview() {
-  const sel = document.getElementById('certType');
-  const opt = sel.options[sel.selectedIndex];
+  const sel = document.getElementById('landingForm:certType');
+  const opt = sel && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
   const purposeSel = document.getElementById('fPurpose');
   const purposeOpt = purposeSel.options[purposeSel.selectedIndex];
   const idSel = document.getElementById('fIdType');
@@ -182,7 +185,7 @@ function goToReview() {
   ].filter(Boolean).join(' ') || '—';
 
   const rows = [
-    { k: 'Certificate Type', v: opt.text },
+    { k: 'Certificate Type', v: opt ? opt.text : '—' },
     { k: 'Full Name', v: fullName },
     { k: 'Date of Birth', v: fmtDate(document.getElementById('fDob').value) },
     { k: 'Sex', v: document.getElementById('fSex').value === 'M' ? 'Male' : document.getElementById('fSex').value === 'F' ? 'Female' : '—' },
@@ -229,9 +232,10 @@ function copyRef() {
 }
 
 function startOver() {
-  document.getElementById('certType').value = '';
-  document.getElementById('certHint').textContent = 'Choose the document you need to request.';
-  document.getElementById('btnProceed').disabled = true;
+  /* Reset just the landing-scene JSF dropdown DOM value; the session-scoped
+     RequestBean keeps its own state until the next AJAX postback overwrites it. */
+  const sel = document.getElementById('landingForm:certType');
+  if (sel) sel.selectedIndex = 0;
   resetOtp();
   goTo('p-landing');
 }

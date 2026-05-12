@@ -57,23 +57,24 @@
                              requiredMessage="Email is required."/>
                 <p:message for="email"/>
 
-                <p:outputLabel for="barangayId"
+                <p:outputLabel for="organization"
                                styleClass="af-label"
-                               value="Barangay"/>
-                <h:selectOneMenu id="barangayId"
-                                 value="#{registerBean.barangayId}"
-                                 styleClass="ui-inputfield"
-                                 required="true"
-                                 requiredMessage="Please select your barangay.">
-                    <f:selectItem itemValue="#{null}"
-                                  itemLabel="Select your barangay…"
-                                  noSelectionOption="true"/>
-                    <f:selectItems value="#{systemConfigBean.barangays}"
-                                   var="b"
-                                   itemValue="#{b.id}"
-                                   itemLabel="#{b.name}"/>
-                </h:selectOneMenu>
-                <p:message for="barangayId"/>
+                               value="#{systemConfigBean.orgLabel}"/>
+                <p:autoComplete id="organization"
+                                value="#{registerBean.selectedOrganization}"
+                                completeMethod="#{registerBean.completeOrganization}"
+                                converter="organizationConverter"
+                                var="o"
+                                itemLabel="#{o.name}"
+                                itemValue="#{o}"
+                                forceSelection="true"
+                                minQueryLength="2"
+                                queryDelay="200"
+                                placeholder="Search your #{systemConfigBean.orgLabelLower} by name or code…"
+                                styleClass="ui-inputfield"
+                                required="true"
+                                requiredMessage="Please select your #{systemConfigBean.orgLabelLower}."/>
+                <p:message for="organization"/>
 
                 <p:outputLabel for="password"
                                styleClass="af-label"

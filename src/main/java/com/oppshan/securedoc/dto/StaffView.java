@@ -25,7 +25,7 @@ public class StaffView implements Serializable {
     private String email;
     private Staff.Role role;
     private Boolean isActive;
-    private Long barangayId;
+    private Long organizationId;
     private LocalDateTime lastLogin;
 
     public StaffView() {
@@ -95,12 +95,12 @@ public class StaffView implements Serializable {
         this.isActive = isActive;
     }
 
-    public Long getBarangayId() {
-        return barangayId;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setBarangayId(Long barangayId) {
-        this.barangayId = barangayId;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
     }
 
     public LocalDateTime getLastLogin() {

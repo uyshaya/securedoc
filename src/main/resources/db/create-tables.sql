@@ -1,9 +1,11 @@
 USE securedoc;
 
---  1. BARANGAYS  (multi-tenant root — staff, templates, requests, etc. will scope to a barangay)
-CREATE TABLE barangays
+--  1. ORGANIZATIONS  (tenant root — staff, templates, requests, etc. scope to an organization;
+--                    `type` discriminates barangay/school/city so the schema is open to more tenant types)
+CREATE TABLE organizations
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    type           ENUM('barangay','school','city') NOT NULL DEFAULT 'barangay',
     name           VARCHAR(255) NOT NULL,
     code           VARCHAR(50)  NOT NULL UNIQUE,
     address        TEXT,
@@ -17,20 +19,20 @@ CREATE TABLE barangays
 --  2. STAFF / ADMIN
 CREATE TABLE staff
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    barangay_id   BIGINT       NOT NULL,
-    first_name    VARCHAR(100) NOT NULL,
-    middle_name   VARCHAR(100),
-    last_name     VARCHAR(100) NOT NULL,
-    email         VARCHAR(255) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    role          ENUM('staff', 'admin') DEFAULT 'staff',
-    is_active     BOOLEAN   DEFAULT TRUE,
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login    DATETIME,
-    UNIQUE (barangay_id, email),
-    FOREIGN KEY (barangay_id) REFERENCES barangays (id)
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT       NOT NULL,
+    first_name      VARCHAR(100) NOT NULL,
+    middle_name     VARCHAR(100),
+    last_name       VARCHAR(100) NOT NULL,
+    email           VARCHAR(255) NOT NULL,
+    password_hash   VARCHAR(255) NOT NULL,
+    role            ENUM('staff', 'admin') DEFAULT 'staff',
+    is_active       BOOLEAN   DEFAULT TRUE,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login      DATETIME,
+    UNIQUE (organization_id, email),
+    FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );
 
 --  3. STAFF OTP  (login 2FA)
@@ -47,7 +49,6 @@ CREATE TABLE staff_otps
     FOREIGN KEY (staff_id) REFERENCES staff (id) ON DELETE CASCADE
 );
 
-
 --  4. RESIDENT OTP  (email verification before submitting)
 CREATE TABLE resident_otps
 (
@@ -60,33 +61,37 @@ CREATE TABLE resident_otps
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---  5. ORGANIZATION CERTIFICATE
+--  5. ORGANIZATION CERTIFICATE  (per-organization signing keypair metadata; private keys live off-DB)
 CREATE TABLE org_certificates
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT       NOT NULL,
     issuer_name     VARCHAR(255) NOT NULL,
     serial_number   VARCHAR(255) NOT NULL UNIQUE,
     public_key      TEXT         NOT NULL, -- store public key separately for verifier portal
     certificate_pem TEXT         NOT NULL, -- certificate_pem (PEM format)
     expiry_date     DATETIME     NOT NULL,
     is_active       BOOLEAN   DEFAULT TRUE,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );
 
---  6. DOCUMENT TEMPLATES
+--  6. DOCUMENT TEMPLATES  (per-organization issuable types; one row per org × doc_type)
 CREATE TABLE document_templates
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    doc_type      ENUM('barangay_clearance',
-                       'certificate_of_residency',
-                       'certificate_of_indigency') NOT NULL,
-    name          VARCHAR(255) NOT NULL,
-    description   TEXT,
-    template_data LONGBLOB     NOT NULL,
-    mime_type     VARCHAR(50) DEFAULT 'application/pdf',
-    is_active     BOOLEAN     DEFAULT TRUE, -- allow deactivating old templates
-    created_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT       NOT NULL,
+    doc_type        ENUM('barangay_clearance',
+                         'certificate_of_residency',
+                         'certificate_of_indigency') NOT NULL,
+    name            VARCHAR(255) NOT NULL,
+    description     TEXT,
+    template_data   LONGBLOB     NOT NULL,
+    mime_type       VARCHAR(50) DEFAULT 'application/pdf',
+    is_active       BOOLEAN     DEFAULT TRUE, -- allow deactivating old templates
+    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );
 
 --  7. REQUESTERS  (resident personal info per submission)
@@ -109,7 +114,7 @@ CREATE TABLE requesters
 CREATE TABLE requests
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    barangay_id      BIGINT      NOT NULL,
+    organization_id  BIGINT      NOT NULL,
     reference_number VARCHAR(20) NOT NULL UNIQUE,
     requester_id     BIGINT      NOT NULL,
     template_id      BIGINT      NOT NULL,
@@ -124,7 +129,7 @@ CREATE TABLE requests
     request_note     TEXT,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (barangay_id) REFERENCES barangays (id),
+    FOREIGN KEY (organization_id) REFERENCES organizations (id),
     FOREIGN KEY (requester_id) REFERENCES requesters (id),
     FOREIGN KEY (template_id) REFERENCES document_templates (id),
     FOREIGN KEY (processed_by) REFERENCES staff (id)

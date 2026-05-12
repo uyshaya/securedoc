@@ -15,14 +15,14 @@ public interface StaffRepository extends BasicRepository<Staff, Long> {
     @Query("FROM Staff WHERE email = ?1")
     Optional<Staff> findByEmail(String email);
 
-    @Query("FROM Staff WHERE email = ?1 AND barangay.id = ?2")
-    Optional<Staff> findByEmailAndBarangayId(String email, Long barangayId);
+    @Query("FROM Staff WHERE email = ?1 AND organization.id = ?2")
+    Optional<Staff> findByEmailAndOrganizationId(String email, Long organizationId);
 
-    @Query("SELECT COUNT(s) FROM Staff s WHERE s.email = ?1 AND s.barangay.id = ?2")
-    long countByEmailAndBarangayId(String email, Long barangayId);
+    @Query("SELECT COUNT(s) FROM Staff s WHERE s.email = ?1 AND s.organization.id = ?2")
+    long countByEmailAndOrganizationId(String email, Long organizationId);
 
-    @Query("FROM Staff WHERE barangay.id = ?1 ORDER BY lastName, firstName")
-    List<Staff> listByBarangayId(Long barangayId);
+    @Query("FROM Staff WHERE organization.id = ?1 ORDER BY lastName, firstName")
+    List<Staff> listByOrganizationId(Long organizationId);
 
     @Query("UPDATE Staff SET lastLogin = ?2 WHERE id = ?1")
     int recordLogin(Long staffId, LocalDateTime when);

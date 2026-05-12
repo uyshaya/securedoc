@@ -1,5 +1,6 @@
 package com.oppshan.securedoc.bean;
 
+import com.oppshan.securedoc.dto.OrganizationView;
 import com.oppshan.securedoc.dto.StaffRegistrationCreate;
 import com.oppshan.securedoc.service.AdminAuthService;
 import jakarta.enterprise.context.RequestScoped;
@@ -9,11 +10,18 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.jboss.logging.Logger;
 
+import java.util.List;
+
 /**
  * Backs /admin/register.xhtml. Self-service staff registration:
- * collects basic fields + the applicant's barangay, validates, hashes
+ * collects basic fields + the applicant's organization, validates, hashes
  * the password (via {@link AdminAuthService} → PasswordService), and
  * persists the Staff row with {@code is_active = false}.
+ *
+ * <p>The organization picker is a {@code <p:autoComplete>} backed by
+ * {@link #completeOrganization(String)}; the bean holds the full
+ * {@link OrganizationView} so JSF can re-render the chosen label after
+ * validation failures.
  *
  * <p>An admin must approve the account (flip the flag) before sign-in
  * is allowed; that's enforced in {@code AdminAuthBean.signIn}.
@@ -36,9 +44,14 @@ public class AdminRegistrationBean {
     private String firstName;
     private String lastName;
     private String email;
-    private Long barangayId;
+    private OrganizationView selectedOrganization;
     private String password;
     private String confirmPassword;
+
+    /** Called by {@code <p:autoComplete completeMethod>} as the user types. */
+    public List<OrganizationView> completeOrganization(String query) {
+        return system.searchOrganizations(query);
+    }
 
     public String register() {
         FacesContext fc = FacesContext.getCurrentInstance();
@@ -49,9 +62,11 @@ public class AdminRegistrationBean {
             return null;
         }
 
-        logger.infof("Barangay ID: %s", barangayId);
-        if (barangayId == null) {
-            fc.addMessage(null, error("Please select your barangay."));
+        String orgLabelLower = system.getOrgLabelLower();
+        Long organizationId = selectedOrganization != null ? selectedOrganization.getId() : null;
+        logger.infof("Organization ID: %s", organizationId);
+        if (organizationId == null) {
+            fc.addMessage(null, error("Please select your " + orgLabelLower + "."));
             return null;
         }
 
@@ -65,8 +80,8 @@ public class AdminRegistrationBean {
             return null;
         }
 
-        if (authService.emailTakenInBarangay(email, barangayId)) {
-            fc.addMessage(null, error("An account with that email already exists for the selected barangay."));
+        if (authService.emailTakenInOrganization(email, organizationId)) {
+            fc.addMessage(null, error("An account with that email already exists for the selected " + orgLabelLower + "."));
             return null;
         }
 
@@ -76,7 +91,7 @@ public class AdminRegistrationBean {
             form.setLastName(lastName);
             form.setEmail(email);
             form.setPassword(password);
-            form.setBarangayId(barangayId);
+            form.setOrganizationId(organizationId);
             authService.createStaff(form);
         } catch (RuntimeException e) {
             fc.addMessage(null, error("Could not create account: " + e.getMessage()));
@@ -86,7 +101,7 @@ public class AdminRegistrationBean {
         // Account is persisted as inactive; an admin must approve before sign-in.
         fc.getExternalContext().getFlash().setKeepMessages(true);
         fc.addMessage(null, info(
-                "Account submitted for approval. You'll be able to sign in once a barangay administrator approves your account."));
+                "Account submitted for approval. You'll be able to sign in once a " + orgLabelLower + " administrator approves your account."));
         return "/admin/login.xhtml?faces-redirect=true";
     }
 
@@ -126,12 +141,12 @@ public class AdminRegistrationBean {
         this.email = email;
     }
 
-    public Long getBarangayId() {
-        return barangayId;
+    public OrganizationView getSelectedOrganization() {
+        return selectedOrganization;
     }
 
-    public void setBarangayId(Long barangayId) {
-        this.barangayId = barangayId;
+    public void setSelectedOrganization(OrganizationView selectedOrganization) {
+        this.selectedOrganization = selectedOrganization;
     }
 
     public String getPassword() {
