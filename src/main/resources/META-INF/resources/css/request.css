@@ -232,17 +232,6 @@ hr.div {
 }
 
 /* ─ FIELDS ─ */
-.fwrap {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.frow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
 
 .flabel {
     font-size: 12px;

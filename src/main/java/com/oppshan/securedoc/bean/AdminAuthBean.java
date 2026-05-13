@@ -42,6 +42,7 @@ public class AdminAuthBean implements Serializable {
     private Long pendingStaffId;   // set after step 1, cleared after step 2
     private Long authenticatedId;  // set after successful OTP verify
     private Staff.Role role;       // cached at successful OTP verify
+    private String fullName;       // cached for sidebar profile chip
 
     // ── step 1: email + password ──────────────────────────────────
     public String signIn() {
@@ -115,6 +116,7 @@ public class AdminAuthBean implements Serializable {
         organizationBean.selectById(staff.getOrganizationId());
         this.authenticatedId = staff.getId();
         this.role = staff.getRole();
+        this.fullName = staff.getFullName();
         this.pendingStaffId = null;
         this.otpSent = false;
         this.otpInput = null;
@@ -130,6 +132,7 @@ public class AdminAuthBean implements Serializable {
         this.pendingStaffId = null;
         this.authenticatedId = null;
         this.role = null;
+        this.fullName = null;
         organizationBean.clear();
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "/admin/login.xhtml?faces-redirect=true";
@@ -152,9 +155,11 @@ public class AdminAuthBean implements Serializable {
         if (match.isEmpty() || !Boolean.TRUE.equals(match.get().getIsActive())) {
             this.authenticatedId = null;
             this.role = null;
+            this.fullName = null;
             return false;
         }
         this.role = match.get().getRole();
+        this.fullName = match.get().getFullName();
         return true;
     }
 
@@ -168,6 +173,15 @@ public class AdminAuthBean implements Serializable {
 
     public Long getAuthenticatedId() {
         return authenticatedId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getRoleLabel() {
+        if (role == null) return "";
+        return role == Staff.Role.ADMIN ? "Admin" : "Staff";
     }
 
     // ── getters / setters ─────────────────────────────────────────

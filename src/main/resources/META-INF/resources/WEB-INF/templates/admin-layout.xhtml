@@ -28,6 +28,7 @@
 </h:head>
 
 <h:body styleClass="console-body">
+    <f:loadBundle basename="messages" var="msg"/>
     <div class="console">
 
         <!-- ══ Sidebar ══ -->
@@ -85,6 +86,17 @@
 
             <div class="console-sidebar-footer">
                 <ui:insert name="sidebarFooter">
+                    <h:panelGroup layout="block"
+                                  styleClass="console-profile"
+                                  rendered="#{authBean.authenticated}">
+                        <span class="console-profile-avatar">
+                            <i class="pi pi-user"></i>
+                        </span>
+                        <span class="console-profile-meta">
+                            <span class="console-profile-name">#{authBean.fullName}</span>
+                            <span class="console-profile-role">#{authBean.roleLabel}</span>
+                        </span>
+                    </h:panelGroup>
                     <h:form id="signOutForm">
                         <p:commandButton value="Sign out"
                                          icon="pi pi-sign-out"
@@ -92,7 +104,10 @@
                                          ajax="false"
                                          styleClass="console-signout-btn"/>
                     </h:form>
-                    <span class="console-version">v1.0.0</span>
+                    <div class="console-footer-meta">
+                        <span class="console-footer-text">#{msg['app.footer']}</span>
+                        <span class="console-version">v1.0.0</span>
+                    </div>
                 </ui:insert>
             </div>
         </aside>

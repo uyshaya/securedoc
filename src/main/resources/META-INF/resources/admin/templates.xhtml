@@ -1,6 +1,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
                 xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
@@ -9,11 +10,122 @@
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">Templates</h1>
+        <h1 class="console-page-title">Document Templates</h1>
     </ui:define>
 
     <ui:define name="content">
-        <p>Templates scaffold. Replace with template management UI.</p>
+
+        <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
+
+        <!-- ══ Upload card ══ -->
+        <h:form id="uploadForm" enctype="multipart/form-data">
+            <p:card styleClass="template-upload-card">
+                <f:facet name="title">Upload a new template</f:facet>
+                <f:facet name="subtitle">
+                    PDF only. Templates are scoped to your active
+                    #{systemConfigBean.orgLabelLower}.
+                </f:facet>
+
+                <div class="template-upload-grid">
+                    <div class="fwrap">
+                        <p:outputLabel for="templateName" value="Template name"/>
+                        <p:inputText id="templateName"
+                                     value="#{templateManagementBean.newName}"
+                                     placeholder="e.g. Barangay Apas Clearance"/>
+                    </div>
+
+                    <div class="fwrap">
+                        <p:outputLabel for="templateDocType" value="Certificate type"/>
+                        <p:selectOneMenu id="templateDocType"
+                                         value="#{templateManagementBean.newDocType}">
+                            <f:selectItem itemValue="#{null}"
+                                          itemLabel="Select a certificate type…"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{templateManagementBean.docTypeOptions}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="fwrap template-full-row">
+                        <p:outputLabel for="templateDescription" value="Description"/>
+                        <p:inputTextarea id="templateDescription"
+                                         value="#{templateManagementBean.newDescription}"
+                                         rows="2"
+                                         placeholder="Optional short note about this template version."/>
+                    </div>
+                </div>
+
+                <f:facet name="footer">
+                    <p:fileUpload id="templateFile"
+                                  value="#{templateManagementBean.newFile}"
+                                  mode="simple"
+                                  skinSimple="true"
+                                  accept="application/pdf,.pdf"
+                                  chooseIcon="pi pi-cloud-upload"
+                                  label="Choose PDF"/>
+                    <p:commandButton value="Save template"
+                                     icon="pi pi-save"
+                                     action="#{templateManagementBean.upload}"
+                                     ajax="false"
+                                     styleClass="btn-template-primary"/>
+                </f:facet>
+            </p:card>
+        </h:form>
+
+        <!-- ══ Templates table ══ -->
+        <h:form id="templateListForm">
+            <p:dataTable id="templateTable"
+                         value="#{templateManagementBean.templates}"
+                         var="template"
+                         emptyMessage="No templates yet for this #{systemConfigBean.orgLabelLower}. Upload one above.">
+
+                <p:column headerText="Name">
+                    <h:outputText value="#{template.name}" style="font-weight:500"/>
+                </p:column>
+
+                <p:column headerText="Certificate type">
+                    <h:outputText value="#{templateManagementBean.labelOf(template.docType)}"/>
+                </p:column>
+
+                <p:column headerText="Description">
+                    <h:outputText value="#{empty template.description ? '—' : template.description}"
+                                  style="color:var(--tx-m)"/>
+                </p:column>
+
+                <p:column headerText="Uploaded" style="white-space:nowrap">
+                    <h:outputText value="#{template.createdAt}">
+                        <f:convertDateTime type="localDateTime" pattern="MMM d, yyyy"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Actions" style="white-space:nowrap;width:220px">
+                    <p:button href="#{request.contextPath}/admin/templates/preview?id=#{template.id}"
+                              target="_blank"
+                              value="Preview"
+                              icon="pi pi-eye"
+                              styleClass="ui-button-flat"/>
+
+                    <p:commandButton value="Delete"
+                                     action="#{templateManagementBean.deleteTemplate(template)}"
+                                     update="templateListForm"
+                                     process="@this"
+                                     styleClass="ui-button-flat">
+                        <p:confirm header="Delete template"
+                                   message="Delete &quot;#{template.name}&quot;? This cannot be undone."/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <!-- Global confirm dialog wired by <p:confirm> delete button -->
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+            <p:commandButton value="Delete"
+                             type="button"
+                             styleClass="ui-confirmdialog-yes"/>
+            <p:commandButton value="Cancel"
+                             type="button"
+                             styleClass="ui-button-flat ui-confirmdialog-no"/>
+        </p:confirmDialog>
+
     </ui:define>
 
 </ui:composition>
