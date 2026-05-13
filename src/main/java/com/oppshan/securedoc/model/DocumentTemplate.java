@@ -12,8 +12,8 @@ import java.util.Objects;
  * Per-organization issuable document template. The dropdown on
  * /user/request.xhtml lists the active rows scoped to the picked
  * organization; the {@code template_data} BLOB is only read at
- * issuance, not for the picker — fetch is LAZY so listing the
- * dropdown doesn't pull MB-sized PDF bytes.
+ * issuance time and by the preview servlet. See the field's
+ * comment for why it's eagerly fetched.
  */
 @Entity
 @Table(name = "document_templates")
@@ -47,7 +47,12 @@ public class DocumentTemplate implements Serializable {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Basic(fetch = FetchType.LAZY)
+    // Eagerly loaded: Jakarta Data repos run on a StatelessSession that
+    // closes when the method returns, so @Basic(fetch=LAZY) here throws
+    // LazyInitializationException when the service later reads the blob.
+    // TODO at scale: switch list/dropdown queries to a JPQL constructor-
+    // expression projection (id, doc_type, name, description) so the
+    // blob column is never selected for those reads.
     @Column(name = "template_data", nullable = false, columnDefinition = "LONGBLOB")
     private byte[] templateData;
 
@@ -66,24 +71,77 @@ public class DocumentTemplate implements Serializable {
     public DocumentTemplate() {
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Organization getOrganization() { return organization; }
-    public void setOrganization(Organization organization) { this.organization = organization; }
-    public DocType getDocType() { return docType; }
-    public void setDocType(DocType docType) { this.docType = docType; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public byte[] getTemplateData() { return templateData; }
-    public void setTemplateData(byte[] templateData) { this.templateData = templateData; }
-    public String getMimeType() { return mimeType; }
-    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+
+    public DocType getDocType() {
+        return docType;
+    }
+
+    public void setDocType(DocType docType) {
+        this.docType = docType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public byte[] getTemplateData() {
+        return templateData;
+    }
+
+    public void setTemplateData(byte[] templateData) {
+        this.templateData = templateData;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
     public DocumentTemplateView toView() {
         DocumentTemplateView view = new DocumentTemplateView();
@@ -91,6 +149,7 @@ public class DocumentTemplate implements Serializable {
         view.setDocType(docType);
         view.setName(name);
         view.setDescription(description);
+        view.setCreatedAt(createdAt);
         return view;
     }
 

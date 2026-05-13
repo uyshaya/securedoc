@@ -320,6 +320,19 @@ html, body {
     }
 }
 
+/* ── Shared form-field layout primitives (used across portals) ── */
+.fwrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.frow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
 /* Shared PrimeFaces overrides */
 
 body .ui-selectonemenu {
