@@ -45,11 +45,7 @@
                     <hr class="div"/>
 
                     <div class="notice">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
-                            <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
-                            <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
-                            <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
-                        </svg>
+                        <i class="pi pi-info-circle" style="color:#185FA5;font-size:18px;flex-shrink:0;margin-top:1px"></i>
                         <div class="notice-text">
                             <strong>Valid ID required for all requests</strong>
                             All certificate requests require a valid proof of identification to ensure authenticity and protect against unauthorized access.
@@ -133,39 +129,55 @@
                 </div>
 
                 <div class="steps">
-                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">Verify</span></div>
+                    <div class="step now">
+                        <div class="step-n">1</div>
+                        <span class="step-lbl">Verify</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step next">
+                        <div class="step-n">2</div>
+                        <span class="step-lbl">Details</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step next">
+                        <div class="step-n">3</div>
+                        <span class="step-lbl">Review</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next">
+                        <div class="step-n">4</div>
+                        <span class="step-lbl">Confirm</span></div>
                 </div>
 
                 <div class="bd">
                     <div>
                         <div class="sec-title">Verify your email</div>
-                        <div class="sec-sub">Enter your email address. We'll send a one-time code to confirm it's yours — we'll use this to notify you when your certificate is ready.</div>
-                    </div>
-
-                    <div class="fwrap">
-                        <label class="flabel" for="emailInput">Email address <span class="req">*</span></label>
-                        <div class="email-send-row">
-                            <input type="email" id="emailInput" placeholder="e.g. juan.delacruz@email.com"
-                                   oninput="onEmailInput()" onkeydown="if(event.key==='Enter') sendOtp()"/>
-                            <button type="button" class="btn-inline" id="btnSendOtp" disabled="disabled" onclick="sendOtp()">Send code</button>
+                        <div class="sec-sub">Enter your email address. We'll send a one-time code to confirm it's yours
+                            — we'll use this to notify you when your certificate is ready.
                         </div>
-                        <span class="fhint">A 6-digit verification code will be sent to this address.</span>
                     </div>
 
-                    <div class="notice-error" id="emailErr">
-                        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
-                            <circle cx="8" cy="8" r="7" stroke="#C0392B" stroke-width="1.3"/>
-                            <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
-                            <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
-                        </svg>
-                        <span id="emailErrMsg">Please enter a valid email address.</span>
-                    </div>
+                    <h:form id="emailForm">
+                        <div class="fwrap">
+                            <p:outputLabel for="emailInput" styleClass="flabel">
+                                Email address <span class="req">*</span>
+                            </p:outputLabel>
+                            <div class="email-send-row">
+                                <p:inputText id="emailInput"
+                                             value="#{requestBean.email}"
+                                             type="email"
+                                             placeholder="e.g. juan.delacruz@email.com"
+                                             oninput="onEmailInput()"/>
+                                <p:commandButton id="btnSendOtp"
+                                                 value="Send code"
+                                                 styleClass="btn-inline"
+                                                 action="#{requestBean.sendOtp}"
+                                                 process="@form"
+                                                 update="@form"
+                                                 oncomplete="if (args &amp;&amp; !args.validationFailed) enterOtpScene();"/>
+                            </div>
+                            <span class="fhint">A 6-digit verification code will be sent to this address.</span>
+                        </div>
+
+                        <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
+                    </h:form>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
@@ -187,13 +199,21 @@
                 </div>
 
                 <div class="steps">
-                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">Verify</span></div>
+                    <div class="step now">
+                        <div class="step-n">1</div>
+                        <span class="step-lbl">Verify</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step next">
+                        <div class="step-n">2</div>
+                        <span class="step-lbl">Details</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step next">
+                        <div class="step-n">3</div>
+                        <span class="step-lbl">Review</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next">
+                        <div class="step-n">4</div>
+                        <span class="step-lbl">Confirm</span></div>
                 </div>
 
                 <div class="bd">
@@ -215,16 +235,21 @@
                             <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp5"/>
                         </div>
 
-                        <div class="notice-error" id="otpErr" style="width:100%">
-                            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
-                                <circle cx="8" cy="8" r="7" stroke="#C0392B" stroke-width="1.3"/>
-                                <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
-                                <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
-                            </svg>
-                            Incorrect code. Please try again.
-                        </div>
+                        <h:form id="otpForm" style="width:100%">
+                            <h:inputHidden id="otpInput" value="#{requestBean.otpInput}"/>
+                            <p:commandButton id="btnVerify"
+                                             action="#{requestBean.verifyOtp}"
+                                             process="@form"
+                                             update="@form"
+                                             style="display:none"
+                                             oncomplete="onVerifyOtpComplete(args);"/>
+                            <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
+                        </h:form>
 
-                        <p class="otp-resend">Didn't receive it? <button type="button" id="btnResend" onclick="resendOtp()" disabled="disabled">Resend code</button> <span id="resendTimer"></span></p>
+                        <p class="otp-resend">Didn't receive it?
+                            <button type="button" id="btnResend" onclick="resendOtp()" disabled="disabled">Resend code
+                            </button>
+                            <span id="resendTimer"></span></p>
                     </div>
                 </div>
             </div>
@@ -247,23 +272,30 @@
                 </div>
 
                 <div class="steps">
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step done">
+                        <div class="step-n">
+                            <i class="pi pi-check" style="font-size:10px"></i>
+                        </div>
+                        <span class="step-lbl">Verify</span></div>
                     <div class="step-sep"></div>
-                    <div class="step now"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step now">
+                        <div class="step-n">2</div>
+                        <span class="step-lbl">Details</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step next">
+                        <div class="step-n">3</div>
+                        <span class="step-lbl">Review</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next">
+                        <div class="step-n">4</div>
+                        <span class="step-lbl">Confirm</span></div>
                 </div>
 
                 <div class="bd">
 
                     <div class="cert-pill">
                         <div class="cert-icon">
-                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                                <rect x="4" y="2" width="12" height="16" rx="2" stroke="#7EC8F5" stroke-width="1.4"/>
-                                <path d="M7 7h6M7 10h4" stroke="#7EC8F5" stroke-width="1.4" stroke-linecap="round"/>
-                            </svg>
+                            <i class="pi pi-file" style="color:#7EC8F5;font-size:18px"></i>
                         </div>
                         <div>
                             <div class="cert-name" id="formCertName">—</div>
@@ -273,127 +305,161 @@
 
                     <hr class="div"/>
 
-                    <div style="display:flex;flex-direction:column;gap:14px">
-                        <div class="sec-lbl">Personal Information</div>
+                    <h:form id="detailsForm">
+                        <f:event type="postValidate"
+                                 listener="#{requestBean.summarizeDetailsValidation}"/>
+                        <div style="display:flex;flex-direction:column;gap:14px">
+                            <div class="sec-lbl">Personal Information</div>
 
-                        <div class="frow">
-                            <div class="fwrap">
-                                <label class="flabel" for="fFirst">First Name <span class="req">*</span></label>
-                                <input type="text" id="fFirst" placeholder="e.g. Juan"/>
-                            </div>
-                            <div class="fwrap">
-                                <label class="flabel" for="fMiddle">Middle Name</label>
-                                <input type="text" id="fMiddle" placeholder="(optional)"/>
-                            </div>
-                        </div>
-
-                        <div class="fwrap">
-                            <label class="flabel" for="fLast">Last Name <span class="req">*</span></label>
-                            <input type="text" id="fLast" placeholder="e.g. Dela Cruz"/>
-                        </div>
-
-                        <div class="frow">
-                            <div class="fwrap">
-                                <label class="flabel" for="fDob">Date of Birth <span class="req">*</span></label>
-                                <input type="date" id="fDob"/>
-                            </div>
-                            <div class="fwrap">
-                                <label class="flabel" for="fSex">Sex <span class="req">*</span></label>
-                                <select id="fSex">
-                                    <option value="" disabled="disabled" selected="selected">Select…</option>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="div"/>
-
-                    <div style="display:flex;flex-direction:column;gap:14px">
-                        <div class="sec-lbl">Contact &amp; Purpose</div>
-
-                        <div class="fwrap">
-                            <label class="flabel" for="fPhone">Contact Number <span class="req">*</span></label>
-                            <input type="tel" id="fPhone" placeholder="e.g. 09XX XXX XXXX"/>
-                        </div>
-
-                        <div class="fwrap">
-                            <label class="flabel" style="justify-content:space-between">
-                                Email Address
-                                <span class="email-verified-badge">
-                                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    Verified
-                                </span>
-                            </label>
-                            <input type="email" id="fEmail" class="email-locked" readonly="readonly"/>
-                        </div>
-
-                        <div class="fwrap">
-                            <label class="flabel" for="fPurpose">Purpose of Request <span class="req">*</span></label>
-                            <select id="fPurpose" onchange="onPurposeChange()">
-                                <option value="" disabled="disabled" selected="selected">Select purpose…</option>
-                                <option value="employment">Employment / Job Application</option>
-                                <option value="travel">Travel / Passport / Visa</option>
-                                <option value="school">School Enrollment / Scholarship</option>
-                                <option value="loan">Bank / Loan Application</option>
-                                <option value="legal">Legal / Court Proceedings</option>
-                                <option value="insurance">Insurance / Benefits</option>
-                                <option value="personal">Personal Record / Reference</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-
-                        <div class="fwrap" id="otherPurposeWrap" style="display:none">
-                            <label class="flabel" for="fOtherPurpose">Please specify <span class="req">*</span></label>
-                            <input type="text" id="fOtherPurpose" placeholder="Describe your purpose…"/>
-                        </div>
-                    </div>
-
-                    <hr class="div"/>
-
-                    <div style="display:flex;flex-direction:column;gap:14px">
-                        <div class="sec-lbl">Proof of Identification</div>
-
-                        <div class="fwrap">
-                            <label class="flabel" for="fIdType">ID Type <span class="req">*</span></label>
-                            <select id="fIdType">
-                                <option value="" disabled="disabled" selected="selected">Select ID type…</option>
-                                <option>Philippine Passport</option>
-                                <option>Driver's License</option>
-                                <option>PhilSys (National ID)</option>
-                                <option>Voter's ID / COMELEC Card</option>
-                                <option>SSS / GSIS Card</option>
-                                <option>PRC ID</option>
-                                <option>Postal ID</option>
-                                <option>Barangay ID</option>
-                            </select>
-                        </div>
-
-                        <div class="fwrap">
-                            <label class="flabel">Upload Valid ID <span class="req">*</span></label>
-                            <div class="upload-zone" id="uploadZone">
-                                <input type="file" accept="image/*,.pdf" onchange="onFileSelected(event)"/>
-                                <div class="upload-icon">
-                                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                                        <path d="M10 13V4M6 8l4-4 4 4" stroke="#6B7A8D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M3 14v2a1 1 0 001 1h12a1 1 0 001-1v-2" stroke="#6B7A8D" stroke-width="1.5" stroke-linecap="round"/>
-                                    </svg>
+                            <div class="frow">
+                                <div class="fwrap">
+                                    <p:outputLabel for="fFirst" styleClass="flabel" value="First Name"/>
+                                    <p:inputText id="fFirst"
+                                                 value="#{requestBean.firstName}"
+                                                 placeholder="e.g. Juan"
+                                                 required="true"
+                                                 requiredMessage="First name is required."
+                                    />
                                 </div>
-                                <div class="upload-lbl">Click to upload or drag &amp; drop</div>
-                                <div class="upload-sub">JPG, PNG or PDF · Max 5MB</div>
-                                <div class="upload-fname" id="uploadFname"></div>
+                                <div class="fwrap">
+                                    <p:outputLabel for="fMiddle" styleClass="flabel" value="Middle Name"/>
+                                    <p:inputText id="fMiddle"
+                                                 value="#{requestBean.middleName}"
+                                                 placeholder="(optional)"/>
+                                </div>
                             </div>
-                            <span class="fhint">Front and back must be visible if applicable.</span>
-                        </div>
-                    </div>
 
-                    <div class="cta-row">
-                        <button type="button" class="btn-primary" onclick="goToReview()">
-                            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Review &amp; Submit
-                        </button>
-                    </div>
+                            <div class="fwrap">
+                                <p:outputLabel for="fLast" styleClass="flabel" value="Last Name"/>
+                                <p:inputText id="fLast"
+                                             value="#{requestBean.lastName}"
+                                             placeholder="e.g. Dela Cruz"
+                                             required="true"
+                                             requiredMessage="Last name is required."
+                                />
+                            </div>
+
+                            <div class="frow">
+                                <div class="fwrap">
+                                    <p:outputLabel for="fDob" styleClass="flabel" value="Date of Birth"/>
+                                    <p:datePicker id="fDob"
+                                                  value="#{requestBean.dateOfBirth}"
+                                                  pattern="yyyy-MM-dd"
+                                                  showIcon="false"
+                                                  required="true"
+                                                  requiredMessage="Date of birth is required."
+                                    />
+                                </div>
+                                <div class="fwrap">
+                                    <p:outputLabel for="fSex" styleClass="flabel" value="Sex"/>
+                                    <p:selectOneMenu id="fSex"
+                                                     value="#{requestBean.sex}"
+                                                     required="true"
+                                                     requiredMessage="Sex is required."
+                                    >
+                                        <f:selectItem itemValue="#{null}" itemLabel="Select…" noSelectionOption="true"/>
+                                        <f:selectItems value="#{requestBean.sexOptions}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="div"/>
+
+                        <div style="display:flex;flex-direction:column;gap:14px">
+                            <div class="sec-lbl">Contact &amp; Purpose</div>
+
+                            <div class="fwrap">
+                                <p:outputLabel for="fPhone" styleClass="flabel" value="Contact Number"/>
+                                <p:inputText id="fPhone"
+                                             value="#{requestBean.contactNumber}"
+                                             placeholder="e.g. 09XX XXX XXXX"
+                                />
+                            </div>
+
+                            <div class="fwrap">
+                                <label class="flabel" style="justify-content:space-between">
+                                    Email Address
+                                    <span class="email-verified-badge">
+                                        <i class="pi pi-check" style="color:var(--green);font-size:10px"></i>
+                                        Verified
+                                    </span>
+                                </label>
+                                <p:inputText id="fEmail"
+                                             value="#{requestBean.email}"
+                                             readonly="true"
+                                             styleClass="email-locked"/>
+                            </div>
+
+                            <div class="fwrap">
+                                <p:outputLabel for="fPurpose" styleClass="flabel" value="Purpose of Request"/>
+                                <p:selectOneMenu id="fPurpose"
+                                                 value="#{requestBean.purpose}"
+                                                 required="true"
+                                                 requiredMessage="Purpose is required."
+                                                 onchange="onPurposeChange();">
+                                    <f:selectItem itemValue="#{null}" itemLabel="Select purpose…"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItems value="#{requestBean.purposeOptions}"/>
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="fwrap" id="otherPurposeWrap" style="display:none">
+                                <p:outputLabel for="fOtherPurpose" styleClass="flabel">
+                                    Please specify <span class="req">*</span>
+                                </p:outputLabel>
+                                <p:inputText id="fOtherPurpose"
+                                             value="#{requestBean.otherPurpose}"
+                                             placeholder="Describe your purpose…"
+                                />
+                            </div>
+                        </div>
+
+                        <hr class="div"/>
+
+                        <div style="display:flex;flex-direction:column;gap:14px">
+                            <div class="sec-lbl">Proof of Identification</div>
+
+                            <div class="fwrap">
+                                <p:outputLabel for="fIdType" styleClass="flabel" value="ID Type"/>
+                                <p:selectOneMenu id="fIdType"
+                                                 value="#{requestBean.idType}"
+                                                 required="true"
+                                                 requiredMessage="ID type is required."
+                                >
+                                    <f:selectItem itemValue="#{null}" itemLabel="Select ID type…"
+                                                  noSelectionOption="true"/>
+                                    <f:selectItems value="#{requestBean.idTypeOptions}"/>
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="fwrap">
+                                <label class="flabel">Upload Valid ID <span class="req">*</span></label>
+                                <div class="upload-zone" id="uploadZone">
+                                    <input type="file" accept="image/*,.pdf" onchange="onFileSelected(event);"/>
+                                    <div class="upload-icon">
+                                        <i class="pi pi-cloud-upload" style="color:#6B7A8D;font-size:18px"></i>
+                                    </div>
+                                    <div class="upload-lbl">Click to upload or drag &amp; drop</div>
+                                    <div class="upload-sub">JPG, PNG or PDF · Max 5MB</div>
+                                    <div class="upload-fname" id="uploadFname"></div>
+                                </div>
+                                <span class="fhint">Front and back must be visible if applicable.</span>
+                            </div>
+                        </div>
+
+                        <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
+
+                        <div class="cta-row">
+                            <p:commandButton id="btnReview"
+                                             value="Review &amp; Submit"
+                                             styleClass="btn-primary"
+                                             action="#{requestBean.proceedToReview}"
+                                             process="@form"
+                                             update="@form"
+                                             oncomplete="if (args &amp;&amp; !args.validationFailed) enterReviewScene();"/>
+                        </div>
+                    </h:form>
 
                 </div>
             </div>
@@ -416,13 +482,25 @@
                 </div>
 
                 <div class="steps">
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step done">
+                        <div class="step-n">
+                            <i class="pi pi-check" style="font-size:10px"></i>
+                        </div>
+                        <span class="step-lbl">Verify</span></div>
                     <div class="step-sep"></div>
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Details</span></div>
+                    <div class="step done">
+                        <div class="step-n">
+                            <i class="pi pi-check" style="font-size:10px"></i>
+                        </div>
+                        <span class="step-lbl">Details</span></div>
                     <div class="step-sep"></div>
-                    <div class="step now"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step now">
+                        <div class="step-n">3</div>
+                        <span class="step-lbl">Review</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next">
+                        <div class="step-n">4</div>
+                        <span class="step-lbl">Confirm</span></div>
                 </div>
 
                 <div class="bd">
@@ -434,22 +512,24 @@
                     <div class="review-list" id="reviewList"></div>
 
                     <div class="notice">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
-                            <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
-                            <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
-                            <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
-                        </svg>
+                        <i class="pi pi-info-circle" style="color:#185FA5;font-size:18px;flex-shrink:0;margin-top:1px"></i>
                         <div class="notice-text">
                             <strong>Ready to submit?</strong>
-                            By submitting you confirm all information is accurate. Falsification of documents is punishable by law.
+                            By submitting you confirm all information is accurate. Falsification of documents is
+                            punishable by law.
                         </div>
                     </div>
 
-                    <div class="cta-row">
-                        <button type="button" class="btn-primary" onclick="submitRequest()">
-                            Submit Request
-                        </button>
-                    </div>
+                    <h:form id="reviewForm">
+                        <div class="cta-row">
+                            <p:commandButton value="Submit Request"
+                                             styleClass="btn-primary"
+                                             action="#{requestBean.submitRequest}"
+                                             process="@this"
+                                             update=":confirmForm"
+                                             oncomplete="if (args &amp;&amp; !args.validationFailed) goTo('p-confirm');"/>
+                        </div>
+                    </h:form>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
@@ -474,54 +554,70 @@
                 </div>
 
                 <div class="steps">
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step done">
+                        <div class="step-n">
+                            <i class="pi pi-check" style="font-size:10px"></i>
+                        </div>
+                        <span class="step-lbl">Verify</span></div>
                     <div class="step-sep"></div>
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Details</span></div>
+                    <div class="step done">
+                        <div class="step-n">
+                            <i class="pi pi-check" style="font-size:10px"></i>
+                        </div>
+                        <span class="step-lbl">Details</span></div>
                     <div class="step-sep"></div>
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Review</span></div>
+                    <div class="step done">
+                        <div class="step-n">
+                            <i class="pi pi-check" style="font-size:10px"></i>
+                        </div>
+                        <span class="step-lbl">Review</span></div>
                     <div class="step-sep"></div>
-                    <div class="step now"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step now">
+                        <div class="step-n">4</div>
+                        <span class="step-lbl">Confirm</span></div>
                 </div>
 
-                <div class="bd" style="align-items:center">
+                <h:form id="confirmForm" styleClass="bd" style="align-items:center">
                     <div style="text-align:center;padding:8px 0 4px">
                         <div class="confirm-icon">
-                            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
-                                <path d="M8 16l5.5 5.5L24 10" stroke="#1A7A45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                            <i class="pi pi-check" style="color:#1A7A45;font-size:30px;font-weight:600"></i>
                         </div>
                         <div class="confirm-title">Request Submitted!</div>
-                        <div class="confirm-sub">Your certificate request has been received. A confirmation and status updates will be sent to <strong id="confirmEmail" style="color:var(--navy)"></strong>.</div>
+                        <div class="confirm-sub">Your certificate request has been received. A confirmation and status
+                            updates will be sent to <strong id="confirmEmail" style="color:var(--navy);font-weight:600">
+                                <h:outputText value="#{requestBean.email}"/>
+                            </strong>.
+                        </div>
                     </div>
 
                     <div class="ref-badge" style="width:100%">
-                        <div>
+                        <div style="min-width:0;flex:1">
                             <div class="ref-lbl">Reference No.</div>
-                            <div class="ref-num" id="refNum">SC-2025-00000</div>
+                            <div class="ref-num" id="refNum">
+                                <h:outputText value="#{requestBean.submittedReference}"/>
+                            </div>
                         </div>
                         <button type="button" class="btn-ghost" onclick="copyRef()" id="btnCopy">
-                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="6" y="6" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 10H3a1 1 0 01-1-1V3a1 1 0 011-1h6a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                            <i class="pi pi-copy" style="font-size:13px;margin-right:5px"></i>
                             Copy
                         </button>
                     </div>
 
                     <div class="notice" style="width:100%">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
-                            <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
-                            <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
-                            <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
-                        </svg>
+                        <i class="pi pi-info-circle" style="color:#185FA5;font-size:18px;flex-shrink:0;margin-top:1px"></i>
                         <div class="notice-text">
                             <strong>Processing time: 3–5 business days</strong>
-                            Bring this reference number and your original valid ID when claiming your document at the office.
+                            Bring this reference number and your original valid ID when claiming your document at the
+                            office.
                         </div>
                     </div>
 
                     <div class="cta-row" style="width:100%">
                         <button type="button" class="btn-primary" onclick="startOver()">Make another request</button>
-                        <button type="button" class="btn-secondary" onclick="goToTrackFromConfirm()">Track status</button>
+                        <button type="button" class="btn-secondary" onclick="goToTrackFromConfirm()">Track status
+                        </button>
                     </div>
-                </div>
+                </h:form>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
         </div>
@@ -544,7 +640,9 @@
                 <div class="bd">
                     <div>
                         <div class="sec-title">Track your request</div>
-                        <div class="sec-sub">Enter the reference number from your confirmation to check the current status of your document request.</div>
+                        <div class="sec-sub">Enter the reference number from your confirmation to check the current
+                            status of your document request.
+                        </div>
                     </div>
 
                     <div class="fwrap">
@@ -557,8 +655,9 @@
                                    onkeydown="if(event.key==='Enter') doTrack()"
                                    autocomplete="off"
                                    style="text-transform:uppercase;letter-spacing:0.5px"/>
-                            <button type="button" class="btn-inline" id="btnTrack" disabled="disabled" onclick="doTrack()">
-                                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                            <button type="button" class="btn-inline" id="btnTrack" disabled="disabled"
+                                    onclick="doTrack()">
+                                <i class="pi pi-search" style="font-size:13px;margin-right:6px"></i>
                                 Check
                             </button>
                         </div>
@@ -566,51 +665,9 @@
                     </div>
 
                     <div class="notice-error" id="trackErr" style="display:none">
-                        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
-                            <circle cx="8" cy="8" r="7" stroke="#C0392B" stroke-width="1.3"/>
-                            <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
-                            <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
-                        </svg>
                         Reference number not found. Please check and try again.
                     </div>
 
-                    <div id="trackResult" style="display:none">
-                        <div class="track-status-banner" id="trackBanner">
-                            <div class="track-status-icon" id="trackIcon"></div>
-                            <div style="flex:1">
-                                <div class="track-status-label" id="trackStatusLabel"></div>
-                                <div class="track-status-desc"  id="trackStatusDesc"></div>
-                            </div>
-                        </div>
-
-                        <div class="review-list" style="margin-top:14px">
-                            <div class="review-item">
-                                <span class="rv-key">Reference No.</span>
-                                <span class="rv-val" id="trackRefDisplay" style="font-family:'DM Serif Display',serif;font-size:14px;letter-spacing:0.5px"></span>
-                            </div>
-                            <div class="review-item">
-                                <span class="rv-key">Document Type</span>
-                                <span class="rv-val" id="trackDocType"></span>
-                            </div>
-                            <div class="review-item">
-                                <span class="rv-key">Date Submitted</span>
-                                <span class="rv-val" id="trackSubmitted"></span>
-                            </div>
-                            <div class="review-item" id="trackLastUpdateRow">
-                                <span class="rv-key">Last Updated</span>
-                                <span class="rv-val" id="trackLastUpdate"></span>
-                            </div>
-                        </div>
-
-                        <div class="notice" id="trackNotice" style="margin-top:14px">
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;margin-top:1px">
-                                <circle cx="9" cy="9" r="8" stroke="#185FA5" stroke-width="1.2"/>
-                                <path d="M9 8V12.5" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round"/>
-                                <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
-                            </svg>
-                            <div class="notice-text" id="trackNoticeText"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>

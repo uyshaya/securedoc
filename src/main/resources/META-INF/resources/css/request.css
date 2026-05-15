@@ -37,7 +37,7 @@
 
 .hd-nav {
     background: var(--navy);
-    padding: 22px 40px 0;
+    padding: 22px 40px 16px;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -95,7 +95,7 @@
 /* ─ STEPS ─ */
 .steps {
     background: var(--navy);
-    padding: 16px 40px 20px;
+    padding: 0 40px 20px;
     display: flex;
     align-items: center;
 }
@@ -234,7 +234,7 @@ hr.div {
 /* ─ FIELDS ─ */
 
 .flabel {
-    font-size: 12px;
+    font-size: 11px !important;
     font-weight: 500;
     color: var(--tx-2);
     display: flex;
@@ -245,6 +245,16 @@ hr.div {
 .req {
     color: #E55353;
     font-size: 10px;
+}
+
+/* PrimeFaces auto-renders <span class="ui-outputlabel-rfi"> next to
+   any <p:outputLabel> whose target input has required="true". Pin
+   the size to the label's font and use the brand red, so it doesn't
+   stick out next to the manually-marked ".req" labels elsewhere. */
+.flabel .ui-outputlabel-rfi {
+    color: #E55353;
+    font-size: 11px;
+    margin-left: 2px;
 }
 
 .fhint {
@@ -665,11 +675,29 @@ textarea {
     letter-spacing: 1px;
 }
 
+/* ─ FORMS ─ */
+/* The details form on p-form has stacked sections separated by <hr class="div"/>.
+   <h:form> renders as a plain <form> with no flex layout, so sections collapse
+   tight against each other. Match the .bd gap so the hr separators get the same
+   breathing room as everything else in the card. */
+#detailsForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 /* ─ BUTTONS ─ */
 .cta-row {
     display: flex;
     gap: 10px;
     margin-top: 4px;
+}
+
+/* p:commandButton with styleClass="btn-primary" picks up flex:1 from .btn-primary,
+   but saga's .ui-button shorthand sometimes overrides width. Force the flex item
+   on PF buttons inside a cta-row so they fill the row like native .btn-primary. */
+.cta-row > .ui-button {
+    flex: 1 1 0 !important;
 }
 
 .btn-primary {
@@ -744,9 +772,50 @@ textarea {
     opacity: 1 !important;
 }
 
+body .ui-button.ui-button-text-only .ui-button-text,
 .ui-button.btn-primary .ui-button-text {
     color: var(--white) !important;
-    padding: 0 !important;
+    border-radius: var(--r-sm);
+    padding: 13px 20px;
+}
+
+/* ─── PrimeFaces saga override — same navy treatment as .btn-primary,
+       smaller padding (matches the native .btn-inline next to inputs). */
+.ui-button.btn-inline,
+.ui-button.btn-inline.ui-state-default {
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    border: none !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+.ui-button.btn-inline:enabled:hover,
+.ui-button.btn-inline.ui-state-hover {
+    background: var(--navy-mid) !important;
+}
+
+.ui-button.btn-inline:enabled:focus,
+.ui-button.btn-inline.ui-state-focus {
+    background: var(--navy) !important;
+    box-shadow: 0 0 0 3px rgba(12, 59, 110, 0.25) !important;
+    outline: none !important;
+}
+
+.ui-button.btn-inline:disabled,
+.ui-button.btn-inline.ui-state-disabled {
+    background: #A0ADB8 !important;
+    color: var(--white) !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
+
+.ui-button.btn-inline .ui-button-text {
+    color: var(--white) !important;
+    /* Override the generic body-scoped 13px 20px so the inline button
+       stays the same height as the input it sits next to (11px 16px). */
+    padding: 11px 16px !important;
 }
 
 /* ─── PrimeFaces saga override: theme.css ships ~1rem (≈16px) on inputs
@@ -794,6 +863,78 @@ select {
 .ui-autocomplete-panel .ui-autocomplete-item.ui-state-highlight {
     background: var(--blue-tint) !important;
     color: var(--navy) !important;
+}
+
+/* ─── p:selectOneMenu — saga renders a div wrapper; global.css strips its
+       border, so restore the same border + radius + focus style as the
+       native inputs and autocomplete. */
+.ui-selectonemenu {
+    width: 100% !important;
+    background: var(--white) !important;
+    border: 0.5px solid #C2CDD9 !important;
+    border-radius: var(--r-sm) !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+
+.ui-selectonemenu .ui-selectonemenu-label {
+    padding: 11px 13px !important;
+    color: var(--tx-1) !important;
+    border: none !important;
+    background: transparent !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 13.5px !important;
+}
+
+.ui-selectonemenu .ui-selectonemenu-label.ui-selectonemenu-label-empty {
+    color: #ADBAC8 !important;
+}
+
+.ui-selectonemenu .ui-selectonemenu-trigger,
+.ui-selectonemenu .ui-selectonemenu-trigger.ui-state-default {
+    border: none !important;
+    background: transparent !important;
+    color: #888 !important;
+    width: 32px !important;
+}
+
+.ui-selectonemenu:not(.ui-state-disabled):hover,
+.ui-selectonemenu.ui-state-focus {
+    border-color: var(--navy-mid) !important;
+    box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1) !important;
+}
+
+.ui-selectonemenu.ui-state-disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+
+.ui-selectonemenu-panel {
+    border: 0.5px solid var(--border) !important;
+    border-radius: var(--r-sm) !important;
+    box-shadow: 0 6px 18px rgba(12, 59, 110, 0.08) !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+.ui-selectonemenu-panel .ui-selectonemenu-item {
+    padding: 9px 13px !important;
+    color: var(--tx-1) !important;
+    font-size: 13.5px !important;
+}
+
+.ui-selectonemenu-panel .ui-selectonemenu-item:hover,
+.ui-selectonemenu-panel .ui-selectonemenu-item.ui-state-highlight {
+    background: var(--blue-tint) !important;
+    color: var(--navy) !important;
+}
+
+/* ─── p:datePicker — the inner input is .ui-inputfield, but the .ui-calendar
+       wrapper needs full width so the input fills the row like other fields. */
+.ui-calendar {
+    width: 100% !important;
+}
+
+.ui-calendar > .ui-inputfield {
+    width: 100% !important;
 }
 
 /* ─── p:messages — match the admin's minimal inline red-text error style
@@ -964,117 +1105,4 @@ select {
 
 .track-input-row input {
     flex: 1;
-}
-
-.track-status-banner {
-    border-radius: var(--r-sm);
-    padding: 16px 18px;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-}
-
-.track-status-banner.st-submitted {
-    background: var(--blue-tint);
-    border: 0.5px solid var(--blue-bdr);
-    border-left: 4px solid var(--navy-mid);
-}
-
-.track-status-banner.st-review {
-    background: #FFF8EE;
-    border: 0.5px solid #FDE68A;
-    border-left: 4px solid #B45309;
-}
-
-.track-status-banner.st-processing {
-    background: #F0F4FF;
-    border: 0.5px solid #C7D4F8;
-    border-left: 4px solid #4361C2;
-}
-
-.track-status-banner.st-completed {
-    background: var(--green-tint);
-    border: 0.5px solid #A7D9BA;
-    border-left: 4px solid var(--green);
-}
-
-.track-status-banner.st-rejected {
-    background: var(--red-tint);
-    border: 0.5px solid var(--red-bdr);
-    border-left: 4px solid var(--red);
-}
-
-.track-status-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.st-submitted .track-status-icon {
-    background: rgba(24, 95, 165, 0.1);
-}
-
-.st-review .track-status-icon {
-    background: rgba(180, 83, 9, 0.1);
-}
-
-.st-processing .track-status-icon {
-    background: rgba(67, 97, 194, 0.1);
-}
-
-.st-completed .track-status-icon {
-    background: rgba(26, 122, 69, 0.12);
-}
-
-.st-rejected .track-status-icon {
-    background: rgba(192, 57, 43, 0.1);
-}
-
-.track-status-label {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-}
-
-.st-submitted .track-status-label {
-    color: var(--navy-mid);
-}
-
-.st-review .track-status-label {
-    color: #B45309;
-}
-
-.st-processing .track-status-label {
-    color: #4361C2;
-}
-
-.st-completed .track-status-label {
-    color: var(--green);
-}
-
-.st-rejected .track-status-label {
-    color: var(--red);
-}
-
-.track-status-desc {
-    font-size: 12.5px;
-    color: var(--tx-m);
-    margin-top: 4px;
-    line-height: 1.6;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.spin {
-    animation: spin 1.2s linear infinite;
-    display: inline-block;
 }
