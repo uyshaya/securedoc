@@ -80,7 +80,9 @@ public class AdminAuthBean implements Serializable {
     }
 
     public void resendOtp() {
-        if (pendingStaffId == null) return;
+        if (pendingStaffId == null) {
+            return;
+        }
         authService.issueLoginOtp(pendingStaffId);
         this.otpInput = null;
     }
@@ -150,7 +152,9 @@ public class AdminAuthBean implements Serializable {
      * bounce the request to login.
      */
     public boolean refreshFromDb() {
-        if (authenticatedId == null) return false;
+        if (authenticatedId == null) {
+            return false;
+        }
         Optional<StaffView> match = authService.findById(authenticatedId);
         if (match.isEmpty() || !Boolean.TRUE.equals(match.get().getIsActive())) {
             this.authenticatedId = null;
@@ -180,7 +184,9 @@ public class AdminAuthBean implements Serializable {
     }
 
     public String getRoleLabel() {
-        if (role == null) return "";
+        if (role == null) {
+            return "";
+        }
         return role == Staff.Role.ADMIN ? "Admin" : "Staff";
     }
 

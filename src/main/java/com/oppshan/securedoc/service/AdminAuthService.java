@@ -43,7 +43,9 @@ public class AdminAuthService {
     // ── Staff lookup ─────────────────────────────────────────────
 
     public Optional<StaffView> findById(Long id) {
-        if (id == null) return Optional.empty();
+        if (id == null) {
+            return Optional.empty();
+        }
         return staffRepo.findById(id).map(Staff::toView);
     }
 
@@ -71,7 +73,9 @@ public class AdminAuthService {
     @Transactional
     public void issueLoginOtp(Long staffId) {
         Optional<Staff> match = staffRepo.findById(staffId);
-        if (match.isEmpty()) return;
+        if (match.isEmpty()) {
+            return;
+        }
         Staff staff = match.get();
 
         otpRepo.invalidateActive(staffId, StaffOtp.Type.LOGIN);
@@ -96,10 +100,14 @@ public class AdminAuthService {
      */
     @Transactional
     public boolean verifyLoginOtp(Long staffId, String code) {
-        if (staffId == null || code == null || code.isBlank()) return false;
+        if (staffId == null || code == null || code.isBlank()) {
+            return false;
+        }
 
         Optional<StaffOtp> match = otpRepo.findLatestUnused(staffId, StaffOtp.Type.LOGIN);
-        if (match.isEmpty()) return false;
+        if (match.isEmpty()) {
+            return false;
+        }
         StaffOtp otp = match.get();
 
         boolean success;

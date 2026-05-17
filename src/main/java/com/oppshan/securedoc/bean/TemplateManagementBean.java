@@ -116,7 +116,9 @@ public class TemplateManagementBean implements Serializable {
 
     /** Used by the dataTable to render a friendly label. */
     public String labelOf(DocumentTemplate.DocType type) {
-        if (type == null) return "—";
+        if (type == null) {
+            return "—";
+        }
         return switch (type) {
             case BARANGAY_CLEARANCE -> "Barangay Clearance";
             case CERTIFICATE_OF_RESIDENCY -> "Certificate of Residency";

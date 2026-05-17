@@ -476,6 +476,10 @@ html, body {
     padding: 2px 0 0 !important;
 }
 
+.auth-panel .ui-message:empty {
+    display: none !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Admin Console layout (post-auth) — navy sidebar + content area
    ═══════════════════════════════════════════════════════════════ */
