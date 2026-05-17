@@ -27,7 +27,9 @@ public class TemplateManagementService {
     OrganizationRepository organizationRepo;
 
     public List<DocumentTemplateView> listByOrganization(Long organizationId) {
-        if (organizationId == null) return List.of();
+        if (organizationId == null) {
+            return List.of();
+        }
         return templateRepo.listActiveByOrganizationId(organizationId).stream()
                 .map(DocumentTemplate::toView)
                 .toList();
@@ -61,10 +63,16 @@ public class TemplateManagementService {
      */
     @Transactional
     public void deleteTemplate(Long organizationId, Long templateId) {
-        if (organizationId == null || templateId == null) return;
+        if (organizationId == null || templateId == null) {
+            return;
+        }
         Optional<DocumentTemplate> match = templateRepo.findById(templateId);
-        if (match.isEmpty()) return;
-        if (!match.get().getOrganization().getId().equals(organizationId)) return;
+        if (match.isEmpty()) {
+            return;
+        }
+        if (!match.get().getOrganization().getId().equals(organizationId)) {
+            return;
+        }
         templateRepo.deleteById(templateId);
     }
 
@@ -74,7 +82,9 @@ public class TemplateManagementService {
      * organization than the caller's active one.
      */
     public TemplateContent loadForPreview(Long organizationId, Long templateId) {
-        if (organizationId == null || templateId == null) return null;
+        if (organizationId == null || templateId == null) {
+            return null;
+        }
         return templateRepo.findById(templateId)
                 .filter(t -> t.getOrganization().getId().equals(organizationId))
                 .map(t -> new TemplateContent(t.getTemplateData(), t.getName(), t.getMimeType()))

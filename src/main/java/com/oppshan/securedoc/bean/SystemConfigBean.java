@@ -31,14 +31,18 @@ public class SystemConfigBean {
      * the table.
      */
     public List<OrganizationView> searchOrganizations(String query) {
-        if (query == null || query.isBlank()) return List.of();
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
         return organizationRepo.searchByTypeAndQuery(activeOrgType, query.trim()).stream()
                 .map(Organization::toView)
                 .toList();
     }
 
     public OrganizationView findOrganizationById(Long id) {
-        if (id == null) return null;
+        if (id == null) {
+            return null;
+        }
         return organizationRepo.findById(id).map(Organization::toView).orElse(null);
     }
 
@@ -46,7 +50,9 @@ public class SystemConfigBean {
         return activeOrgType;
     }
 
-    /** Singular, capitalized tenant noun (e.g. "Barangay"). Used for form labels. */
+    /**
+     * Singular, capitalized tenant noun (e.g. "Barangay"). Used for form labels.
+     */
     public String getOrgLabel() {
         return switch (activeOrgType) {
             case BARANGAY -> "Barangay";
@@ -55,7 +61,9 @@ public class SystemConfigBean {
         };
     }
 
-    /** Plural form (e.g. "Barangays"). */
+    /**
+     * Plural form (e.g. "Barangays").
+     */
     public String getOrgLabelPlural() {
         return switch (activeOrgType) {
             case BARANGAY -> "Barangays";
@@ -64,7 +72,9 @@ public class SystemConfigBean {
         };
     }
 
-    /** Lowercase singular for mid-sentence interpolation (e.g. "Please select your barangay."). */
+    /**
+     * Lowercase singular for mid-sentence interpolation (e.g. "Please select your barangay.").
+     */
     public String getOrgLabelLower() {
         return getOrgLabel().toLowerCase();
     }

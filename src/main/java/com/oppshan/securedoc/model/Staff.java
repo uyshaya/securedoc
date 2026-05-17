@@ -153,13 +153,19 @@ public class Staff implements Serializable {
 
     public String getFullName() {
         StringBuilder sb = new StringBuilder();
-        if (firstName != null && !firstName.isBlank()) sb.append(firstName.trim());
+        if (firstName != null && !firstName.isBlank()) {
+            sb.append(firstName.trim());
+        }
         if (middleName != null && !middleName.isBlank()) {
-            if (sb.length() > 0) sb.append(' ');
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
             sb.append(middleName.trim());
         }
         if (lastName != null && !lastName.isBlank()) {
-            if (sb.length() > 0) sb.append(' ');
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
             sb.append(lastName.trim());
         }
         return sb.toString();
@@ -193,8 +199,12 @@ public class Staff implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Staff)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Staff)) {
+            return false;
+        }
         return Objects.equals(id, ((Staff) o).id);
     }
 

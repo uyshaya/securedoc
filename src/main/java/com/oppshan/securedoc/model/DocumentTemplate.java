@@ -155,8 +155,12 @@ public class DocumentTemplate implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DocumentTemplate)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DocumentTemplate)) {
+            return false;
+        }
         return Objects.equals(id, ((DocumentTemplate) o).id);
     }
 

@@ -25,13 +25,17 @@ public class OrganizationViewConverter implements Converter<OrganizationView> {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, OrganizationView value) {
-        if (value == null || value.getId() == null) return "";
+        if (value == null || value.getId() == null) {
+            return "";
+        }
         return String.valueOf(value.getId());
     }
 
     @Override
     public OrganizationView getAsObject(FacesContext context, UIComponent component, String value) {
-        if (value == null || value.isBlank()) return null;
+        if (value == null || value.isBlank()) {
+            return null;
+        }
         try {
             return system.findOrganizationById(Long.valueOf(value.trim()));
         } catch (NumberFormatException e) {

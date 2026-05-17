@@ -49,24 +49,66 @@ public class ResidentOtp implements Serializable {
         return expiresAt != null && LocalDateTime.now().isAfter(expiresAt);
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getOtpCode() { return otpCode; }
-    public void setOtpCode(String otpCode) { this.otpCode = otpCode; }
-    public Integer getOtpAttempts() { return otpAttempts; }
-    public void setOtpAttempts(Integer otpAttempts) { this.otpAttempts = otpAttempts; }
-    public Boolean getIsUsed() { return isUsed; }
-    public void setIsUsed(Boolean isUsed) { this.isUsed = isUsed; }
-    public LocalDateTime getExpiresAt() { return expiresAt; }
-    public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getOtpCode() {
+        return otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
+    }
+
+    public Integer getOtpAttempts() {
+        return otpAttempts;
+    }
+
+    public void setOtpAttempts(Integer otpAttempts) {
+        this.otpAttempts = otpAttempts;
+    }
+
+    public Boolean getIsUsed() {
+        return isUsed;
+    }
+
+    public void setIsUsed(Boolean isUsed) {
+        this.isUsed = isUsed;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ResidentOtp)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ResidentOtp)) {
+            return false;
+        }
         return Objects.equals(id, ((ResidentOtp) o).id);
     }
 

@@ -58,7 +58,9 @@ public class RequestService {
             return false;
         }
         Optional<ResidentOtp> match = otpRepo.findLatestUnused(email.trim());
-        if (match.isEmpty()) return false;
+        if (match.isEmpty()) {
+            return false;
+        }
         ResidentOtp otp = match.get();
 
         boolean success;
