@@ -115,7 +115,7 @@ CREATE TABLE requests
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id  BIGINT      NOT NULL,
-    reference_number VARCHAR(20) NOT NULL UNIQUE,
+    reference_number VARCHAR(36) NOT NULL UNIQUE,
     requester_id     BIGINT      NOT NULL,
     template_id      BIGINT      NOT NULL,
     processed_by     BIGINT,
