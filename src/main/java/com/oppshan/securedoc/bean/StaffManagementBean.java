@@ -1,5 +1,6 @@
 package com.oppshan.securedoc.bean;
 
+import com.oppshan.securedoc.common.I18n;
 import com.oppshan.securedoc.dto.StaffView;
 import com.oppshan.securedoc.model.Staff;
 import com.oppshan.securedoc.service.StaffManagementService;
@@ -16,7 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Backs /admin/staff/staff-management.xhtml. Admin-only — enforced by
+ * Backs /admin/staff/staff-management.xhtml. Admin-only -- enforced by
  * {@code AdminAuthFilter} for the /admin/staff/* path prefix. Handles
  * activation/deactivation (i.e. approving pending registrations or
  * disabling existing accounts) and deletion. Self-service registration
@@ -29,13 +30,24 @@ public class StaffManagementBean implements Serializable {
     @Serial
     private static final long serialVersionUID = 7771533201193136439L;
 
-    @Inject
-    StaffManagementService service;
-
-    @Inject
-    OrganizationBean organizationBean;
+    private final StaffManagementService staffManagementService;
+    private final OrganizationBean organizationBean;
+    private final I18n i18n;
 
     private List<StaffView> staffList;
+
+    @Inject
+    public StaffManagementBean(StaffManagementService staffManagementService,
+                               OrganizationBean organizationBean,
+                               I18n i18n) {
+        this.staffManagementService = staffManagementService;
+        this.organizationBean = organizationBean;
+        this.i18n = i18n;
+    }
+
+    protected StaffManagementBean() {
+        this(null, null, null);
+    }
 
     @PostConstruct
     void init() {
@@ -43,28 +55,31 @@ public class StaffManagementBean implements Serializable {
     }
 
     private void reload() {
-        Long orgId = organizationBean.getActiveId();
-        staffList = service.listByOrganization(orgId);
+        final var activeOrganizationId = organizationBean.getActiveId();
+        staffList = staffManagementService.listByOrganization(activeOrganizationId);
     }
 
-    public void toggleActive(StaffView s) {
-        boolean newState = !Boolean.TRUE.equals(s.getIsActive());
-        service.setActive(s.getId(), newState);
-        s.setIsActive(newState);
+    public void toggleActive(StaffView staff) {
+        final var nextActiveState = !Boolean.TRUE.equals(staff.isActive());
+        staffManagementService.setActive(staff.getId(), nextActiveState);
+        staff.setActive(nextActiveState);
+
+        final var messageKey = nextActiveState ? "staff.activated" : "staff.deactivated";
         FacesContext.getCurrentInstance().addMessage(null,
-                info(s.getFullName() + " " + (newState ? "activated." : "deactivated.")));
+                info(i18n.get(messageKey, staff.getFullName())));
     }
 
     /**
      * Persists the new role for the row whose dropdown was changed.
-     * The selection has already updated {@code s.role} via JSF binding
+     * The selection has already updated {@code staff.role} via JSF binding
      * before this listener fires.
      */
-    public void changeRole(StaffView s) {
-        service.changeRole(s.getId(), s.getRole());
+    public void changeRole(StaffView staff) {
+        staffManagementService.changeRole(staff.getId(), staff.getRole());
+
+        final var roleLabelKey = staff.getRole() == Staff.Role.ADMIN ? "staff.role.admin" : "staff.role.staff";
         FacesContext.getCurrentInstance().addMessage(null,
-                info(s.getFullName() + " role set to "
-                        + (s.getRole() == Staff.Role.ADMIN ? "Admin." : "Staff.")));
+                info(i18n.get("staff.role.changed", staff.getFullName(), i18n.get(roleLabelKey))));
     }
 
     public List<SelectItem> getRoleOptions() {
@@ -74,25 +89,24 @@ public class StaffManagementBean implements Serializable {
         );
     }
 
-    public void deleteStaff(StaffView s) {
+    public void deleteStaff(StaffView staff) {
         try {
-            service.deleteStaff(s.getId());
+            staffManagementService.deleteStaff(staff.getId());
             FacesContext.getCurrentInstance().addMessage(null,
-                    info(s.getFullName() + " deleted."));
+                    info(i18n.get("staff.deleted", staff.getFullName())));
             reload();
-        } catch (RuntimeException e) {
+        } catch (RuntimeException exception) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    error("Could not delete " + s.getFullName()
-                            + " — they may have processed requests on file. Deactivate instead."));
+                    error(i18n.get("staff.delete.failed", staff.getFullName())));
         }
     }
 
-    private static FacesMessage error(String s) {
-        return new FacesMessage(FacesMessage.SEVERITY_ERROR, s, null);
+    private static FacesMessage error(String summary) {
+        return new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
     }
 
-    private static FacesMessage info(String s) {
-        return new FacesMessage(FacesMessage.SEVERITY_INFO, s, null);
+    private static FacesMessage info(String summary) {
+        return new FacesMessage(FacesMessage.SEVERITY_INFO, summary, null);
     }
 
     public List<StaffView> getStaffList() {

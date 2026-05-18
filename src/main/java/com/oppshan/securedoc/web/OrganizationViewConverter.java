@@ -8,6 +8,8 @@ import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.inject.Inject;
 
+import java.util.UUID;
+
 /**
  * Round-trips {@link OrganizationView} between the JSF component tree and
  * its stored value (the row id, as a string). Required by
@@ -25,16 +27,22 @@ public class OrganizationViewConverter implements Converter<OrganizationView> {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, OrganizationView value) {
-        if (value == null || value.getId() == null) return "";
-        return String.valueOf(value.getId());
+        if (value == null || value.getId() == null) {
+            return "";
+        }
+
+        return value.getId().toString();
     }
 
     @Override
     public OrganizationView getAsObject(FacesContext context, UIComponent component, String value) {
-        if (value == null || value.isBlank()) return null;
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
         try {
-            return system.findOrganizationById(Long.valueOf(value.trim()));
-        } catch (NumberFormatException e) {
+            return system.findOrganizationById(UUID.fromString(value.trim()));
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }

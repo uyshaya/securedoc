@@ -3,7 +3,6 @@ package com.oppshan.securedoc.service;
 import com.oppshan.securedoc.dto.StaffRegistrationCreate;
 import com.oppshan.securedoc.dto.StaffRegistrationView;
 import com.oppshan.securedoc.dto.StaffView;
-import com.oppshan.securedoc.model.Organization;
 import com.oppshan.securedoc.model.Staff;
 import com.oppshan.securedoc.model.StaffOtp;
 import com.oppshan.securedoc.repository.OrganizationRepository;
@@ -14,8 +13,10 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class AdminAuthService {
@@ -23,65 +24,75 @@ public class AdminAuthService {
     private static final int OTP_VALIDITY_MINUTES = 5;
     private static final int MAX_OTP_ATTEMPTS = 5;
 
-    @Inject
-    StaffRepository staffRepo;
-
-    @Inject
-    StaffOtpRepository otpRepo;
-
-    @Inject
-    OrganizationRepository organizationRepo;
-
-    @Inject
-    PasswordService passwordService;
-
-    @Inject
-    MailService mail;
-
+    private final StaffRepository staffRepo;
+    private final StaffOtpRepository otpRepo;
+    private final OrganizationRepository organizationRepo;
+    private final PasswordService passwordService;
+    private final MailService mail;
     private final SecureRandom random = new SecureRandom();
 
-    // ── Staff lookup ─────────────────────────────────────────────
+    @Inject
+    public AdminAuthService(StaffRepository staffRepo,
+                            StaffOtpRepository otpRepo,
+                            OrganizationRepository organizationRepo,
+                            PasswordService passwordService,
+                            MailService mail) {
+        this.staffRepo = staffRepo;
+        this.otpRepo = otpRepo;
+        this.organizationRepo = organizationRepo;
+        this.passwordService = passwordService;
+        this.mail = mail;
+    }
 
-    public Optional<StaffView> findById(Long id) {
-        if (id == null) return Optional.empty();
+    // -- Staff lookup ---------------------------------------------
+
+    public Optional<StaffView> findById(UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+
         return staffRepo.findById(id).map(Staff::toView);
     }
 
-    // ── Step 1: email + password ─────────────────────────────────
+    // -- Step 1: email + password ---------------------------------
 
     /**
      * Finds the staff by email and verifies the password in one call so
      * the entity (and its hash) never leaves the service. Returns the
-     * DTO on success, empty otherwise. Does NOT check {@code isActive} —
+     * DTO on success, empty otherwise. Does NOT check {@code isActive} --
      * caller decides how to message that case.
      */
     public Optional<StaffView> authenticate(String email, String password) {
         if (email == null || email.isBlank() || password == null || password.isBlank()) {
             return Optional.empty();
         }
-        Optional<Staff> match = staffRepo.findByEmail(email);
+
+        final var match = staffRepo.findByEmail(email);
         if (match.isEmpty() || !passwordService.verify(password, match.get().getPasswordHash())) {
             return Optional.empty();
         }
+
         return Optional.of(match.get().toView());
     }
 
-    // ── Step 2: OTP issue + verify ───────────────────────────────
+    // -- Step 2: OTP issue + verify -------------------------------
 
     @Transactional
-    public void issueLoginOtp(Long staffId) {
-        Optional<Staff> match = staffRepo.findById(staffId);
-        if (match.isEmpty()) return;
-        Staff staff = match.get();
+    public void issueLoginOtp(UUID staffId) {
+        final var match = staffRepo.findById(staffId);
+        if (match.isEmpty()) {
+            return;
+        }
 
+        final var staff = match.get();
         otpRepo.invalidateActive(staffId, StaffOtp.Type.LOGIN);
 
-        StaffOtp staffOtp = new StaffOtp();
-        staffOtp.setStaff(staff);
-        staffOtp.setOtpCode(generateOtpCode());
-        staffOtp.setOtpType(StaffOtp.Type.LOGIN);
-        staffOtp.setExpiresAt(LocalDateTime.now().plusMinutes(OTP_VALIDITY_MINUTES));
-        otpRepo.save(staffOtp);
+        final var staffOtp = new StaffOtp()
+                .setStaff(staff)
+                .setOtpCode(generateOtpCode())
+                .setOtpType(StaffOtp.Type.LOGIN)
+                .setExpiresAt(Instant.now().plus(OTP_VALIDITY_MINUTES, ChronoUnit.MINUTES));
+        otpRepo.insertWithSession(staffOtp);
 
         mail.sendStaffOtp(staff.getEmail(), staffOtp.getOtpCode());
     }
@@ -90,41 +101,49 @@ public class AdminAuthService {
      * Verifies the most recent unused login OTP for the given staff.
      * On success the OTP is marked used; failure increments attempts
      * and locks the OTP after {@link #MAX_OTP_ATTEMPTS}. The entity is
-     * mutated and then explicitly {@code save()}d because the generated
-     * Jakarta Data impl uses a {@code StatelessSession} — there is no
-     * dirty-tracking auto-flush on managed entities.
+     * mutated and then merged through the active JPA session via
+     * {@code updateWithSession} -- the Hibernate-generated Jakarta Data
+     * impl runs on a {@code StatelessSession} that does not dirty-track
+     * managed entities, so an explicit merge is required.
      */
     @Transactional
-    public boolean verifyLoginOtp(Long staffId, String code) {
-        if (staffId == null || code == null || code.isBlank()) return false;
+    public boolean verifyLoginOtp(UUID staffId, String code) {
+        if (staffId == null || code == null || code.isBlank()) {
+            return false;
+        }
 
-        Optional<StaffOtp> match = otpRepo.findLatestUnused(staffId, StaffOtp.Type.LOGIN);
-        if (match.isEmpty()) return false;
-        StaffOtp otp = match.get();
+        final var match = otpRepo.findLatestUnused(staffId, StaffOtp.Type.LOGIN);
+        if (match.isEmpty()) {
+            return false;
+        }
 
+        final var otp = match.get();
         boolean success;
+
         if (otp.isExpired() || otp.getOtpAttempts() >= MAX_OTP_ATTEMPTS) {
-            otp.setIsUsed(true);
+            otp.setUsed(true);
             success = false;
         } else {
             otp.setOtpAttempts(otp.getOtpAttempts() + 1);
             if (!otp.getOtpCode().equals(code.trim())) {
                 if (otp.getOtpAttempts() >= MAX_OTP_ATTEMPTS) {
-                    otp.setIsUsed(true);
+                    otp.setUsed(true);
                 }
+
                 success = false;
             } else {
-                otp.setIsUsed(true);
+                otp.setUsed(true);
                 success = true;
             }
         }
-        otpRepo.save(otp);
+
+        otpRepo.updateWithSession(otp);
         return success;
     }
 
-    // ── Registration ─────────────────────────────────────────────
+    // -- Registration ---------------------------------------------
 
-    public boolean emailTakenInOrganization(String email, Long organizationId) {
+    public boolean emailTakenInOrganization(String email, UUID organizationId) {
         return staffRepo.countByEmailAndOrganizationId(email, organizationId) > 0;
     }
 
@@ -135,26 +154,28 @@ public class AdminAuthService {
      */
     @Transactional
     public StaffRegistrationView createStaff(StaffRegistrationCreate form) {
-        Organization organization = organizationRepo.findById(form.getOrganizationId())
-                .orElseThrow(() -> new IllegalArgumentException("Unknown organization: " + form.getOrganizationId()));
-        Staff staff = new Staff();
-        staff.setFirstName(form.getFirstName().trim());
-        staff.setLastName(form.getLastName().trim());
-        staff.setEmail(form.getEmail().trim());
-        staff.setPasswordHash(passwordService.hash(form.getPassword()));
-        staff.setOrganization(organization);
-        staff.setRole(Staff.Role.STAFF);
-        staff.setIsActive(Boolean.FALSE);   // pending admin approval
-        staffRepo.save(staff);
+        final var organization = organizationRepo.findById(form.getOrganizationId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Unknown organization: " + form.getOrganizationId()));
+        final var staff = new Staff()
+                .setFirstName(form.getFirstName().trim())
+                .setLastName(form.getLastName().trim())
+                .setEmail(form.getEmail().trim())
+                .setPasswordHash(passwordService.hash(form.getPassword()))
+                .setOrganization(organization)
+                .setRole(Staff.Role.STAFF)
+                .setActive(Boolean.FALSE);
+        staffRepo.insertWithSession(staff);
+
         return staff.toRegistrationView();
     }
 
     @Transactional
-    public void recordLogin(Long staffId) {
-        staffRepo.recordLogin(staffId, LocalDateTime.now());
+    public void recordLogin(UUID staffId) {
+        staffRepo.recordLogin(staffId, Instant.now());
     }
 
-    // ── helpers ──────────────────────────────────────────────────
+    // -- helpers --------------------------------------------------
 
     private String generateOtpCode() {
         return String.format("%06d", random.nextInt(1_000_000));

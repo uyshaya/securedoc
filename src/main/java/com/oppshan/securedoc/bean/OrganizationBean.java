@@ -7,6 +7,7 @@ import jakarta.inject.Named;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Named
 @SessionScoped
@@ -15,10 +16,18 @@ public class OrganizationBean implements Serializable {
     @Serial
     private static final long serialVersionUID = -4968282673847231166L;
 
-    @Inject
-    SystemConfigBean system;
+    private final SystemConfigBean system;
 
     private OrganizationView active;
+
+    @Inject
+    public OrganizationBean(SystemConfigBean system) {
+        this.system = system;
+    }
+
+    protected OrganizationBean() {
+        this(null);
+    }
 
     public OrganizationView getActive() {
         return active;
@@ -28,11 +37,12 @@ public class OrganizationBean implements Serializable {
         this.active = organization;
     }
 
-    public boolean selectById(Long id) {
-        OrganizationView found = system.findOrganizationById(id);
+    public boolean selectById(UUID id) {
+        final var found = system.findOrganizationById(id);
         if (found == null) {
             return false;
         }
+
         this.active = found;
         return true;
     }
@@ -45,7 +55,7 @@ public class OrganizationBean implements Serializable {
         return active != null;
     }
 
-    public Long getActiveId() {
+    public UUID getActiveId() {
         return active != null ? active.getId() : null;
     }
 

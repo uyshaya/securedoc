@@ -12,7 +12,7 @@
     </f:facet>
 
     <ui:insert name="pageTitle">
-        <title>Verify Document – SecureDoc</title>
+        <title>#{msg['layout.verifier.title']}</title>
     </ui:insert>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -41,8 +41,8 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="brand-name">Secure<em>Doc</em></div>
-                        <div class="tagline">Document Verification Portal</div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
+                        <div class="tagline">#{msg['layout.verifier.tagline']}</div>
                     </div>
                 </div>
 
@@ -53,5 +53,7 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
     </div>
+
+    <h:outputScript library="js" name="local-time.js" target="body"/>
 </h:body>
 </html>

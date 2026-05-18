@@ -1,19 +1,17 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="jakarta.faces.html"
-                xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Templates – SecureDoc Admin</title>
+        <title>#{msg['page.templates.title']}</title>
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">Templates</h1>
+        <h1 class="console-page-title">#{msg['page.templates.heading']}</h1>
     </ui:define>
 
     <ui:define name="content">
-        <p>Templates scaffold. Replace with template management UI.</p>
+        <p>#{msg['page.templates.placeholder']}</p>
     </ui:define>
 
 </ui:composition>

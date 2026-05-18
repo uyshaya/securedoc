@@ -1,7 +1,11 @@
 package com.oppshan.securedoc.dto;
 
+import com.google.common.base.MoreObjects;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Narrow projection returned by {@code AdminAuthService.createStaff}
@@ -14,52 +18,94 @@ public class StaffRegistrationView implements Serializable {
     @Serial
     private static final long serialVersionUID = 5199120916097796464L;
 
-    private Long id;
+    private UUID id;
+
     private String fullName;
+
     private String email;
-    private Long organizationId;
-    private Boolean isActive;
+
+    private UUID organizationId;
+
+    private Boolean active;
 
     public StaffRegistrationView() {
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public StaffRegistrationView setId(UUID id) {
         this.id = id;
+        return this;
     }
 
     public String getFullName() {
         return fullName;
     }
 
-    public void setFullName(String fullName) {
+    public StaffRegistrationView setFullName(String fullName) {
         this.fullName = fullName;
+        return this;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public StaffRegistrationView setEmail(String email) {
         this.email = email;
+        return this;
     }
 
-    public Long getOrganizationId() {
+    public UUID getOrganizationId() {
         return organizationId;
     }
 
-    public void setOrganizationId(Long organizationId) {
+    public StaffRegistrationView setOrganizationId(UUID organizationId) {
         this.organizationId = organizationId;
+        return this;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
+    public Boolean isActive() {
+        return active;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public StaffRegistrationView setActive(Boolean active) {
+        this.active = active;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof final StaffRegistrationView that)) {
+            return false;
+        }
+
+        return Objects.equals(id, that.id) &&
+               Objects.equals(fullName, that.fullName) &&
+               Objects.equals(email, that.email) &&
+               Objects.equals(organizationId, that.organizationId) &&
+               Objects.equals(active, that.active);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, fullName, email, organizationId, active);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("fullName", fullName)
+                .add("email", email)
+                .add("organizationId", organizationId)
+                .add("active", active)
+                .toString();
     }
 }

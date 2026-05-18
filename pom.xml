@@ -2,112 +2,199 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.oppshan</groupId>
     <artifactId>securedoc</artifactId>
     <version>1.0.0</version>
+    <packaging>quarkus</packaging>
 
     <properties>
-        <!-- FIX 1: Added missing platform group/artifact ID properties -->
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.27.1</quarkus.platform.version>
-
-        <!-- FIX 2: Added missing plugin version properties -->
-        <compiler-plugin.version>3.13.0</compiler-plugin.version>
-        <surefire-plugin.version>3.2.5</surefire-plugin.version>
-
-        <!-- FIX 3: Updated Java source/target from 11 to 17 (Quarkus 3.x requires Java 17+) -->
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.5.5</maven.surefire.plugin.version>
+        <maven.failsafe.plugin.version>3.5.5</maven.failsafe.plugin.version>
+        <jacoco.plugin.version>0.8.14</jacoco.plugin.version>
+        <exec.maven.plugin.version>3.6.3</exec.maven.plugin.version>
+
+        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.version>3.35.3</quarkus.platform.version>
+
+        <jakarta.data-api.version>1.0.1</jakarta.data-api.version>
+        <quarkus.primefaces.version>4.15.15</quarkus.primefaces.version>
+        <pdfbox.version>3.0.7</pdfbox.version>
+        <quarkus.pdfbox.version>1.2.2</quarkus.pdfbox.version>
+        <bouncycastle.version>1.84</bouncycastle.version>
+        <guava.version>33.5.0-jre</guava.version>
+
+        <skipITs>true</skipITs>
+
+        <native.march>-march=compatibility</native.march>
+        <native.resources.includes>
+            META-INF/services/**,
+            **/*.properties,
+            **/*.xml,
+            **/*.json,
+            **/*.sql,
+            **/*.html,
+            **/*.xhtml,
+            **/*.css,
+            **/*.js,
+            **/*.svg,
+            **/*.png,
+            **/*.jpg,
+            **/*.jpeg,
+            **/*.gif,
+            **/*.ico,
+            **/*.woff,
+            **/*.woff2,
+            **/*.ttf,
+            **/*.otf,
+            **/*.eot,
+            **/*.txt,
+            **/*.md,
+        </native.resources.includes>
+        <native.build.args.base>
+            -R:MaxHeapSize=512m,
+            -H:+AddAllCharsets,
+            -H:+UnlockExperimentalVMOptions,
+            -H:+InstallExitHandlers,
+            -H:+JNI,
+            -H:+UseServiceLoaderFeature,
+            -H:+EnableSecurityServicesFeature,
+            -H:+ReportExceptionStackTraces,
+            ${native.march},
+            --gc=G1,
+            --future-defaults=all,
+            --enable-native-access=ALL-UNNAMED,
+        </native.build.args.base>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-bom</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkiverse.primefaces</groupId>
+                <artifactId>quarkus-primefaces</artifactId>
+                <version>${quarkus.primefaces.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.data</groupId>
+                <artifactId>jakarta.data-api</artifactId>
+                <version>${jakarta.data-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>${pdfbox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkiverse.pdfbox</groupId>
+                <artifactId>quarkus-pdfbox</artifactId>
+                <version>${quarkus.pdfbox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-
-        <!-- JSF (MyFaces) + PrimeFaces -->
         <dependency>
             <groupId>io.quarkiverse.primefaces</groupId>
             <artifactId>quarkus-primefaces</artifactId>
-            <version>4.15.13</version>
         </dependency>
-
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest</artifactId>
+            <artifactId>quarkus-resteasy</artifactId>
         </dependency>
-
-        <!-- CDI - required for @Named, @SessionScoped, @Inject -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-undertow</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
-
-        <!-- JPA / Hibernate ORM -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-orm</artifactId>
         </dependency>
-
-        <!-- Jakarta Data API — Hibernate ORM 7 generates the repository
-             impls at compile time via hibernate-jpamodelgen (annotation
-             processor wired below in maven-compiler-plugin). -->
         <dependency>
-            <groupId>jakarta.data</groupId>
-            <artifactId>jakarta.data-api</artifactId>
-            <version>1.0.1</version>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>
-
-        <!-- MySQL JDBC driver -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-mysql</artifactId>
         </dependency>
-
-        <!-- Apache PDFBox -->
         <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.2</version>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-flyway</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkiverse.pdfbox</groupId>
-            <artifactId>quarkus-pdfbox</artifactId>
-            <version>1.2.1</version>
-        </dependency>
-
-        <!-- BouncyCastle (BCrypt password hashing) -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.78.1</version>
-        </dependency>
-
-        <!-- SMTP mailer (used for OTP delivery) -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-mailer</artifactId>
         </dependency>
+        <dependency>
+            <groupId>jakarta.data</groupId>
+            <artifactId>jakarta.data-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.pdfbox</groupId>
+            <artifactId>quarkus-pdfbox</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
 
+        <!-- Test -->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-junit5</artifactId>
+            <artifactId>quarkus-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jacoco</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -119,40 +206,62 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.quarkus.platform</groupId>
+                    <artifactId>quarkus-maven-plugin</artifactId>
+                    <version>${quarkus.platform.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven.failsafe.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${exec.maven.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>${quarkus.platform.group-id}</groupId>
+                <groupId>io.quarkus.platform</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>${quarkus.platform.version}</version>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build</goal>
-                            <goal>generate-code</goal>
-                            <goal>generate-code-tests</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler-plugin.version}</version>
                 <configuration>
                     <parameters>true</parameters>
                     <annotationProcessorPaths>
-                        <path>
+                        <annotationProcessorPath>
                             <groupId>org.hibernate.orm</groupId>
-                            <artifactId>hibernate-jpamodelgen</artifactId>
-                            <version>7.1.4.Final</version>
-                        </path>
+                            <artifactId>hibernate-processor</artifactId>
+                        </annotationProcessorPath>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-g</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
                 <configuration>
+                    <argLine>@{argLine}</argLine>
                     <systemPropertyVariables>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
@@ -161,7 +270,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${surefire-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -171,14 +279,494 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <argLine>@{argLine}</argLine>
                     <systemPropertyVariables>
-                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner
+                        </native.image.path>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <exclClassLoaders>*QuarkusClassLoader</exclClassLoaders>
+                            <destFile>${project.build.directory}/jacoco-quarkus.exec</destFile>
+                            <append>true</append>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+                Pre-pull mysql:8 before tests run. Quarkus DevServices spins
+                the container up via Testcontainers, which has its own pull
+                logic with a 30s no-progress watchdog: on a slow Docker
+                Hub connection that watchdog can fire repeatedly and time
+                the test boot out. Doing the pull directly through the
+                docker CLI here keeps the per-test boot reliable.
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>pull-mysql-image</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>docker</executable>
+                            <arguments>
+                                <argument>pull</argument>
+                                <argument>mysql:8</argument>
+                            </arguments>
+                            <skip>${skipTests}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>arch-aarch64</id>
+            <activation>
+                <os>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <native.march>-march=armv8-a+aes+lse</native.march>
+            </properties>
+        </profile>
+        <profile>
+            <id>arch-amd64</id>
+            <activation>
+                <os>
+                    <arch>amd64</arch>
+                </os>
+            </activation>
+            <properties>
+                <native.march>-march=x86-64-v3</native.march>
+            </properties>
+        </profile>
+        <profile>
+            <id>native</id>
+            <activation>
+                <property>
+                    <name>native</name>
+                </property>
+            </activation>
+            <properties>
+                <skipITs>false</skipITs>
+                <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
+                <quarkus.native.enabled>true</quarkus.native.enabled>
+                <quarkus.native.additional-build-args>
+                    ${native.build.args.base}
+                    -H:+TraceSecurityServices,
+                    -H:+SourceLevelDebug,
+                    -g,
+                    --verbose,
+                </quarkus.native.additional-build-args>
+                <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+            </properties>
+        </profile>
+        <profile>
+            <id>native-release</id>
+            <activation>
+                <property>
+                    <name>native-release</name>
+                </property>
+            </activation>
+            <properties>
+                <skipITs>false</skipITs>
+                <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
+                <quarkus.native.enabled>true</quarkus.native.enabled>
+                <quarkus.native.additional-build-args>
+                    ${native.build.args.base}
+                </quarkus.native.additional-build-args>
+                <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+            </properties>
+        </profile>
+        <profile>
+            <!--
+                native-release-pgo: builds three native binaries (normal, instrumented, optimized)
+                in a SINGLE Maven reactor, runs the load workload against each,
+                prints a side-by-side comparison, and copies the winner of
+                normal-vs-optimized back to the canonical target/...-runner path.
+                The instrumented binary is throwaway (used only to capture the
+                profile that feeds the optimized build) and is deleted after.
+
+                Lifecycle layout:
+                  prepare-package        docker up + build NORMAL
+                  package                save NORMAL + test NORMAL + reset DB + build INSTRUMENTED
+                  pre-integration-test   save INSTRUMENTED + test INSTRUMENTED + reset DB + build OPTIMIZED
+                  integration-test       save OPTIMIZED + test OPTIMIZED + compare + select winner
+                  post-integration-test  docker down
+
+                Reset DB between tests truncates the app tables but keeps the
+                container running, so each binary's load test starts from the
+                same empty-app state while MySQL page cache stays warm (the
+                comparison measures app code, not cold MySQL).
+
+                exec-maven-plugin is declared before quarkus-maven-plugin so that
+                within any phase shared by both plugins, exec executions (save +
+                test) run before quarkus:build executions. That gives us the
+                interleaved sequence build -> save -> test -> build -> save -> test
+                -> build -> save -> test in one reactor, no nested mvn.
+
+                STUB: the .sh / .ps1 scripts under scripts/graalvm-pgo/ are
+                placeholders; workload.sh in particular runs a stand-in GET
+                against the index page. See scripts/graalvm-pgo/README.md for
+                the fill-in list.
+            -->
+            <id>native-release-pgo</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>compose-up</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <arguments>
+                                        <argument>compose</argument>
+                                        <argument>-f</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/docker-compose.yml</argument>
+                                        <argument>up</argument>
+                                        <argument>-d</argument>
+                                        <argument>--wait</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>save-normal-runner</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <argument>mkdir -p ${project.build.directory}/runners &amp;&amp; mv ${project.build.directory}/securedoc-*-runner ${project.build.directory}/runners/normal-runner</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>test-normal</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-test-binary.sh</argument>
+                                        <argument>normal</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <!--
+                                Truncate the app tables before the next load test. The MySQL
+                                container stays up across all three tests (so MySQL page cache
+                                state is warm and comparable), but the application data must
+                                reset to give the next binary the same empty-app starting state
+                                as the first one.
+                            -->
+                            <execution>
+                                <id>reset-db-after-normal</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-reset-db.sh</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>save-instrumented-runner</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <argument>mv ${project.build.directory}/securedoc-*-runner ${project.build.directory}/runners/instrumented-runner</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>test-instrumented</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-test-binary.sh</argument>
+                                        <argument>instrumented</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>reset-db-after-instrumented</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-reset-db.sh</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>save-optimized-runner</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>-c</argument>
+                                        <argument>mv ${project.build.directory}/securedoc-*-runner ${project.build.directory}/runners/optimized-runner</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>test-optimized</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-test-binary.sh</argument>
+                                        <argument>optimized</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>compare-results</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-compare.sh</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>select-winner</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-select-winner.sh</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>compose-down</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <arguments>
+                                        <argument>compose</argument>
+                                        <argument>-f</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/docker-compose.yml</argument>
+                                        <argument>down</argument>
+                                        <argument>-v</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.quarkus.platform</groupId>
+                        <artifactId>quarkus-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-normal</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
+                                        <quarkus.native.enabled>true</quarkus.native.enabled>
+                                        <quarkus.native.additional-build-args>${native.build.args.base}</quarkus.native.additional-build-args>
+                                        <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-instrumented</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
+                                        <quarkus.native.enabled>true</quarkus.native.enabled>
+                                        <quarkus.native.additional-build-args>${native.build.args.base} --pgo-instrument,</quarkus.native.additional-build-args>
+                                        <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-optimized</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
+                                        <quarkus.native.enabled>true</quarkus.native.enabled>
+                                        <quarkus.native.additional-build-args>${native.build.args.base} --pgo=${project.build.directory}/pgo-run/default.iprof,</quarkus.native.additional-build-args>
+                                        <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!--
+                Auto-activated on Windows when native-release-pgo is also active.
+                Overrides the bash exec executions to invoke their .ps1
+                counterparts via pwsh.
+            -->
+            <id>native-release-pgo-platform-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>test-normal</id>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-test-binary.ps1</argument>
+                                        <argument>normal</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>reset-db-after-normal</id>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-reset-db.ps1</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>test-instrumented</id>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-test-binary.ps1</argument>
+                                        <argument>instrumented</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>reset-db-after-instrumented</id>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-reset-db.ps1</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>test-optimized</id>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-test-binary.ps1</argument>
+                                        <argument>optimized</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>compare-results</id>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-compare.ps1</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>select-winner</id>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-select-winner.ps1</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

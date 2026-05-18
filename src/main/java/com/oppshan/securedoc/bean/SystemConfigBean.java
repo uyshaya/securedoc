@@ -9,6 +9,7 @@ import jakarta.inject.Named;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
+import java.util.UUID;
 
 @Named
 @ApplicationScoped
@@ -17,12 +18,21 @@ public class SystemConfigBean {
     public static final String APPLICATION_NAME = "SecureDoc";
     public static final String APPLICATION_VERSION = "1.0.0";
 
-    @Inject
-    @ConfigProperty(name = "securedoc.org.active-type", defaultValue = "BARANGAY")
-    Organization.Type activeOrgType;
+    private final Organization.Type activeOrgType;
+    private final OrganizationRepository organizationRepo;
 
     @Inject
-    OrganizationRepository organizationRepo;
+    public SystemConfigBean(@ConfigProperty(name = "securedoc.org.active-type",
+                                            defaultValue = "BARANGAY")
+                            Organization.Type activeOrgType,
+                            OrganizationRepository organizationRepo) {
+        this.activeOrgType = activeOrgType;
+        this.organizationRepo = organizationRepo;
+    }
+
+    protected SystemConfigBean() {
+        this(null, null);
+    }
 
     /**
      * Server-side search for the registration autocomplete. Returns up to ~tens
@@ -31,14 +41,20 @@ public class SystemConfigBean {
      * the table.
      */
     public List<OrganizationView> searchOrganizations(String query) {
-        if (query == null || query.isBlank()) return List.of();
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
         return organizationRepo.searchByTypeAndQuery(activeOrgType, query.trim()).stream()
                 .map(Organization::toView)
                 .toList();
     }
 
-    public OrganizationView findOrganizationById(Long id) {
-        if (id == null) return null;
+    public OrganizationView findOrganizationById(UUID id) {
+        if (id == null) {
+            return null;
+        }
+
         return organizationRepo.findById(id).map(Organization::toView).orElse(null);
     }
 

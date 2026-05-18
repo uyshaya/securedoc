@@ -13,13 +13,14 @@ import jakarta.inject.Named;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Backs the multi-scene resident document-request flow on
  * /user/request.xhtml. Session-scoped because the user walks through
- * scenes (landing → email → otp → details → review → confirm) via JS
+ * scenes (landing -> email -> otp -> details -> review -> confirm) via JS
  * scene transitions, and the picked organization/template selections
- * must persist across them. Anonymous flow — no login required.
+ * must persist across them. Anonymous flow -- no login required.
  *
  * <p>Currently only the landing scene is JSF-bound; subsequent scenes
  * remain HTML/JS stubs until their backends land.
@@ -31,15 +32,23 @@ public class RequestBean implements Serializable {
     @Serial
     private static final long serialVersionUID = 8273419837461829374L;
 
-    @Inject
-    SystemConfigBean system;
-
-    @Inject
-    DocumentTemplateRepository templateRepo;
+    private final SystemConfigBean system;
+    private final DocumentTemplateRepository templateRepo;
 
     private OrganizationView selectedOrganization;
-    private Long selectedTemplateId;
+    private UUID selectedTemplateId;
     private List<DocumentTemplateView> availableTemplates = List.of();
+
+    @Inject
+    public RequestBean(SystemConfigBean system,
+                       DocumentTemplateRepository templateRepo) {
+        this.system = system;
+        this.templateRepo = templateRepo;
+    }
+
+    protected RequestBean() {
+        this(null, null);
+    }
 
     /** Called by the autocomplete's {@code completeMethod} as the resident types. */
     public List<OrganizationView> completeOrganization(String query) {
@@ -53,10 +62,12 @@ public class RequestBean implements Serializable {
      */
     public void onOrganizationSelected() {
         selectedTemplateId = null;
+
         if (selectedOrganization == null || selectedOrganization.getId() == null) {
             availableTemplates = List.of();
             return;
         }
+
         availableTemplates = templateRepo.listActiveByOrganizationId(selectedOrganization.getId()).stream()
                 .map(DocumentTemplate::toView)
                 .toList();
@@ -64,22 +75,25 @@ public class RequestBean implements Serializable {
 
     /**
      * Server-side validation invoked by the landing-scene "Proceed" button.
-     * Returns null in all cases — scene advancement is driven by the
+     * Returns null in all cases -- scene advancement is driven by the
      * button's {@code oncomplete} callback, which checks
      * {@code args.validationFailed} before calling {@code goTo('p-email')}.
      */
     public String proceedFromLanding() {
-        FacesContext fc = FacesContext.getCurrentInstance();
+        final var fc = FacesContext.getCurrentInstance();
+
         if (selectedOrganization == null || selectedOrganization.getId() == null) {
             fc.addMessage(null, error("Please select your " + system.getOrgLabelLower() + "."));
             fc.validationFailed();
             return null;
         }
+
         if (selectedTemplateId == null) {
             fc.addMessage(null, error("Please select a certificate type."));
             fc.validationFailed();
             return null;
         }
+
         return null;
     }
 
@@ -95,11 +109,11 @@ public class RequestBean implements Serializable {
         this.selectedOrganization = selectedOrganization;
     }
 
-    public Long getSelectedTemplateId() {
+    public UUID getSelectedTemplateId() {
         return selectedTemplateId;
     }
 
-    public void setSelectedTemplateId(Long selectedTemplateId) {
+    public void setSelectedTemplateId(UUID selectedTemplateId) {
         this.selectedTemplateId = selectedTemplateId;
     }
 
@@ -110,11 +124,13 @@ public class RequestBean implements Serializable {
     /** Placeholder text for the cert-type dropdown, reflecting the org-selection state. */
     public String getCertTypePlaceholder() {
         if (selectedOrganization == null) {
-            return "Select your " + system.getOrgLabelLower() + " first…";
+            return "Select your " + system.getOrgLabelLower() + " first...";
         }
+
         if (availableTemplates.isEmpty()) {
             return "No certificate types available for this " + system.getOrgLabelLower();
         }
-        return "Select a certificate type…";
+
+        return "Select a certificate type...";
     }
 }

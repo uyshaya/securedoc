@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Admin-driven staff CRUD scoped to a single organization. Self-service
@@ -18,32 +19,36 @@ import java.util.List;
 @ApplicationScoped
 public class StaffManagementService {
 
-    @Inject
-    StaffRepository staffRepo;
+    private final StaffRepository staffRepo;
 
-    public List<StaffView> listByOrganization(Long organizationId) {
+    @Inject
+    public StaffManagementService(StaffRepository staffRepo) {
+        this.staffRepo = staffRepo;
+    }
+
+    public List<StaffView> listByOrganization(UUID organizationId) {
         return staffRepo.listByOrganizationId(organizationId).stream()
                 .map(Staff::toView)
                 .toList();
     }
 
     @Transactional
-    public void setActive(Long staffId, boolean active) {
+    public void setActive(UUID staffId, boolean active) {
         staffRepo.setActive(staffId, active);
     }
 
     @Transactional
-    public void changeRole(Long staffId, Staff.Role role) {
+    public void changeRole(UUID staffId, Staff.Role role) {
         staffRepo.setRole(staffId, role);
     }
 
     /**
      * Hard-delete. Will fail if the staff is referenced by an existing
-     * request (processed_by) — caller should surface the error and
+     * request (processed_by) -- caller should surface the error and
      * consider deactivating instead.
      */
     @Transactional
-    public void deleteStaff(Long staffId) {
+    public void deleteStaff(UUID staffId) {
         staffRepo.deleteById(staffId);
     }
 }

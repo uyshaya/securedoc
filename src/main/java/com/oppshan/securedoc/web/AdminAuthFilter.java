@@ -2,7 +2,11 @@ package com.oppshan.securedoc.web;
 
 import com.oppshan.securedoc.bean.AdminAuthBean;
 import jakarta.inject.Inject;
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,13 +16,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Gate for /admin/*. Three layers:
- *   1. Public paths (login, register) pass through unauthenticated.
- *   2. Authenticated paths require an active session — otherwise
- *      redirect to /admin/login.xhtml?expired=1.
- *   3. Admin-only paths (e.g. /admin/staff/*) additionally require
- *      role=ADMIN — otherwise redirect to /admin/dashboard.xhtml?denied=1
- *      so a signed-in staff member doesn't get logged out, just bounced.
+ * Gate for /admin/*. Three layers: 1. Public paths (login, register) pass through unauthenticated. 2. Authenticated
+ * paths require an active session -- otherwise redirect to /admin/login.xhtml?expired=1. 3. Admin-only paths (e.g.
+ * /admin/staff/*) additionally require role=ADMIN -- otherwise redirect to /admin/dashboard.xhtml?denied=1 so a
+ * signed-in staff member doesn't get logged out, just bounced.
  */
 @WebFilter(urlPatterns = "/admin/*")
 public class AdminAuthFilter implements Filter {
@@ -36,13 +37,12 @@ public class AdminAuthFilter implements Filter {
     AdminAuthBean adminAuthBean;
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, ServletException {
-
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) res;
-
-        String path = request.getServletPath();
+    public void doFilter(ServletRequest req,
+                         ServletResponse res,
+                         FilterChain chain) throws IOException, ServletException {
+        final var request = (HttpServletRequest) req;
+        final var response = (HttpServletResponse) res;
+        final var path = request.getServletPath();
 
         // (1) login / register pages are public so users can come in.
         if (PUBLIC_PATHS.contains(path)) {
@@ -75,9 +75,12 @@ public class AdminAuthFilter implements Filter {
     }
 
     private static boolean isAdminOnly(String path) {
-        for (String prefix : ADMIN_ONLY_PREFIXES) {
-            if (path.startsWith(prefix)) return true;
+        for (final var prefix : ADMIN_ONLY_PREFIXES) {
+            if (path.startsWith(prefix)) {
+                return true;
+            }
         }
+
         return false;
     }
 }

@@ -1,5 +1,6 @@
 package com.oppshan.securedoc.bean;
 
+import com.oppshan.securedoc.common.I18n;
 import com.oppshan.securedoc.dto.OrganizationView;
 import com.oppshan.securedoc.dto.StaffRegistrationCreate;
 import com.oppshan.securedoc.service.AdminAuthService;
@@ -11,12 +12,13 @@ import jakarta.inject.Named;
 import org.jboss.logging.Logger;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Backs /admin/register.xhtml. Self-service staff registration:
  * collects basic fields + the applicant's organization, validates, hashes
- * the password (via {@link AdminAuthService} → PasswordService), and
- * persists the Staff row with {@code is_active = false}.
+ * the password (via {@link AdminAuthService} -> PasswordService), and
+ * persists the Staff row with {@code active = false}.
  *
  * <p>The organization picker is a {@code <p:autoComplete>} backed by
  * {@link #completeOrganization(String)}; the bean holds the full
@@ -30,16 +32,12 @@ import java.util.List;
 @RequestScoped
 public class AdminRegistrationBean {
 
-    @Inject
-    private AdminAuthService authService;
-
-    @Inject
-    private SystemConfigBean system;
-
-    @Inject
-    private Logger logger;
-
     private static final int MIN_PASSWORD_LENGTH = 8;
+
+    private final AdminAuthService authService;
+    private final SystemConfigBean system;
+    private final I18n i18n;
+    private final Logger logger;
 
     private String firstName;
     private String lastName;
@@ -48,65 +46,82 @@ public class AdminRegistrationBean {
     private String password;
     private String confirmPassword;
 
+    @Inject
+    public AdminRegistrationBean(AdminAuthService authService,
+                                 SystemConfigBean system,
+                                 I18n i18n,
+                                 Logger logger) {
+        this.authService = authService;
+        this.system = system;
+        this.i18n = i18n;
+        this.logger = logger;
+    }
+
+    protected AdminRegistrationBean() {
+        this(null, null, null, null);
+    }
+
     /** Called by {@code <p:autoComplete completeMethod>} as the user types. */
     public List<OrganizationView> completeOrganization(String query) {
         return system.searchOrganizations(query);
     }
 
     public String register() {
-        FacesContext fc = FacesContext.getCurrentInstance();
+        final var facesContext = FacesContext.getCurrentInstance();
 
         if (isBlank(firstName) || isBlank(lastName) || isBlank(email)
                 || isBlank(password) || isBlank(confirmPassword)) {
-            fc.addMessage(null, error("All fields are required."));
+            facesContext.addMessage(null, error(i18n.get("register.all.fields.required")));
             return null;
         }
 
-        String orgLabelLower = system.getOrgLabelLower();
-        Long organizationId = selectedOrganization != null ? selectedOrganization.getId() : null;
+        final var orgLabelLower = system.getOrgLabelLower();
+        final UUID organizationId = selectedOrganization != null ? selectedOrganization.getId() : null;
         logger.infof("Organization ID: %s", organizationId);
+
         if (organizationId == null) {
-            fc.addMessage(null, error("Please select your " + orgLabelLower + "."));
+            facesContext.addMessage(null, error(i18n.get("register.select.organization", orgLabelLower)));
             return null;
         }
 
         if (!password.equals(confirmPassword)) {
-            fc.addMessage(null, error("Passwords do not match."));
+            facesContext.addMessage(null, error(i18n.get("register.passwords.do.not.match")));
             return null;
         }
 
         if (password.length() < MIN_PASSWORD_LENGTH) {
-            fc.addMessage(null, error("Password must be at least " + MIN_PASSWORD_LENGTH + " characters."));
+            facesContext.addMessage(null,
+                    error(i18n.get("register.password.too.short", MIN_PASSWORD_LENGTH)));
             return null;
         }
 
         if (authService.emailTakenInOrganization(email, organizationId)) {
-            fc.addMessage(null, error("An account with that email already exists for the selected " + orgLabelLower + "."));
+            facesContext.addMessage(null, error(i18n.get("register.email.taken", orgLabelLower)));
             return null;
         }
 
         try {
-            StaffRegistrationCreate form = new StaffRegistrationCreate();
-            form.setFirstName(firstName);
-            form.setLastName(lastName);
-            form.setEmail(email);
-            form.setPassword(password);
-            form.setOrganizationId(organizationId);
+            final var form = new StaffRegistrationCreate()
+                    .setFirstName(firstName)
+                    .setLastName(lastName)
+                    .setEmail(email)
+                    .setPassword(password)
+                    .setOrganizationId(organizationId);
             authService.createStaff(form);
-        } catch (RuntimeException e) {
-            fc.addMessage(null, error("Could not create account: " + e.getMessage()));
+        } catch (RuntimeException exception) {
+            facesContext.addMessage(null,
+                    error(i18n.get("register.create.failed", exception.getMessage())));
             return null;
         }
 
-        // Account is persisted as inactive; an admin must approve before sign-in.
-        fc.getExternalContext().getFlash().setKeepMessages(true);
-        fc.addMessage(null, info(
-                "Account submitted for approval. You'll be able to sign in once a " + orgLabelLower + " administrator approves your account."));
+        facesContext.getExternalContext().getFlash().setKeepMessages(true);
+        facesContext.addMessage(null,
+                info(i18n.get("register.submitted.for.approval", orgLabelLower)));
         return "/admin/login.xhtml?faces-redirect=true";
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.isBlank();
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     private static FacesMessage error(String summary) {

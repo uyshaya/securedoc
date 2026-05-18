@@ -1,0 +1,35 @@
+# docker-compose.yml -- PGO load-test backing services for securedoc.
+#
+# Brought up by the `native-release-pgo` Maven profile's prepare-package
+# phase (TODO: profile not yet wired in pom.xml); torn down by post-
+# integration-test or by the pgo-build.sh wrapper's EXIT/INT/TERM trap.
+#
+# STUB: securedoc has no Keycloak / OIDC, so this file ships MySQL only.
+# When tests need a real mailer to validate the OTP flow, add a MailHog
+# (or similar SMTP sink) service here and point quarkus.mailer.host at it.
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: securedoc-pgo-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: securedoc-pgo-root
+      MYSQL_DATABASE: securedoc
+      MYSQL_USER: securedoc_user
+      MYSQL_PASSWORD: securedoc-pgo-app
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    # Mount db-init/ to run any startup SQL. MySQL applies *.sql / *.sh in
+    # alphabetical order on first boot only.
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+
+# No named volumes: the container is wiped between PGO runs (`down -v` in
+# pgo-build.sh's trap), so persistence would only hide state-leakage bugs.

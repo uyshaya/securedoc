@@ -1,4 +1,4 @@
-/* ─ CERT HINTS ─ */
+/* - CERT HINTS - */
 const hints = {
   birth: 'Certified true copy of birth record from PSA.',
   marriage: 'Certified true copy of marriage record from PSA.',
@@ -11,7 +11,7 @@ const hints = {
   'late-reg': 'Registration of a civil event recorded past the deadline.',
 };
 
-/* ─ NAVIGATION ─ */
+/* - NAVIGATION - */
 function goTo(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -35,7 +35,7 @@ function populateFromLanding() {
   }
 }
 
-/* ─ EMAIL STEP ─ */
+/* - EMAIL STEP - */
 function onEmailInput() {
   const v = document.getElementById('emailInput').value.trim();
   const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -56,7 +56,7 @@ function sendOtp() {
   startResendTimer(30);
 }
 
-/* ─ OTP STEP ─ */
+/* - OTP STEP - */
 const DEMO_OTP = '123456';
 let otpVal = ['', '', '', '', '', ''];
 
@@ -155,7 +155,7 @@ function resendOtp() {
   startResendTimer(30);
 }
 
-/* ─ FORM STEP ─ */
+/* - FORM STEP - */
 function onPurposeChange() {
   document.getElementById('otherPurposeWrap').style.display =
     document.getElementById('fPurpose').value === 'other' ? 'flex' : 'none';
@@ -169,7 +169,7 @@ function onFileSelected(e) {
   z.style.borderColor = 'var(--navy-mid)'; z.style.background = 'var(--blue-tint)';
 }
 
-/* ─ REVIEW STEP ─ */
+/* - REVIEW STEP - */
 function goToReview() {
   const sel = document.getElementById('landingForm:certType');
   const opt = sel && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
@@ -182,18 +182,18 @@ function goToReview() {
     document.getElementById('fFirst').value.trim(),
     document.getElementById('fMiddle').value.trim(),
     document.getElementById('fLast').value.trim()
-  ].filter(Boolean).join(' ') || '—';
+  ].filter(Boolean).join(' ') || '--';
 
   const rows = [
-    { k: 'Certificate Type', v: opt ? opt.text : '—' },
+    { k: 'Certificate Type', v: opt ? opt.text : '--' },
     { k: 'Full Name', v: fullName },
     { k: 'Date of Birth', v: fmtDate(document.getElementById('fDob').value) },
-    { k: 'Sex', v: document.getElementById('fSex').value === 'M' ? 'Male' : document.getElementById('fSex').value === 'F' ? 'Female' : '—' },
-    { k: 'Contact Number', v: document.getElementById('fPhone').value.trim() || '—' },
-    { k: 'Email Address', v: document.getElementById('fEmail').value || '—' },
-    { k: 'Purpose', v: purposeOpt?.value === 'other' ? (document.getElementById('fOtherPurpose').value || '—') : (purposeOpt?.text || '—') },
-    { k: 'Valid ID Type', v: idOpt?.value ? idOpt.text : '—' },
-    { k: 'ID Uploaded', v: document.getElementById('uploadFname').textContent ? 'Yes ✓' : 'No' },
+    { k: 'Sex', v: document.getElementById('fSex').value === 'M' ? 'Male' : document.getElementById('fSex').value === 'F' ? 'Female' : '--' },
+    { k: 'Contact Number', v: document.getElementById('fPhone').value.trim() || '--' },
+    { k: 'Email Address', v: document.getElementById('fEmail').value || '--' },
+    { k: 'Purpose', v: purposeOpt?.value === 'other' ? (document.getElementById('fOtherPurpose').value || '--') : (purposeOpt?.text || '--') },
+    { k: 'Valid ID Type', v: idOpt?.value ? idOpt.text : '--' },
+    { k: 'ID Uploaded', v: document.getElementById('uploadFname').textContent ? 'Yes [OK]' : 'No' },
   ];
 
   document.getElementById('reviewList').innerHTML = rows.map(r => `
@@ -206,11 +206,11 @@ function goToReview() {
 }
 
 function fmtDate(v) {
-  if (!v) return '—';
+  if (!v) return '--';
   return new Date(v + 'T00:00:00').toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-/* ─ SUBMIT ─ */
+/* - SUBMIT - */
 function submitRequest() {
   const ref = 'SC-' + new Date().getFullYear() + '-' + String(Math.floor(10000 + Math.random() * 90000));
   document.getElementById('refNum').textContent = ref;
@@ -240,13 +240,13 @@ function startOver() {
   goTo('p-landing');
 }
 
-/* ─ TRACK STATUS ─ */
+/* - TRACK STATUS - */
 const DEMO_STATUSES = {
-  'SC-2025-00001': { status: 'SUBMITTED',    doc: 'Barangay Clearance',       submitted: 'March 10, 2025', updated: 'March 10, 2025 · 9:42 AM' },
-  'SC-2025-00202': { status: 'UNDER REVIEW', doc: 'Certificate of Residency', submitted: 'March 14, 2025', updated: 'March 15, 2025 · 11:05 AM' },
-  'SC-2025-00303': { status: 'PROCESSING',   doc: 'Certificate of Indigency', submitted: 'March 12, 2025', updated: 'March 16, 2025 · 2:30 PM' },
-  'SC-2025-00404': { status: 'COMPLETED',    doc: 'Barangay Clearance',       submitted: 'March 8, 2025',  updated: 'March 13, 2025 · 4:15 PM' },
-  'SC-2025-00505': { status: 'REJECTED',     doc: 'Certificate of Residency', submitted: 'March 11, 2025', updated: 'March 12, 2025 · 10:00 AM' },
+  'SC-2025-00001': { status: 'SUBMITTED',    doc: 'Barangay Clearance',       submitted: 'March 10, 2025', updated: 'March 10, 2025 . 9:42 AM' },
+  'SC-2025-00202': { status: 'UNDER REVIEW', doc: 'Certificate of Residency', submitted: 'March 14, 2025', updated: 'March 15, 2025 . 11:05 AM' },
+  'SC-2025-00303': { status: 'PROCESSING',   doc: 'Certificate of Indigency', submitted: 'March 12, 2025', updated: 'March 16, 2025 . 2:30 PM' },
+  'SC-2025-00404': { status: 'COMPLETED',    doc: 'Barangay Clearance',       submitted: 'March 8, 2025',  updated: 'March 13, 2025 . 4:15 PM' },
+  'SC-2025-00505': { status: 'REJECTED',     doc: 'Certificate of Residency', submitted: 'March 11, 2025', updated: 'March 12, 2025 . 10:00 AM' },
 };
 
 const STATUS_CONFIG = {
@@ -254,7 +254,7 @@ const STATUS_CONFIG = {
     cls: 'st-submitted',
     icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#185FA5" stroke-width="1.6"/><path d="M10 6v4.5l2.5 2" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     desc: 'Your request has been received and is in the queue. No action is needed from you at this time.',
-    notice: '<strong>What to expect next</strong>A staff member will review your submitted documents within 1–2 business days.',
+    notice: '<strong>What to expect next</strong>A staff member will review your submitted documents within 1-2 business days.',
   },
   'UNDER REVIEW': {
     cls: 'st-review',
@@ -266,7 +266,7 @@ const STATUS_CONFIG = {
     cls: 'st-processing',
     icon: `<svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 100 14A7 7 0 0010 3z" stroke="#4361C2" stroke-width="1.5" stroke-dasharray="3 2"/><path d="M10 6v4l2 2" stroke="#4361C2" stroke-width="1.5" stroke-linecap="round"/></svg>`,
     desc: 'Your request has been approved and your document is currently being prepared.',
-    notice: '<strong>Document in preparation</strong>Your document is being printed and signed. It should be ready for pickup within the next 1–2 business days.',
+    notice: '<strong>Document in preparation</strong>Your document is being printed and signed. It should be ready for pickup within the next 1-2 business days.',
   },
   'COMPLETED': {
     cls: 'st-completed',

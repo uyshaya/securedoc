@@ -1,19 +1,17 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="jakarta.faces.html"
-                xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Dashboard – SecureDoc Admin</title>
+        <title>#{msg['page.dashboard.title']}</title>
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">Dashboard</h1>
+        <h1 class="console-page-title">#{msg['page.dashboard.heading']}</h1>
     </ui:define>
 
     <ui:define name="content">
-        <p>Admin console scaffold. Replace with dashboard widgets.</p>
+        <p>#{msg['page.dashboard.placeholder']}</p>
     </ui:define>
 
 </ui:composition>

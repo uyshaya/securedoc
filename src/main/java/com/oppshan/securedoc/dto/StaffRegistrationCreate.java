@@ -1,13 +1,17 @@
 package com.oppshan.securedoc.dto;
 
+import com.google.common.base.MoreObjects;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Form payload submitted from /admin/register.xhtml. Bundles the
  * fields that {@code AdminAuthService.createStaff} needs so the
  * service signature doesn't grow a long positional argument list.
- * Bean-side fields like {@code confirmPassword} stay in the bean —
+ * Bean-side fields like {@code confirmPassword} stay in the bean --
  * they never reach the service.
  */
 public class StaffRegistrationCreate implements Serializable {
@@ -16,10 +20,14 @@ public class StaffRegistrationCreate implements Serializable {
     private static final long serialVersionUID = 8892600475009793842L;
 
     private String firstName;
+
     private String lastName;
+
     private String email;
+
     private String password;
-    private Long organizationId;
+
+    private UUID organizationId;
 
     public StaffRegistrationCreate() {
     }
@@ -28,39 +36,78 @@ public class StaffRegistrationCreate implements Serializable {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public StaffRegistrationCreate setFirstName(String firstName) {
         this.firstName = firstName;
+        return this;
     }
 
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
+    public StaffRegistrationCreate setLastName(String lastName) {
         this.lastName = lastName;
+        return this;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public StaffRegistrationCreate setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public StaffRegistrationCreate setPassword(String password) {
         this.password = password;
+        return this;
     }
 
-    public Long getOrganizationId() {
+    public UUID getOrganizationId() {
         return organizationId;
     }
 
-    public void setOrganizationId(Long organizationId) {
+    public StaffRegistrationCreate setOrganizationId(UUID organizationId) {
         this.organizationId = organizationId;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof final StaffRegistrationCreate that)) {
+            return false;
+        }
+
+        // Password intentionally excluded -- we don't want it in equality semantics
+        // (it's plaintext until the service hashes it; equals should be by identity here).
+        return Objects.equals(firstName, that.firstName) &&
+               Objects.equals(lastName, that.lastName) &&
+               Objects.equals(email, that.email) &&
+               Objects.equals(organizationId, that.organizationId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, email, organizationId);
+    }
+
+    @Override
+    public String toString() {
+        // password deliberately omitted -- never log plaintext credentials.
+        return MoreObjects.toStringHelper(this)
+                .add("firstName", firstName)
+                .add("lastName", lastName)
+                .add("email", email)
+                .add("organizationId", organizationId)
+                .toString();
     }
 }

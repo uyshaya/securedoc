@@ -6,14 +6,14 @@
                 template="/WEB-INF/templates/resident-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Request a Document – SecureDoc</title>
+        <title>#{msg['page.request.title']}</title>
     </ui:define>
 
     <ui:define name="content">
 
-        <!-- ══════════════════════════════════════
-             P1 · LANDING — Select Certificate
-        ═══════════════════════════════════════ -->
+        <!-- ======================================
+             P1 . LANDING - Select Certificate
+        ======================================= -->
         <div class="page active" id="p-landing">
             <div class="card">
                 <div class="hd">
@@ -24,21 +24,21 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="brand-name">Secure<em>Doc</em></div>
-                        <div class="tagline">Official Document Services</div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
+                        <div class="tagline">#{msg['request.tagline']}</div>
                     </div>
                 </div>
 
                 <div class="bd">
                     <div>
                         <div class="hours-hd">
-                            <span class="section-lbl">Business Hours</span>
-                            <span class="badge-open"><span class="dot"></span>Open now</span>
+                            <span class="section-lbl">#{msg['request.business.hours']}</span>
+                            <span class="badge-open"><span class="dot"></span>#{msg['request.open.now']}</span>
                         </div>
                         <div class="hours-grid">
-                            <div class="hours-pill"><span class="hours-day">Mon – Fri</span><span class="hours-time">8:00 AM – 5:00 PM</span></div>
-                            <div class="hours-pill"><span class="hours-day">Saturday</span><span class="hours-time">8:00 AM – 12:00 PM</span></div>
-                            <div class="hours-pill"><span class="hours-day">Sunday</span><span class="hours-closed">Closed</span></div>
+                            <div class="hours-pill"><span class="hours-day">#{msg['request.day.mon.fri']}</span><span class="hours-time">#{msg['request.hours.weekdays']}</span></div>
+                            <div class="hours-pill"><span class="hours-day">#{msg['request.day.saturday']}</span><span class="hours-time">#{msg['request.hours.saturday']}</span></div>
+                            <div class="hours-pill"><span class="hours-day">#{msg['request.day.sunday']}</span><span class="hours-closed">#{msg['request.hours.closed']}</span></div>
                         </div>
                     </div>
 
@@ -51,8 +51,8 @@
                             <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
                         </svg>
                         <div class="notice-text">
-                            <strong>Valid ID required for all requests</strong>
-                            All certificate requests require a valid proof of identification to ensure authenticity and protect against unauthorized access.
+                            <strong>#{msg['request.notice.valid.id.title']}</strong>
+                            #{msg['request.notice.valid.id.body']}
                         </div>
                     </div>
 
@@ -71,7 +71,7 @@
                                             forceSelection="true"
                                             minQueryLength="2"
                                             queryDelay="200"
-                                            placeholder="Search your #{systemConfigBean.orgLabelLower} by name or code…">
+                                            placeholder="#{i18n.get('register.placeholder.organization', systemConfigBean.orgLabelLower)}">
                                 <p:ajax event="itemSelect"
                                         listener="#{requestBean.onOrganizationSelected}"
                                         update="certTypeWrap"/>
@@ -79,11 +79,11 @@
                                         listener="#{requestBean.onOrganizationSelected}"
                                         update="certTypeWrap"/>
                             </p:autoComplete>
-                            <span class="cert-hint">Pick the office that will issue your document.</span>
+                            <span class="cert-hint">#{msg['request.label.organization.hint']}</span>
                         </div>
 
                         <h:panelGroup layout="block" styleClass="fwrap" id="certTypeWrap">
-                            <label class="flabel" for="certType">Certificate type</label>
+                            <label class="flabel" for="certType">#{msg['request.label.cert.type']}</label>
                             <h:selectOneMenu id="certType"
                                              value="#{requestBean.selectedTemplateId}"
                                              disabled="#{requestBean.selectedOrganization == null}">
@@ -95,7 +95,7 @@
                                                itemValue="#{t.id}"
                                                itemLabel="#{t.name}"/>
                             </h:selectOneMenu>
-                            <span class="cert-hint">Choose the document you need to request.</span>
+                            <span class="cert-hint">#{msg['request.label.cert.type.hint']}</span>
                         </h:panelGroup>
 
                         <p:messages globalOnly="true"
@@ -103,13 +103,13 @@
                                     showDetail="false"/>
 
                         <div class="cta-row">
-                            <p:commandButton value="Proceed to Request"
+                            <p:commandButton value="#{msg['request.button.proceed']}"
                                              styleClass="btn-primary"
                                              action="#{requestBean.proceedFromLanding}"
                                              process="@form"
                                              update="@form"
                                              oncomplete="if (args &amp;&amp; !args.validationFailed) { populateFromLanding(); goTo('p-email'); }"/>
-                            <button type="button" class="btn-secondary" onclick="goTo('p-track')">Track request</button>
+                            <button type="button" class="btn-secondary" onclick="goTo('p-track')">#{msg['request.button.track']}</button>
                         </div>
                     </h:form>
                 </div>
@@ -117,45 +117,45 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P2 · EMAIL — Enter email address
-        ═══════════════════════════════════════ -->
+        <!-- ======================================
+             P2 . EMAIL - Enter email address
+        ======================================= -->
         <div class="page" id="p-email">
             <div class="card">
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-landing')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['request.button.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
                 <div class="steps">
-                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">Verify</span></div>
+                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">#{msg['request.step.verify']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">#{msg['request.step.details']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">#{msg['request.step.review']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">#{msg['request.step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
                     <div>
-                        <div class="sec-title">Verify your email</div>
-                        <div class="sec-sub">Enter your email address. We'll send a one-time code to confirm it's yours — we'll use this to notify you when your certificate is ready.</div>
+                        <div class="sec-title">#{msg['request.email.title']}</div>
+                        <div class="sec-sub">#{msg['request.email.sub']}</div>
                     </div>
 
                     <div class="fwrap">
-                        <label class="flabel" for="emailInput">Email address <span class="req">*</span></label>
+                        <label class="flabel" for="emailInput">#{msg['request.email.label']} <span class="req">#{msg['request.required.marker']}</span></label>
                         <div class="email-send-row">
-                            <input type="email" id="emailInput" placeholder="e.g. juan.delacruz@email.com"
+                            <input type="email" id="emailInput" placeholder="#{msg['request.email.placeholder']}"
                                    oninput="onEmailInput()" onkeydown="if(event.key==='Enter') sendOtp()"/>
-                            <button type="button" class="btn-inline" id="btnSendOtp" disabled="disabled" onclick="sendOtp()">Send code</button>
+                            <button type="button" class="btn-inline" id="btnSendOtp" disabled="disabled" onclick="sendOtp()">#{msg['request.email.button.send']}</button>
                         </div>
-                        <span class="fhint">A 6-digit verification code will be sent to this address.</span>
+                        <span class="fhint">#{msg['request.email.hint']}</span>
                     </div>
 
                     <div class="notice-error" id="emailErr">
@@ -164,42 +164,42 @@
                             <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
                             <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
                         </svg>
-                        <span id="emailErrMsg">Please enter a valid email address.</span>
+                        <span id="emailErrMsg">#{msg['request.email.error.invalid']}</span>
                     </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P3 · OTP — Enter code
-        ═══════════════════════════════════════ -->
+        <!-- ======================================
+             P3 . OTP - Enter code
+        ======================================= -->
         <div class="page" id="p-otp">
             <div class="card">
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-email')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['request.button.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
                 <div class="steps">
-                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">Verify</span></div>
+                    <div class="step now"><div class="step-n">1</div><span class="step-lbl">#{msg['request.step.verify']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step next"><div class="step-n">2</div><span class="step-lbl">#{msg['request.step.details']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">#{msg['request.step.review']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">#{msg['request.step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
                     <div>
-                        <div class="sec-title">Enter verification code</div>
-                        <div class="sec-sub">We sent a 6-digit code to <strong id="otpEmailDisplay"
+                        <div class="sec-title">#{msg['request.otp.title']}</div>
+                        <div class="sec-sub">#{msg['request.otp.sub.prefix']} <strong id="otpEmailDisplay"
                                                                                style="color:var(--navy);font-weight:600"></strong>.
                             #{msg['otp.expiry.info']}
                         </div>
@@ -221,39 +221,39 @@
                                 <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
                                 <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
                             </svg>
-                            Incorrect code. Please try again.
+                            #{msg['request.otp.error.incorrect']}
                         </div>
 
-                        <p class="otp-resend">Didn't receive it? <button type="button" id="btnResend" onclick="resendOtp()" disabled="disabled">Resend code</button> <span id="resendTimer"></span></p>
+                        <p class="otp-resend">#{msg['request.otp.resend.prompt']} <button type="button" id="btnResend" onclick="resendOtp()" disabled="disabled">#{msg['request.otp.resend']}</button> <span id="resendTimer"></span></p>
                     </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P4 · FORM — Request details
-        ═══════════════════════════════════════ -->
+        <!-- ======================================
+             P4 . FORM - Request details
+        ======================================= -->
         <div class="page" id="p-form">
             <div class="card">
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-otp')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['request.button.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
                 <div class="steps">
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">#{msg['request.step.verify']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step now"><div class="step-n">2</div><span class="step-lbl">Details</span></div>
+                    <div class="step now"><div class="step-n">2</div><span class="step-lbl">#{msg['request.step.details']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step next"><div class="step-n">3</div><span class="step-lbl">#{msg['request.step.review']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">#{msg['request.step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
@@ -266,43 +266,43 @@
                             </svg>
                         </div>
                         <div>
-                            <div class="cert-name" id="formCertName">—</div>
-                            <div class="cert-category" id="formCertCat">—</div>
+                            <div class="cert-name" id="formCertName">--</div>
+                            <div class="cert-category" id="formCertCat">--</div>
                         </div>
                     </div>
 
                     <hr class="div"/>
 
                     <div style="display:flex;flex-direction:column;gap:14px">
-                        <div class="sec-lbl">Personal Information</div>
+                        <div class="sec-lbl">#{msg['request.form.section.personal']}</div>
 
                         <div class="frow">
                             <div class="fwrap">
-                                <label class="flabel" for="fFirst">First Name <span class="req">*</span></label>
-                                <input type="text" id="fFirst" placeholder="e.g. Juan"/>
+                                <label class="flabel" for="fFirst">#{msg['request.form.label.first.name']} <span class="req">#{msg['request.required.marker']}</span></label>
+                                <input type="text" id="fFirst" placeholder="#{msg['request.form.placeholder.first.name']}"/>
                             </div>
                             <div class="fwrap">
-                                <label class="flabel" for="fMiddle">Middle Name</label>
-                                <input type="text" id="fMiddle" placeholder="(optional)"/>
+                                <label class="flabel" for="fMiddle">#{msg['request.form.label.middle.name']}</label>
+                                <input type="text" id="fMiddle" placeholder="#{msg['request.form.placeholder.middle.name']}"/>
                             </div>
                         </div>
 
                         <div class="fwrap">
-                            <label class="flabel" for="fLast">Last Name <span class="req">*</span></label>
-                            <input type="text" id="fLast" placeholder="e.g. Dela Cruz"/>
+                            <label class="flabel" for="fLast">#{msg['request.form.label.last.name']} <span class="req">#{msg['request.required.marker']}</span></label>
+                            <input type="text" id="fLast" placeholder="#{msg['request.form.placeholder.last.name']}"/>
                         </div>
 
                         <div class="frow">
                             <div class="fwrap">
-                                <label class="flabel" for="fDob">Date of Birth <span class="req">*</span></label>
+                                <label class="flabel" for="fDob">#{msg['request.form.label.dob']} <span class="req">#{msg['request.required.marker']}</span></label>
                                 <input type="date" id="fDob"/>
                             </div>
                             <div class="fwrap">
-                                <label class="flabel" for="fSex">Sex <span class="req">*</span></label>
+                                <label class="flabel" for="fSex">#{msg['request.form.label.sex']} <span class="req">#{msg['request.required.marker']}</span></label>
                                 <select id="fSex">
-                                    <option value="" disabled="disabled" selected="selected">Select…</option>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
+                                    <option value="" disabled="disabled" selected="selected">#{msg['request.form.sex.placeholder']}</option>
+                                    <option value="M">#{msg['request.form.sex.male']}</option>
+                                    <option value="F">#{msg['request.form.sex.female']}</option>
                                 </select>
                             </div>
                         </div>
@@ -311,67 +311,67 @@
                     <hr class="div"/>
 
                     <div style="display:flex;flex-direction:column;gap:14px">
-                        <div class="sec-lbl">Contact &amp; Purpose</div>
+                        <div class="sec-lbl">#{msg['request.form.section.contact']}</div>
 
                         <div class="fwrap">
-                            <label class="flabel" for="fPhone">Contact Number <span class="req">*</span></label>
-                            <input type="tel" id="fPhone" placeholder="e.g. 09XX XXX XXXX"/>
+                            <label class="flabel" for="fPhone">#{msg['request.form.label.phone']} <span class="req">#{msg['request.required.marker']}</span></label>
+                            <input type="tel" id="fPhone" placeholder="#{msg['request.form.placeholder.phone']}"/>
                         </div>
 
                         <div class="fwrap">
                             <label class="flabel" style="justify-content:space-between">
-                                Email Address
+                                #{msg['request.form.label.email']}
                                 <span class="email-verified-badge">
                                     <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    Verified
+                                    #{msg['request.form.email.verified']}
                                 </span>
                             </label>
                             <input type="email" id="fEmail" class="email-locked" readonly="readonly"/>
                         </div>
 
                         <div class="fwrap">
-                            <label class="flabel" for="fPurpose">Purpose of Request <span class="req">*</span></label>
+                            <label class="flabel" for="fPurpose">#{msg['request.form.label.purpose']} <span class="req">#{msg['request.required.marker']}</span></label>
                             <select id="fPurpose" onchange="onPurposeChange()">
-                                <option value="" disabled="disabled" selected="selected">Select purpose…</option>
-                                <option value="employment">Employment / Job Application</option>
-                                <option value="travel">Travel / Passport / Visa</option>
-                                <option value="school">School Enrollment / Scholarship</option>
-                                <option value="loan">Bank / Loan Application</option>
-                                <option value="legal">Legal / Court Proceedings</option>
-                                <option value="insurance">Insurance / Benefits</option>
-                                <option value="personal">Personal Record / Reference</option>
-                                <option value="other">Other</option>
+                                <option value="" disabled="disabled" selected="selected">#{msg['request.form.purpose.placeholder']}</option>
+                                <option value="employment">#{msg['request.form.purpose.employment']}</option>
+                                <option value="travel">#{msg['request.form.purpose.travel']}</option>
+                                <option value="school">#{msg['request.form.purpose.school']}</option>
+                                <option value="loan">#{msg['request.form.purpose.loan']}</option>
+                                <option value="legal">#{msg['request.form.purpose.legal']}</option>
+                                <option value="insurance">#{msg['request.form.purpose.insurance']}</option>
+                                <option value="personal">#{msg['request.form.purpose.personal']}</option>
+                                <option value="other">#{msg['request.form.purpose.other']}</option>
                             </select>
                         </div>
 
                         <div class="fwrap" id="otherPurposeWrap" style="display:none">
-                            <label class="flabel" for="fOtherPurpose">Please specify <span class="req">*</span></label>
-                            <input type="text" id="fOtherPurpose" placeholder="Describe your purpose…"/>
+                            <label class="flabel" for="fOtherPurpose">#{msg['request.form.label.other.purpose']} <span class="req">#{msg['request.required.marker']}</span></label>
+                            <input type="text" id="fOtherPurpose" placeholder="#{msg['request.form.placeholder.other.purpose']}"/>
                         </div>
                     </div>
 
                     <hr class="div"/>
 
                     <div style="display:flex;flex-direction:column;gap:14px">
-                        <div class="sec-lbl">Proof of Identification</div>
+                        <div class="sec-lbl">#{msg['request.form.section.id']}</div>
 
                         <div class="fwrap">
-                            <label class="flabel" for="fIdType">ID Type <span class="req">*</span></label>
+                            <label class="flabel" for="fIdType">#{msg['request.form.label.id.type']} <span class="req">#{msg['request.required.marker']}</span></label>
                             <select id="fIdType">
-                                <option value="" disabled="disabled" selected="selected">Select ID type…</option>
-                                <option>Philippine Passport</option>
-                                <option>Driver's License</option>
-                                <option>PhilSys (National ID)</option>
-                                <option>Voter's ID / COMELEC Card</option>
-                                <option>SSS / GSIS Card</option>
-                                <option>PRC ID</option>
-                                <option>Postal ID</option>
-                                <option>Barangay ID</option>
+                                <option value="" disabled="disabled" selected="selected">#{msg['request.form.id.type.placeholder']}</option>
+                                <option>#{msg['request.form.id.type.passport']}</option>
+                                <option>#{msg['request.form.id.type.drivers']}</option>
+                                <option>#{msg['request.form.id.type.philsys']}</option>
+                                <option>#{msg['request.form.id.type.voter']}</option>
+                                <option>#{msg['request.form.id.type.sss']}</option>
+                                <option>#{msg['request.form.id.type.prc']}</option>
+                                <option>#{msg['request.form.id.type.postal']}</option>
+                                <option>#{msg['request.form.id.type.barangay']}</option>
                             </select>
                         </div>
 
                         <div class="fwrap">
-                            <label class="flabel">Upload Valid ID <span class="req">*</span></label>
+                            <label class="flabel">#{msg['request.form.label.id.upload']} <span class="req">#{msg['request.required.marker']}</span></label>
                             <div class="upload-zone" id="uploadZone">
                                 <input type="file" accept="image/*,.pdf" onchange="onFileSelected(event)"/>
                                 <div class="upload-icon">
@@ -380,18 +380,18 @@
                                         <path d="M3 14v2a1 1 0 001 1h12a1 1 0 001-1v-2" stroke="#6B7A8D" stroke-width="1.5" stroke-linecap="round"/>
                                     </svg>
                                 </div>
-                                <div class="upload-lbl">Click to upload or drag &amp; drop</div>
-                                <div class="upload-sub">JPG, PNG or PDF · Max 5MB</div>
+                                <div class="upload-lbl">#{msg['request.form.upload.label']}</div>
+                                <div class="upload-sub">#{msg['request.form.upload.hint']}</div>
                                 <div class="upload-fname" id="uploadFname"></div>
                             </div>
-                            <span class="fhint">Front and back must be visible if applicable.</span>
+                            <span class="fhint">#{msg['request.form.upload.help']}</span>
                         </div>
                     </div>
 
                     <div class="cta-row">
                         <button type="button" class="btn-primary" onclick="goToReview()">
                             <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M9 4l5 4-5 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            Review &amp; Submit
+                            #{msg['request.form.button.review']}
                         </button>
                     </div>
 
@@ -400,35 +400,35 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P5 · REVIEW
-        ═══════════════════════════════════════ -->
+        <!-- ======================================
+             P5 . REVIEW
+        ======================================= -->
         <div class="page" id="p-review">
             <div class="card">
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-form')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['request.button.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
                 <div class="steps">
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">#{msg['request.step.verify']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Details</span></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">#{msg['request.step.details']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step now"><div class="step-n">3</div><span class="step-lbl">Review</span></div>
+                    <div class="step now"><div class="step-n">3</div><span class="step-lbl">#{msg['request.step.review']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step next"><div class="step-n">4</div><span class="step-lbl">#{msg['request.step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
                     <div>
-                        <div class="sec-title">Review your request</div>
-                        <div class="sec-sub">Confirm all details are correct before submitting.</div>
+                        <div class="sec-title">#{msg['request.review.title']}</div>
+                        <div class="sec-sub">#{msg['request.review.sub']}</div>
                     </div>
 
                     <div class="review-list" id="reviewList"></div>
@@ -440,14 +440,14 @@
                             <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
                         </svg>
                         <div class="notice-text">
-                            <strong>Ready to submit?</strong>
-                            By submitting you confirm all information is accurate. Falsification of documents is punishable by law.
+                            <strong>#{msg['request.review.ready.title']}</strong>
+                            #{msg['request.review.ready.body']}
                         </div>
                     </div>
 
                     <div class="cta-row">
                         <button type="button" class="btn-primary" onclick="submitRequest()">
-                            Submit Request
+                            #{msg['request.review.button.submit']}
                         </button>
                     </div>
                 </div>
@@ -455,9 +455,9 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P6 · CONFIRMATION
-        ═══════════════════════════════════════ -->
+        <!-- ======================================
+             P6 . CONFIRMATION
+        ======================================= -->
         <div class="page" id="p-confirm">
             <div class="card">
                 <div class="hd">
@@ -468,19 +468,19 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="brand-name">Secure<em>Doc</em></div>
-                        <div class="tagline">Official Document Services</div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
+                        <div class="tagline">#{msg['request.tagline']}</div>
                     </div>
                 </div>
 
                 <div class="steps">
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Verify</span></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">#{msg['request.step.verify']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Details</span></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">#{msg['request.step.details']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">Review</span></div>
+                    <div class="step done"><div class="step-n"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="step-lbl">#{msg['request.step.review']}</span></div>
                     <div class="step-sep"></div>
-                    <div class="step now"><div class="step-n">4</div><span class="step-lbl">Confirm</span></div>
+                    <div class="step now"><div class="step-n">4</div><span class="step-lbl">#{msg['request.step.confirm']}</span></div>
                 </div>
 
                 <div class="bd" style="align-items:center">
@@ -490,18 +490,18 @@
                                 <path d="M8 16l5.5 5.5L24 10" stroke="#1A7A45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </div>
-                        <div class="confirm-title">Request Submitted!</div>
-                        <div class="confirm-sub">Your certificate request has been received. A confirmation and status updates will be sent to <strong id="confirmEmail" style="color:var(--navy)"></strong>.</div>
+                        <div class="confirm-title">#{msg['request.confirm.title']}</div>
+                        <div class="confirm-sub">#{msg['request.confirm.sub']} <strong id="confirmEmail" style="color:var(--navy)"></strong>.</div>
                     </div>
 
                     <div class="ref-badge" style="width:100%">
                         <div>
-                            <div class="ref-lbl">Reference No.</div>
+                            <div class="ref-lbl">#{msg['request.confirm.ref.label']}</div>
                             <div class="ref-num" id="refNum">SC-2025-00000</div>
                         </div>
                         <button type="button" class="btn-ghost" onclick="copyRef()" id="btnCopy">
                             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="6" y="6" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 10H3a1 1 0 01-1-1V3a1 1 0 011-1h6a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-                            Copy
+                            #{msg['request.confirm.button.copy']}
                         </button>
                     </div>
 
@@ -512,57 +512,57 @@
                             <circle cx="9" cy="5.75" r="0.75" fill="#185FA5"/>
                         </svg>
                         <div class="notice-text">
-                            <strong>Processing time: 3–5 business days</strong>
-                            Bring this reference number and your original valid ID when claiming your document at the office.
+                            <strong>#{msg['request.confirm.notice.title']}</strong>
+                            #{msg['request.confirm.notice.body']}
                         </div>
                     </div>
 
                     <div class="cta-row" style="width:100%">
-                        <button type="button" class="btn-primary" onclick="startOver()">Make another request</button>
-                        <button type="button" class="btn-secondary" onclick="goToTrackFromConfirm()">Track status</button>
+                        <button type="button" class="btn-primary" onclick="startOver()">#{msg['request.confirm.button.another']}</button>
+                        <button type="button" class="btn-secondary" onclick="goToTrackFromConfirm()">#{msg['request.confirm.button.track']}</button>
                     </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P-TRACK · Track Request Status
-        ═══════════════════════════════════════ -->
+        <!-- ======================================
+             P-TRACK . Track Request Status
+        ======================================= -->
         <div class="page" id="p-track">
             <div class="card">
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-landing')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['request.button.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
                 <div class="bd">
                     <div>
-                        <div class="sec-title">Track your request</div>
-                        <div class="sec-sub">Enter the reference number from your confirmation to check the current status of your document request.</div>
+                        <div class="sec-title">#{msg['request.track.title']}</div>
+                        <div class="sec-sub">#{msg['request.track.sub']}</div>
                     </div>
 
                     <div class="fwrap">
-                        <label class="flabel" for="trackInput">Reference number <span class="req">*</span></label>
+                        <label class="flabel" for="trackInput">#{msg['request.track.label.ref']} <span class="req">#{msg['request.required.marker']}</span></label>
                         <div class="track-input-row">
                             <input type="text"
                                    id="trackInput"
-                                   placeholder="e.g. SC-2025-00291"
+                                   placeholder="#{msg['request.track.placeholder.ref']}"
                                    oninput="onTrackInput()"
                                    onkeydown="if(event.key==='Enter') doTrack()"
                                    autocomplete="off"
                                    style="text-transform:uppercase;letter-spacing:0.5px"/>
                             <button type="button" class="btn-inline" id="btnTrack" disabled="disabled" onclick="doTrack()">
                                 <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-                                Check
+                                #{msg['request.track.button.check']}
                             </button>
                         </div>
-                        <span class="fhint">Format: SC-YYYY-NNNNN (found on your confirmation receipt)</span>
+                        <span class="fhint">#{msg['request.track.hint']}</span>
                     </div>
 
                     <div class="notice-error" id="trackErr" style="display:none">
@@ -571,7 +571,7 @@
                             <path d="M8 5v4" stroke="#C0392B" stroke-width="1.4" stroke-linecap="round"/>
                             <circle cx="8" cy="11.5" r="0.7" fill="#C0392B"/>
                         </svg>
-                        Reference number not found. Please check and try again.
+                        #{msg['request.track.error.not.found']}
                     </div>
 
                     <div id="trackResult" style="display:none">
@@ -585,19 +585,19 @@
 
                         <div class="review-list" style="margin-top:14px">
                             <div class="review-item">
-                                <span class="rv-key">Reference No.</span>
+                                <span class="rv-key">#{msg['request.track.review.ref']}</span>
                                 <span class="rv-val" id="trackRefDisplay" style="font-family:'DM Serif Display',serif;font-size:14px;letter-spacing:0.5px"></span>
                             </div>
                             <div class="review-item">
-                                <span class="rv-key">Document Type</span>
+                                <span class="rv-key">#{msg['request.track.review.doc.type']}</span>
                                 <span class="rv-val" id="trackDocType"></span>
                             </div>
                             <div class="review-item">
-                                <span class="rv-key">Date Submitted</span>
+                                <span class="rv-key">#{msg['request.track.review.submitted']}</span>
                                 <span class="rv-val" id="trackSubmitted"></span>
                             </div>
                             <div class="review-item" id="trackLastUpdateRow">
-                                <span class="rv-key">Last Updated</span>
+                                <span class="rv-key">#{msg['request.track.review.updated']}</span>
                                 <span class="rv-val" id="trackLastUpdate"></span>
                             </div>
                         </div>
