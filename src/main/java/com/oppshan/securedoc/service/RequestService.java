@@ -2,6 +2,7 @@ package com.oppshan.securedoc.service;
 
 import com.oppshan.securedoc.dto.RequestCreate;
 import com.oppshan.securedoc.dto.RequestSubmissionView;
+import com.oppshan.securedoc.dto.RequestTrackingView;
 import com.oppshan.securedoc.model.DocumentTemplate;
 import com.oppshan.securedoc.model.Organization;
 import com.oppshan.securedoc.model.Request;
@@ -134,6 +135,19 @@ public class RequestService {
         requestRepo.save(request);
 
         return request.toSubmissionView();
+    }
+
+    /**
+     * Resident-facing status lookup by UUID reference number. No
+     * authentication — the reference itself is the secret. Returns a
+     * narrow projection that omits requester PII so an unauthenticated
+     * caller with a leaked reference can't enumerate personal data.
+     */
+    public Optional<RequestTrackingView> lookupByReference(String referenceNumber) {
+        if (referenceNumber == null || referenceNumber.isBlank()) {
+            return Optional.empty();
+        }
+        return requestRepo.findTrackingByReferenceNumber(referenceNumber.trim());
     }
 
     private static @NonNull Requester getRequester(RequestCreate form) {

@@ -25,20 +25,20 @@
                     </div>
                     <div>
                         <div class="brand-name">Secure<em>Doc</em></div>
-                        <div class="tagline">Official Document Services</div>
+                        <div class="tagline">#{msg['brand.tagline']}</div>
                     </div>
                 </div>
 
                 <div class="bd">
                     <div>
                         <div class="hours-hd">
-                            <span class="section-lbl">Business Hours</span>
-                            <span class="badge-open"><span class="dot"></span>Open now</span>
+                            <span class="section-lbl">#{msg['landing.hours.heading']}</span>
+                            <span class="badge-open"><span class="dot"></span>#{msg['landing.hours.openNow']}</span>
                         </div>
                         <div class="hours-grid">
-                            <div class="hours-pill"><span class="hours-day">Mon – Fri</span><span class="hours-time">8:00 AM – 5:00 PM</span></div>
-                            <div class="hours-pill"><span class="hours-day">Saturday</span><span class="hours-time">8:00 AM – 12:00 PM</span></div>
-                            <div class="hours-pill"><span class="hours-day">Sunday</span><span class="hours-closed">Closed</span></div>
+                            <div class="hours-pill"><span class="hours-day">#{msg['landing.hours.monFri']}</span><span class="hours-time">#{msg['landing.hours.weekday']}</span></div>
+                            <div class="hours-pill"><span class="hours-day">#{msg['landing.hours.saturday']}</span><span class="hours-time">#{msg['landing.hours.saturdayHours']}</span></div>
+                            <div class="hours-pill"><span class="hours-day">#{msg['landing.hours.sunday']}</span><span class="hours-closed">#{msg['landing.hours.closed']}</span></div>
                         </div>
                     </div>
 
@@ -47,8 +47,8 @@
                     <div class="notice">
                         <i class="pi pi-info-circle" style="color:#185FA5;font-size:18px;flex-shrink:0;margin-top:1px"></i>
                         <div class="notice-text">
-                            <strong>Valid ID required for all requests</strong>
-                            All certificate requests require a valid proof of identification to ensure authenticity and protect against unauthorized access.
+                            <strong>#{msg['landing.notice.idRequired.title']}</strong>
+                            #{msg['landing.notice.idRequired.body']}
                         </div>
                     </div>
 
@@ -67,7 +67,7 @@
                                             forceSelection="true"
                                             minQueryLength="2"
                                             queryDelay="200"
-                                            placeholder="Search your #{systemConfigBean.orgLabelLower} by name or code…">
+                                            placeholder="#{msg['landing.org.placeholder'].formatted(systemConfigBean.orgLabelLower)}">
                                 <p:ajax event="itemSelect"
                                         listener="#{requestBean.onOrganizationSelected}"
                                         update="certTypeWrap"/>
@@ -75,11 +75,11 @@
                                         listener="#{requestBean.onOrganizationSelected}"
                                         update="certTypeWrap"/>
                             </p:autoComplete>
-                            <span class="cert-hint">Pick the office that will issue your document.</span>
+                            <span class="cert-hint">#{msg['landing.org.hint']}</span>
                         </div>
 
                         <h:panelGroup layout="block" styleClass="fwrap" id="certTypeWrap">
-                            <label class="flabel" for="certType">Certificate type</label>
+                            <label class="flabel" for="certType">#{msg['landing.cert.label']}</label>
                             <h:selectOneMenu id="certType"
                                              value="#{requestBean.selectedTemplateId}"
                                              disabled="#{requestBean.selectedOrganization == null}">
@@ -91,7 +91,7 @@
                                                itemValue="#{t.id}"
                                                itemLabel="#{t.name}"/>
                             </h:selectOneMenu>
-                            <span class="cert-hint">Choose the document you need to request.</span>
+                            <span class="cert-hint">#{msg['landing.cert.hint']}</span>
                         </h:panelGroup>
 
                         <p:messages globalOnly="true"
@@ -99,13 +99,13 @@
                                     showDetail="false"/>
 
                         <div class="cta-row">
-                            <p:commandButton value="Proceed to Request"
+                            <p:commandButton value="#{msg['landing.btn.proceed']}"
                                              styleClass="btn-primary"
                                              action="#{requestBean.proceedFromLanding}"
                                              process="@form"
                                              update="@form"
                                              oncomplete="if (args &amp;&amp; !args.validationFailed) { populateFromLanding(); goTo('p-email'); }"/>
-                            <button type="button" class="btn-secondary" onclick="goTo('p-track')">Track request</button>
+                            <button type="button" class="btn-secondary" onclick="goTo('p-track')">#{msg['landing.btn.track']}</button>
                         </div>
                     </h:form>
                 </div>
@@ -121,7 +121,7 @@
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-landing')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
                         <div class="brand-name">Secure<em>Doc</em></div>
@@ -131,49 +131,47 @@
                 <div class="steps">
                     <div class="step now">
                         <div class="step-n">1</div>
-                        <span class="step-lbl">Verify</span></div>
+                        <span class="step-lbl">#{msg['step.verify']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">2</div>
-                        <span class="step-lbl">Details</span></div>
+                        <span class="step-lbl">#{msg['step.details']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">3</div>
-                        <span class="step-lbl">Review</span></div>
+                        <span class="step-lbl">#{msg['step.review']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">4</div>
-                        <span class="step-lbl">Confirm</span></div>
+                        <span class="step-lbl">#{msg['step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
                     <div>
-                        <div class="sec-title">Verify your email</div>
-                        <div class="sec-sub">Enter your email address. We'll send a one-time code to confirm it's yours
-                            — we'll use this to notify you when your certificate is ready.
-                        </div>
+                        <div class="sec-title">#{msg['email.title']}</div>
+                        <div class="sec-sub">#{msg['email.subtitle']}</div>
                     </div>
 
                     <h:form id="emailForm">
                         <div class="fwrap">
                             <p:outputLabel for="emailInput" styleClass="flabel">
-                                Email address <span class="req">*</span>
+                                #{msg['email.field.label']} <span class="req">#{msg['common.required']}</span>
                             </p:outputLabel>
                             <div class="email-send-row">
                                 <p:inputText id="emailInput"
                                              value="#{requestBean.email}"
                                              type="email"
-                                             placeholder="e.g. juan.delacruz@email.com"
+                                             placeholder="#{msg['email.field.placeholder']}"
                                              oninput="onEmailInput()"/>
                                 <p:commandButton id="btnSendOtp"
-                                                 value="Send code"
+                                                 value="#{msg['email.btn.send']}"
                                                  styleClass="btn-inline"
                                                  action="#{requestBean.sendOtp}"
                                                  process="@form"
                                                  update="@form"
                                                  oncomplete="if (args &amp;&amp; !args.validationFailed) enterOtpScene();"/>
                             </div>
-                            <span class="fhint">A 6-digit verification code will be sent to this address.</span>
+                            <span class="fhint">#{msg['email.field.hint']}</span>
                         </div>
 
                         <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
@@ -191,7 +189,7 @@
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-email')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
                         <div class="brand-name">Secure<em>Doc</em></div>
@@ -201,26 +199,26 @@
                 <div class="steps">
                     <div class="step now">
                         <div class="step-n">1</div>
-                        <span class="step-lbl">Verify</span></div>
+                        <span class="step-lbl">#{msg['step.verify']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">2</div>
-                        <span class="step-lbl">Details</span></div>
+                        <span class="step-lbl">#{msg['step.details']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">3</div>
-                        <span class="step-lbl">Review</span></div>
+                        <span class="step-lbl">#{msg['step.review']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">4</div>
-                        <span class="step-lbl">Confirm</span></div>
+                        <span class="step-lbl">#{msg['step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
                     <div>
-                        <div class="sec-title">Enter verification code</div>
-                        <div class="sec-sub">We sent a 6-digit code to <strong id="otpEmailDisplay"
-                                                                               style="color:var(--navy);font-weight:600"></strong>.
+                        <div class="sec-title">#{msg['otp.title']}</div>
+                        <div class="sec-sub">#{msg['otp.subtitle.prefix']} <strong id="otpEmailDisplay"
+                                                                                   style="color:var(--navy);font-weight:600"></strong>.
                             #{msg['otp.expiry.info']}
                         </div>
                     </div>
@@ -246,8 +244,8 @@
                             <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
                         </h:form>
 
-                        <p class="otp-resend">Didn't receive it?
-                            <button type="button" id="btnResend" onclick="resendOtp()" disabled="disabled">Resend code
+                        <p class="otp-resend">#{msg['otp.resend.prompt']}
+                            <button type="button" id="btnResend" onclick="resendOtp()" disabled="disabled">#{msg['otp.btn.resend']}
                             </button>
                             <span id="resendTimer"></span></p>
                     </div>
@@ -264,7 +262,7 @@
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-otp')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
                         <div class="brand-name">Secure<em>Doc</em></div>
@@ -276,19 +274,19 @@
                         <div class="step-n">
                             <i class="pi pi-check" style="font-size:10px"></i>
                         </div>
-                        <span class="step-lbl">Verify</span></div>
+                        <span class="step-lbl">#{msg['step.verify']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step now">
                         <div class="step-n">2</div>
-                        <span class="step-lbl">Details</span></div>
+                        <span class="step-lbl">#{msg['step.details']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">3</div>
-                        <span class="step-lbl">Review</span></div>
+                        <span class="step-lbl">#{msg['step.review']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">4</div>
-                        <span class="step-lbl">Confirm</span></div>
+                        <span class="step-lbl">#{msg['step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
@@ -309,55 +307,55 @@
                         <f:event type="postValidate"
                                  listener="#{requestBean.summarizeDetailsValidation}"/>
                         <div style="display:flex;flex-direction:column;gap:14px">
-                            <div class="sec-lbl">Personal Information</div>
+                            <div class="sec-lbl">#{msg['details.section.personal']}</div>
 
                             <div class="frow">
                                 <div class="fwrap">
-                                    <p:outputLabel for="fFirst" styleClass="flabel" value="First Name"/>
+                                    <p:outputLabel for="fFirst" styleClass="flabel" value="#{msg['details.firstName.label']}"/>
                                     <p:inputText id="fFirst"
                                                  value="#{requestBean.firstName}"
-                                                 placeholder="e.g. Juan"
+                                                 placeholder="#{msg['details.firstName.placeholder']}"
                                                  required="true"
-                                                 requiredMessage="First name is required."
+                                                 requiredMessage="#{msg['details.firstName.required']}"
                                     />
                                 </div>
                                 <div class="fwrap">
-                                    <p:outputLabel for="fMiddle" styleClass="flabel" value="Middle Name"/>
+                                    <p:outputLabel for="fMiddle" styleClass="flabel" value="#{msg['details.middleName.label']}"/>
                                     <p:inputText id="fMiddle"
                                                  value="#{requestBean.middleName}"
-                                                 placeholder="(optional)"/>
+                                                 placeholder="#{msg['details.middleName.placeholder']}"/>
                                 </div>
                             </div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fLast" styleClass="flabel" value="Last Name"/>
+                                <p:outputLabel for="fLast" styleClass="flabel" value="#{msg['details.lastName.label']}"/>
                                 <p:inputText id="fLast"
                                              value="#{requestBean.lastName}"
-                                             placeholder="e.g. Dela Cruz"
+                                             placeholder="#{msg['details.lastName.placeholder']}"
                                              required="true"
-                                             requiredMessage="Last name is required."
+                                             requiredMessage="#{msg['details.lastName.required']}"
                                 />
                             </div>
 
                             <div class="frow">
                                 <div class="fwrap">
-                                    <p:outputLabel for="fDob" styleClass="flabel" value="Date of Birth"/>
+                                    <p:outputLabel for="fDob" styleClass="flabel" value="#{msg['details.dob.label']}"/>
                                     <p:datePicker id="fDob"
                                                   value="#{requestBean.dateOfBirth}"
                                                   pattern="yyyy-MM-dd"
                                                   showIcon="false"
                                                   required="true"
-                                                  requiredMessage="Date of birth is required."
+                                                  requiredMessage="#{msg['details.dob.required']}"
                                     />
                                 </div>
                                 <div class="fwrap">
-                                    <p:outputLabel for="fSex" styleClass="flabel" value="Sex"/>
+                                    <p:outputLabel for="fSex" styleClass="flabel" value="#{msg['details.sex.label']}"/>
                                     <p:selectOneMenu id="fSex"
                                                      value="#{requestBean.sex}"
                                                      required="true"
-                                                     requiredMessage="Sex is required."
+                                                     requiredMessage="#{msg['details.sex.required']}"
                                     >
-                                        <f:selectItem itemValue="#{null}" itemLabel="Select…" noSelectionOption="true"/>
+                                        <f:selectItem itemValue="#{null}" itemLabel="#{msg['details.sex.placeholder']}" noSelectionOption="true"/>
                                         <f:selectItems value="#{requestBean.sexOptions}"/>
                                     </p:selectOneMenu>
                                 </div>
@@ -367,22 +365,22 @@
                         <hr class="div"/>
 
                         <div style="display:flex;flex-direction:column;gap:14px">
-                            <div class="sec-lbl">Contact &amp; Purpose</div>
+                            <div class="sec-lbl">#{msg['details.section.contact']}</div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fPhone" styleClass="flabel" value="Contact Number"/>
+                                <p:outputLabel for="fPhone" styleClass="flabel" value="#{msg['details.phone.label']}"/>
                                 <p:inputText id="fPhone"
                                              value="#{requestBean.contactNumber}"
-                                             placeholder="e.g. 09XX XXX XXXX"
+                                             placeholder="#{msg['details.phone.placeholder']}"
                                 />
                             </div>
 
                             <div class="fwrap">
                                 <label class="flabel" style="justify-content:space-between">
-                                    Email Address
+                                    #{msg['details.email.label']}
                                     <span class="email-verified-badge">
                                         <i class="pi pi-check" style="color:var(--green);font-size:10px"></i>
-                                        Verified
+                                        #{msg['details.email.verified']}
                                     </span>
                                 </label>
                                 <p:inputText id="fEmail"
@@ -392,13 +390,13 @@
                             </div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fPurpose" styleClass="flabel" value="Purpose of Request"/>
+                                <p:outputLabel for="fPurpose" styleClass="flabel" value="#{msg['details.purpose.label']}"/>
                                 <p:selectOneMenu id="fPurpose"
                                                  value="#{requestBean.purpose}"
                                                  required="true"
-                                                 requiredMessage="Purpose is required."
+                                                 requiredMessage="#{msg['details.purpose.required']}"
                                                  onchange="onPurposeChange();">
-                                    <f:selectItem itemValue="#{null}" itemLabel="Select purpose…"
+                                    <f:selectItem itemValue="#{null}" itemLabel="#{msg['details.purpose.placeholder']}"
                                                   noSelectionOption="true"/>
                                     <f:selectItems value="#{requestBean.purposeOptions}"/>
                                 </p:selectOneMenu>
@@ -406,11 +404,11 @@
 
                             <div class="fwrap" id="otherPurposeWrap" style="display:none">
                                 <p:outputLabel for="fOtherPurpose" styleClass="flabel">
-                                    Please specify <span class="req">*</span>
+                                    #{msg['details.otherPurpose.label']} <span class="req">#{msg['common.required']}</span>
                                 </p:outputLabel>
                                 <p:inputText id="fOtherPurpose"
                                              value="#{requestBean.otherPurpose}"
-                                             placeholder="Describe your purpose…"
+                                             placeholder="#{msg['details.otherPurpose.placeholder']}"
                                 />
                             </div>
                         </div>
@@ -418,33 +416,33 @@
                         <hr class="div"/>
 
                         <div style="display:flex;flex-direction:column;gap:14px">
-                            <div class="sec-lbl">Proof of Identification</div>
+                            <div class="sec-lbl">#{msg['details.section.id']}</div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fIdType" styleClass="flabel" value="ID Type"/>
+                                <p:outputLabel for="fIdType" styleClass="flabel" value="#{msg['details.idType.label']}"/>
                                 <p:selectOneMenu id="fIdType"
                                                  value="#{requestBean.idType}"
                                                  required="true"
-                                                 requiredMessage="ID type is required."
+                                                 requiredMessage="#{msg['details.idType.required']}"
                                 >
-                                    <f:selectItem itemValue="#{null}" itemLabel="Select ID type…"
+                                    <f:selectItem itemValue="#{null}" itemLabel="#{msg['details.idType.placeholder']}"
                                                   noSelectionOption="true"/>
                                     <f:selectItems value="#{requestBean.idTypeOptions}"/>
                                 </p:selectOneMenu>
                             </div>
 
                             <div class="fwrap">
-                                <label class="flabel">Upload Valid ID <span class="req">*</span></label>
+                                <label class="flabel">#{msg['details.upload.label']} <span class="req">#{msg['common.required']}</span></label>
                                 <div class="upload-zone" id="uploadZone">
                                     <input type="file" accept="image/*,.pdf" onchange="onFileSelected(event);"/>
                                     <div class="upload-icon">
                                         <i class="pi pi-cloud-upload" style="color:#6B7A8D;font-size:18px"></i>
                                     </div>
-                                    <div class="upload-lbl">Click to upload or drag &amp; drop</div>
-                                    <div class="upload-sub">JPG, PNG or PDF · Max 5MB</div>
+                                    <div class="upload-lbl">#{msg['details.upload.cta']}</div>
+                                    <div class="upload-sub">#{msg['details.upload.formats']}</div>
                                     <div class="upload-fname" id="uploadFname"></div>
                                 </div>
-                                <span class="fhint">Front and back must be visible if applicable.</span>
+                                <span class="fhint">#{msg['details.upload.hint']}</span>
                             </div>
                         </div>
 
@@ -452,7 +450,7 @@
 
                         <div class="cta-row">
                             <p:commandButton id="btnReview"
-                                             value="Review &amp; Submit"
+                                             value="#{msg['details.btn.review']}"
                                              styleClass="btn-primary"
                                              action="#{requestBean.proceedToReview}"
                                              process="@form"
@@ -474,7 +472,7 @@
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-form')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
                         <div class="brand-name">Secure<em>Doc</em></div>
@@ -486,27 +484,27 @@
                         <div class="step-n">
                             <i class="pi pi-check" style="font-size:10px"></i>
                         </div>
-                        <span class="step-lbl">Verify</span></div>
+                        <span class="step-lbl">#{msg['step.verify']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step done">
                         <div class="step-n">
                             <i class="pi pi-check" style="font-size:10px"></i>
                         </div>
-                        <span class="step-lbl">Details</span></div>
+                        <span class="step-lbl">#{msg['step.details']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step now">
                         <div class="step-n">3</div>
-                        <span class="step-lbl">Review</span></div>
+                        <span class="step-lbl">#{msg['step.review']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step next">
                         <div class="step-n">4</div>
-                        <span class="step-lbl">Confirm</span></div>
+                        <span class="step-lbl">#{msg['step.confirm']}</span></div>
                 </div>
 
                 <div class="bd">
                     <div>
-                        <div class="sec-title">Review your request</div>
-                        <div class="sec-sub">Confirm all details are correct before submitting.</div>
+                        <div class="sec-title">#{msg['review.title']}</div>
+                        <div class="sec-sub">#{msg['review.subtitle']}</div>
                     </div>
 
                     <div class="review-list" id="reviewList"></div>
@@ -514,15 +512,14 @@
                     <div class="notice">
                         <i class="pi pi-info-circle" style="color:#185FA5;font-size:18px;flex-shrink:0;margin-top:1px"></i>
                         <div class="notice-text">
-                            <strong>Ready to submit?</strong>
-                            By submitting you confirm all information is accurate. Falsification of documents is
-                            punishable by law.
+                            <strong>#{msg['review.notice.title']}</strong>
+                            #{msg['review.notice.body']}
                         </div>
                     </div>
 
                     <h:form id="reviewForm">
                         <div class="cta-row">
-                            <p:commandButton value="Submit Request"
+                            <p:commandButton value="#{msg['review.btn.submit']}"
                                              styleClass="btn-primary"
                                              action="#{requestBean.submitRequest}"
                                              process="@this"
@@ -549,7 +546,7 @@
                     </div>
                     <div>
                         <div class="brand-name">Secure<em>Doc</em></div>
-                        <div class="tagline">Official Document Services</div>
+                        <div class="tagline">#{msg['brand.tagline']}</div>
                     </div>
                 </div>
 
@@ -558,23 +555,23 @@
                         <div class="step-n">
                             <i class="pi pi-check" style="font-size:10px"></i>
                         </div>
-                        <span class="step-lbl">Verify</span></div>
+                        <span class="step-lbl">#{msg['step.verify']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step done">
                         <div class="step-n">
                             <i class="pi pi-check" style="font-size:10px"></i>
                         </div>
-                        <span class="step-lbl">Details</span></div>
+                        <span class="step-lbl">#{msg['step.details']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step done">
                         <div class="step-n">
                             <i class="pi pi-check" style="font-size:10px"></i>
                         </div>
-                        <span class="step-lbl">Review</span></div>
+                        <span class="step-lbl">#{msg['step.review']}</span></div>
                     <div class="step-sep"></div>
                     <div class="step now">
                         <div class="step-n">4</div>
-                        <span class="step-lbl">Confirm</span></div>
+                        <span class="step-lbl">#{msg['step.confirm']}</span></div>
                 </div>
 
                 <h:form id="confirmForm" styleClass="bd" style="align-items:center">
@@ -582,9 +579,9 @@
                         <div class="confirm-icon">
                             <i class="pi pi-check" style="color:#1A7A45;font-size:30px;font-weight:600"></i>
                         </div>
-                        <div class="confirm-title">Request Submitted!</div>
-                        <div class="confirm-sub">Your certificate request has been received. A confirmation and status
-                            updates will be sent to <strong id="confirmEmail" style="color:var(--navy);font-weight:600">
+                        <div class="confirm-title">#{msg['confirm.title']}</div>
+                        <div class="confirm-sub">#{msg['confirm.subtitle.prefix']}
+                            <strong id="confirmEmail" style="color:var(--navy);font-weight:600">
                                 <h:outputText value="#{requestBean.email}"/>
                             </strong>.
                         </div>
@@ -592,29 +589,28 @@
 
                     <div class="ref-badge" style="width:100%">
                         <div style="min-width:0;flex:1">
-                            <div class="ref-lbl">Reference No.</div>
+                            <div class="ref-lbl">#{msg['confirm.ref.label']}</div>
                             <div class="ref-num" id="refNum">
                                 <h:outputText value="#{requestBean.submittedReference}"/>
                             </div>
                         </div>
                         <button type="button" class="btn-ghost" onclick="copyRef()" id="btnCopy">
                             <i class="pi pi-copy" style="font-size:13px;margin-right:5px"></i>
-                            Copy
+                            #{msg['confirm.btn.copy']}
                         </button>
                     </div>
 
                     <div class="notice" style="width:100%">
                         <i class="pi pi-info-circle" style="color:#185FA5;font-size:18px;flex-shrink:0;margin-top:1px"></i>
                         <div class="notice-text">
-                            <strong>Processing time: 3–5 business days</strong>
-                            Bring this reference number and your original valid ID when claiming your document at the
-                            office.
+                            <strong>#{msg['confirm.notice.title']}</strong>
+                            #{msg['confirm.notice.body']}
                         </div>
                     </div>
 
                     <div class="cta-row" style="width:100%">
-                        <button type="button" class="btn-primary" onclick="startOver()">Make another request</button>
-                        <button type="button" class="btn-secondary" onclick="goToTrackFromConfirm()">Track status
+                        <button type="button" class="btn-primary" onclick="startOver()">#{msg['confirm.btn.again']}</button>
+                        <button type="button" class="btn-secondary" onclick="goToTrackFromConfirm()">#{msg['confirm.btn.track']}
                         </button>
                     </div>
                 </h:form>
@@ -630,45 +626,89 @@
                 <div class="hd-nav">
                     <button type="button" class="btn-back" onclick="goTo('p-landing')">
                         <i class="pi pi-angle-left"></i>
-                        Back
+                        #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
                         <div class="brand-name">Secure<em>Doc</em></div>
                     </div>
                 </div>
 
-                <div class="bd">
+                <h:form id="trackForm" styleClass="bd">
                     <div>
-                        <div class="sec-title">Track your request</div>
-                        <div class="sec-sub">Enter the reference number from your confirmation to check the current
-                            status of your document request.
-                        </div>
+                        <div class="sec-title">#{msg['track.title']}</div>
+                        <div class="sec-sub">#{msg['track.subtitle']}</div>
                     </div>
 
                     <div class="fwrap">
-                        <label class="flabel" for="trackInput">Reference number <span class="req">*</span></label>
+                        <p:outputLabel for="trackInput" styleClass="flabel">
+                            #{msg['track.field.label']} <span class="req">#{msg['common.required']}</span>
+                        </p:outputLabel>
                         <div class="track-input-row">
-                            <input type="text"
-                                   id="trackInput"
-                                   placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
-                                   oninput="onTrackInput()"
-                                   onkeydown="if(event.key==='Enter') doTrack()"
-                                   autocomplete="off"
-                                   style="letter-spacing:0.5px"/>
-                            <button type="button" class="btn-inline" id="btnTrack" disabled="disabled"
-                                    onclick="doTrack()">
-                                <i class="pi pi-search" style="font-size:13px;margin-right:6px"></i>
-                                Check
-                            </button>
+                            <p:inputText id="trackInput"
+                                         value="#{requestBean.trackReference}"
+                                         placeholder="#{msg['track.field.placeholder']}"
+                                         autocomplete="off"
+                                         style="letter-spacing:0.5px"
+                                         oninput="onTrackInput()"/>
+                            <p:commandButton id="btnTrack"
+                                             value="#{msg['track.btn.check']}"
+                                             styleClass="btn-inline"
+                                             action="#{requestBean.trackRequest}"
+                                             process="@form"
+                                             update="@form"/>
                         </div>
-                        <span class="fhint">Paste the reference number from your confirmation receipt.</span>
+                        <span class="fhint">#{msg['track.field.hint']}</span>
                     </div>
 
-                    <div class="notice-error" id="trackErr" style="display:none">
-                        Reference number not found. Please check and try again.
-                    </div>
+                    <h:panelGroup layout="block"
+                                  styleClass="notice-error show"
+                                  rendered="#{requestBean.trackingNotFound}">
+                        #{msg['track.notFound']}
+                    </h:panelGroup>
 
-                </div>
+                    <h:panelGroup layout="block"
+                                  styleClass="track-result"
+                                  rendered="#{not empty requestBean.trackedResult}">
+                        <div class="track-result-head">
+                            <div class="track-result-title">
+                                <h:outputText value="#{requestBean.trackedResult.certificateName}"/>
+                            </div>
+                            <h:outputText value="#{requestBean.trackedResult.statusLabel}"
+                                          styleClass="status-badge status-#{requestBean.trackedResult.status}"/>
+                        </div>
+
+                        <div class="review-list">
+                            <div class="review-item">
+                                <span class="rv-key">#{msg['confirm.ref.label']}</span>
+                                <span class="rv-val">
+                                    <h:outputText value="#{requestBean.trackedResult.referenceNumber}"/>
+                                </span>
+                            </div>
+                            <div class="review-item">
+                                <span class="rv-key">#{msg['track.result.issuingOffice']}</span>
+                                <span class="rv-val">
+                                    <h:outputText value="#{requestBean.trackedResult.organizationName}"/>
+                                </span>
+                            </div>
+                            <div class="review-item">
+                                <span class="rv-key">#{msg['track.result.submitted']}</span>
+                                <span class="rv-val">
+                                    <h:outputText value="#{requestBean.trackedResult.createdAt}">
+                                        <f:convertDateTime type="localDateTime" pattern="MMM d, yyyy h:mm a"/>
+                                    </h:outputText>
+                                </span>
+                            </div>
+                            <div class="review-item">
+                                <span class="rv-key">#{msg['track.result.lastUpdate']}</span>
+                                <span class="rv-val">
+                                    <h:outputText value="#{requestBean.trackedResult.updatedAt}">
+                                        <f:convertDateTime type="localDateTime" pattern="MMM d, yyyy h:mm a"/>
+                                    </h:outputText>
+                                </span>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </h:form>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
         </div>
