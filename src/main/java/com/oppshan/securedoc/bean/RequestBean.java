@@ -2,6 +2,8 @@ package com.oppshan.securedoc.bean;
 
 import com.oppshan.securedoc.dto.DocumentTemplateView;
 import com.oppshan.securedoc.dto.OrganizationView;
+import com.oppshan.securedoc.dto.RequestCreate;
+import com.oppshan.securedoc.dto.RequestSubmissionView;
 import com.oppshan.securedoc.model.DocumentTemplate;
 import com.oppshan.securedoc.repository.DocumentTemplateRepository;
 import com.oppshan.securedoc.service.RequestService;
@@ -12,12 +14,12 @@ import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.faces.model.SelectItem;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -230,18 +232,44 @@ public class RequestBean implements Serializable {
     }
 
     /**
-     * Review-scene "Submit Request" action. Generates a random UUID
-     * reference and exposes it on {@link #getSubmittedReference()} so
-     * the confirmation scene can render it. Returns null — the button's
-     * {@code oncomplete} handles the scene transition.
+     * Review-scene "Submit Request" action. Persists the requester +
+     * request rows via {@link RequestService#submitRequest} and exposes
+     * the generated UUID reference on {@link #getSubmittedReference()}
+     * so the confirmation scene can render it. Returns null — the
+     * button's {@code oncomplete} handles the scene transition.
      *
-     * <p>Persistence + cryptographic signing is not wired yet; once it
-     * is, the reference will come from the {@code requests} row's
-     * generated value rather than a local UUID.
+     * <p>Cryptographic signing (the issued {@code documents} row) lands
+     * in a later phase — that happens when staff approves the request,
+     * not at submission time.
      */
     public String submitRequest() {
-        this.submittedReference = UUID.randomUUID().toString();
+        FacesContext fc = FacesContext.getCurrentInstance();
+        RequestCreate form = getRequestCreate();
+        try {
+            RequestSubmissionView submitted = requestService.submitRequest(form);
+            this.submittedReference = submitted.getReferenceNumber();
+        } catch (RuntimeException submitFailure) {
+            fc.addMessage(null, error("Could not submit request: " + submitFailure.getMessage()));
+            fc.validationFailed();
+        }
         return null;
+    }
+
+    private @NonNull RequestCreate getRequestCreate() {
+        RequestCreate form = new RequestCreate();
+        form.setOrganizationId(selectedOrganization == null ? null : selectedOrganization.getId());
+        form.setTemplateId(selectedTemplateId);
+        form.setEmail(email);
+        form.setFirstName(firstName);
+        form.setMiddleName(middleName);
+        form.setLastName(lastName);
+        form.setDateOfBirth(dateOfBirth);
+        form.setSex(sex);
+        form.setContactNumber(contactNumber);
+        form.setIdType(idType);
+        form.setPurpose(purpose);
+        form.setOtherPurpose(otherPurpose);
+        return form;
     }
 
     public List<SelectItem> getSexOptions() {

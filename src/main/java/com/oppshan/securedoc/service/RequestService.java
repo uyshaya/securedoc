@@ -1,19 +1,31 @@
 package com.oppshan.securedoc.service;
 
+import com.oppshan.securedoc.dto.RequestCreate;
+import com.oppshan.securedoc.dto.RequestSubmissionView;
+import com.oppshan.securedoc.model.DocumentTemplate;
+import com.oppshan.securedoc.model.Organization;
+import com.oppshan.securedoc.model.Request;
+import com.oppshan.securedoc.model.Requester;
 import com.oppshan.securedoc.model.ResidentOtp;
+import com.oppshan.securedoc.repository.DocumentTemplateRepository;
+import com.oppshan.securedoc.repository.OrganizationRepository;
+import com.oppshan.securedoc.repository.RequestRepository;
+import com.oppshan.securedoc.repository.RequesterRepository;
 import com.oppshan.securedoc.repository.ResidentOtpRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.jspecify.annotations.NonNull;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
- * Resident-facing request flow service. Covers email OTP issuance and
- * verification (steps 1–2 of the multi-step submission wizard);
- * request persistence lands in a later phase.
+ * Resident-facing request flow service. Covers email OTP issuance,
+ * verification (steps 1–2 of the multi-step submission wizard), and
+ * the final request persistence on submit.
  */
 @ApplicationScoped
 public class RequestService {
@@ -23,6 +35,18 @@ public class RequestService {
 
     @Inject
     ResidentOtpRepository otpRepo;
+
+    @Inject
+    RequesterRepository requesterRepo;
+
+    @Inject
+    RequestRepository requestRepo;
+
+    @Inject
+    OrganizationRepository organizationRepo;
+
+    @Inject
+    DocumentTemplateRepository templateRepo;
 
     @Inject
     MailService mail;
@@ -81,6 +105,48 @@ public class RequestService {
         }
         otpRepo.save(otp);
         return success;
+    }
+
+    /**
+     * Persists a resident submission as one {@link Requester} row plus
+     * one {@link Request} row tied to it. The request is created with
+     * status PENDING and a {@code UUID.randomUUID().toString()}
+     * reference number. Returns the narrow view.
+     */
+    @Transactional
+    public RequestSubmissionView submitRequest(RequestCreate form) {
+        Organization organization = organizationRepo.findById(form.getOrganizationId())
+                .orElseThrow(() -> new IllegalArgumentException("Unknown organization: " + form.getOrganizationId()));
+        DocumentTemplate template = templateRepo.findById(form.getTemplateId())
+                .orElseThrow(() -> new IllegalArgumentException("Unknown template: " + form.getTemplateId()));
+
+        Requester requester = getRequester(form);
+        requesterRepo.save(requester);
+
+        Request request = new Request();
+        request.setOrganization(organization);
+        request.setRequester(requester);
+        request.setTemplate(template);
+        request.setReferenceNumber(UUID.randomUUID().toString());
+        request.setStatus(Request.Status.PENDING);
+        request.setPurpose(form.getPurpose());
+        request.setOtherPurpose(form.getOtherPurpose() == null ? null : form.getOtherPurpose().trim());
+        requestRepo.save(request);
+
+        return request.toSubmissionView();
+    }
+
+    private static @NonNull Requester getRequester(RequestCreate form) {
+        Requester requester = new Requester();
+        requester.setFirstName(form.getFirstName().trim());
+        requester.setMiddleName(form.getMiddleName() == null ? null : form.getMiddleName().trim());
+        requester.setLastName(form.getLastName().trim());
+        requester.setEmail(form.getEmail().trim());
+        requester.setSex(form.getSex());
+        requester.setDateOfBirth(form.getDateOfBirth());
+        requester.setContactNumber(form.getContactNumber() == null ? null : form.getContactNumber().trim());
+        requester.setIdType(form.getIdType());
+        return requester;
     }
 
     private String generateOtpCode() {

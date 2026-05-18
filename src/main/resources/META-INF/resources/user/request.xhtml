@@ -650,18 +650,18 @@
                         <div class="track-input-row">
                             <input type="text"
                                    id="trackInput"
-                                   placeholder="e.g. SC-2025-00291"
+                                   placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
                                    oninput="onTrackInput()"
                                    onkeydown="if(event.key==='Enter') doTrack()"
                                    autocomplete="off"
-                                   style="text-transform:uppercase;letter-spacing:0.5px"/>
+                                   style="letter-spacing:0.5px"/>
                             <button type="button" class="btn-inline" id="btnTrack" disabled="disabled"
                                     onclick="doTrack()">
                                 <i class="pi pi-search" style="font-size:13px;margin-right:6px"></i>
                                 Check
                             </button>
                         </div>
-                        <span class="fhint">Format: SC-YYYY-NNNNN (found on your confirmation receipt)</span>
+                        <span class="fhint">Paste the reference number from your confirmation receipt.</span>
                     </div>
 
                     <div class="notice-error" id="trackErr" style="display:none">
