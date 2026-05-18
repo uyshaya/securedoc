@@ -4,6 +4,7 @@ import com.oppshan.securedoc.dto.DocumentTemplateView;
 import com.oppshan.securedoc.dto.OrganizationView;
 import com.oppshan.securedoc.dto.RequestCreate;
 import com.oppshan.securedoc.dto.RequestSubmissionView;
+import com.oppshan.securedoc.dto.RequestTrackingView;
 import com.oppshan.securedoc.model.DocumentTemplate;
 import com.oppshan.securedoc.repository.DocumentTemplateRepository;
 import com.oppshan.securedoc.service.RequestService;
@@ -91,6 +92,28 @@ public class RequestBean implements Serializable {
      * what will live in the database once persistence lands.
      */
     private String submittedReference;
+
+    // ── Track-scene fields ───────────────────────────────────────
+    /**
+     * Reference number bound on the track scene; the resident types
+     * (or pastes from their confirmation email) the UUID here.
+     */
+    private String trackReference;
+
+    /**
+     * Populated by {@link #trackRequest()} on a successful lookup;
+     * null otherwise. The track scene's result panel renders only
+     * when this is non-null.
+     */
+    private RequestTrackingView trackedResult;
+
+    /**
+     * True after a failed lookup so the scene can flag "not found"
+     * inline. Separate from {@code trackedResult == null} because the
+     * default state (resident hasn't searched yet) shouldn't show
+     * an error.
+     */
+    private boolean trackingNotFound;
 
     /**
      * Called by the autocomplete's {@code completeMethod} as the resident types.
@@ -252,6 +275,27 @@ public class RequestBean implements Serializable {
             fc.addMessage(null, error("Could not submit request: " + submitFailure.getMessage()));
             fc.validationFailed();
         }
+        return null;
+    }
+
+    /**
+     * Track-scene "Check" action. Looks up the request by reference
+     * number (anonymous — the UUID itself is the secret) and surfaces
+     * either {@link #trackedResult} for the result panel or
+     * {@link #trackingNotFound} for the inline error notice.
+     * Returns null since the scene re-renders in place.
+     */
+    public String trackRequest() {
+        this.trackedResult = null;
+        this.trackingNotFound = false;
+        if (trackReference == null || trackReference.isBlank()) {
+            return null;
+        }
+        requestService.lookupByReference(trackReference)
+                .ifPresentOrElse(
+                        view -> this.trackedResult = view,
+                        () -> this.trackingNotFound = true
+                );
         return null;
     }
 
@@ -423,6 +467,22 @@ public class RequestBean implements Serializable {
 
     public String getSubmittedReference() {
         return submittedReference;
+    }
+
+    public String getTrackReference() {
+        return trackReference;
+    }
+
+    public void setTrackReference(String trackReference) {
+        this.trackReference = trackReference;
+    }
+
+    public RequestTrackingView getTrackedResult() {
+        return trackedResult;
+    }
+
+    public boolean isTrackingNotFound() {
+        return trackingNotFound;
     }
 
     /**

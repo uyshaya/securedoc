@@ -1106,3 +1106,43 @@ select {
 .track-input-row input {
     flex: 1;
 }
+
+.track-result {
+    background: #F8FAFC;
+    border: 0.5px solid #E2E8F0;
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.track-result-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.track-result-title {
+    font-weight: 600;
+    color: var(--tx-1);
+    font-size: 13.5px;
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-PENDING        { background: #F3F4F6; color: #4B5563; }
+.status-UNDER_REVIEW   { background: #E0F2FE; color: #075985; }
+.status-PROCESSING     { background: #FEF3C7; color: #92400E; }
+.status-COMPLETED      { background: #D1FAE5; color: #065F46; }
+.status-REJECTED       { background: #FEE2E2; color: #991B1B; }

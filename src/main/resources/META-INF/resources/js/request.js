@@ -322,26 +322,40 @@ function startOver() {
 }
 
 /* ─ TRACK STATUS ─
-   Lookup is a stub until the requests-table backend is wired. The input
-   + Check button stay live; doTrack always shows the "not found" notice
-   since there is nothing to look up yet. renderTrackResult / status
-   config moved out with the mock data. */
+   Server-side via JSF: the Check p:commandButton fires
+   RequestBean.trackRequest and re-renders trackForm with either the
+   result panel or the not-found notice. This function is purely UX:
+   it gates the Check button on minimum input length and clears any
+   stale server-rendered result while the resident retypes (the bean
+   state is authoritative on the next submit). */
 function onTrackInput() {
-  const v = document.getElementById('trackInput').value.trim();
-  document.getElementById('btnTrack').disabled = v.length < 3;
-  document.getElementById('trackErr').style.display = 'none';
+    const input = document.getElementById('trackForm:trackInput');
+    if (!input) return;
+    const value = (input.value || '').trim();
+    const button = document.getElementById('trackForm:btnTrack');
+    if (button) button.disabled = value.length < 3;
+    document.querySelectorAll('#p-track .notice-error, #p-track .track-result')
+        .forEach(node => {
+            node.style.display = 'none';
+        });
 }
 
-function doTrack() {
-  document.getElementById('trackErr').style.display = 'flex';
-}
-
+/* Confirmation scene's "Track status" CTA: copy the just-issued
+   reference into the track input and jump to track status page. */
 function goToTrackFromConfirm() {
-  const ref = document.getElementById('refNum').textContent.trim();
+  const ref = (document.getElementById('refNum')?.textContent || '').trim();
   goTo('p-track');
   if (ref) {
-    const inp = document.getElementById('trackInput');
-    inp.value = ref;
-    onTrackInput();
+    const input = document.getElementById('trackForm:trackInput');
+    if (input) {
+      input.value = ref;
+      onTrackInput();
+    }
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  /* Initial render has the Check button enabled by JSF; mirror the
+     "empty input → disabled" behavior the resident expects. */
+  if (document.getElementById('trackForm:trackInput')) onTrackInput();
+});
