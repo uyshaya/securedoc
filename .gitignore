@@ -1,42 +1,42 @@
-# ─── Quarkus ────────────────────────────────────────────
+# --- Quarkus --------------------------------------------
 target/
 .quarkus/
 
-# ─── Maven ──────────────────────────────────────────────
+# --- Maven ----------------------------------------------
 .mvn/wrapper/maven-wrapper.jar
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 release.properties
 
-# ─── Environment & Secrets ──────────────────────────────
+# --- Environment & Secrets ------------------------------
 .env
 *.env
 application-prod.properties
 
-# ─── IntelliJ IDEA ──────────────────────────────────────
+# --- IntelliJ IDEA --------------------------------------
 .idea/
 *.iml
 *.iws
 *.ipr
 
-# ─── VS Code ────────────────────────────────────────────
+# --- VS Code --------------------------------------------
 .vscode/
 
-# ─── macOS ──────────────────────────────────────────────
+# --- macOS ----------------------------------------------
 .DS_Store
 *.DS_Store
 
-# ─── Logs ───────────────────────────────────────────────
+# --- Logs -----------------------------------------------
 *.log
 logs/
 
-# ─── Compiled output ────────────────────────────────────
+# --- Compiled output ------------------------------------
 *.class
 *.jar
 *.war
 
-# ─── Keys (never commit private keys) ───────────────────
+# --- Keys (never commit private keys) -------------------
 *.pem
 *.key
 *.p12

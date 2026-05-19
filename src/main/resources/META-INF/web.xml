@@ -11,9 +11,18 @@
         <param-value>Development</param-value>
     </context-param>
 
+    <!--
+        Render every date / instant as UTC on the server side. The DB is UTC
+        (see quarkus.hibernate-orm.jdbc.timezone=UTC in application.properties)
+        and the JVM-side temporal type is always java.time.Instant, so the
+        natural rendering is "instant in UTC". Browser-local conversion is
+        done client-side by js/local-time.js: it walks every <time datetime="...Z">
+        element on the page and replaces its text content with the locale-
+        formatted equivalent in the user's browser timezone.
+    -->
     <context-param>
         <param-name>jakarta.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
     </context-param>
 
     <!-- PrimeFaces settings -->
@@ -43,7 +52,7 @@
         <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
 
-    <!-- Inactivity timeout — drops the HTTP session after 15 minutes of no requests. Check AdminAuthFilter.java -->
+    <!-- Inactivity timeout: drops the HTTP session after 15 minutes of no requests. Check AdminAuthFilter.java -->
     <session-config>
         <session-timeout>15</session-timeout>
     </session-config>

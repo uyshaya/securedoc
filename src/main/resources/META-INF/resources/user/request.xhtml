@@ -6,14 +6,14 @@
                 template="/WEB-INF/templates/resident-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Request a Document – SecureDoc</title>
+        <title>#{msg['page.request.title']}</title>
     </ui:define>
 
     <ui:define name="content">
 
-        <!-- ══════════════════════════════════════
-             P1 · LANDING — Select Certificate
-        ═══════════════════════════════════════ -->
+        <!-- ------------------------------------------------------------
+             P1 . LANDING - Select Certificate
+        ------------------------------------------------------------ -->
         <div class="page active" id="p-landing">
             <div class="card">
                 <div class="hd">
@@ -24,7 +24,7 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                         <div class="tagline">#{msg['brand.tagline']}</div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                                             forceSelection="true"
                                             minQueryLength="2"
                                             queryDelay="200"
-                                            placeholder="#{msg['landing.org.placeholder'].formatted(systemConfigBean.orgLabelLower)}">
+                                            placeholder="#{i18n.get('register.placeholder.organization', systemConfigBean.orgLabelLower)}">
                                 <p:ajax event="itemSelect"
                                         listener="#{requestBean.onOrganizationSelected}"
                                         update="certTypeWrap"/>
@@ -113,9 +113,9 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P2 · EMAIL — Enter email address
-        ═══════════════════════════════════════ -->
+        <!-- ------------------------------------------------------------
+             P2 . EMAIL - Enter email address
+        ------------------------------------------------------------ -->
         <div class="page" id="p-email">
             <div class="card">
                 <div class="hd-nav">
@@ -124,7 +124,7 @@
                         #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
@@ -181,9 +181,9 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P3 · OTP — Enter code
-        ═══════════════════════════════════════ -->
+        <!-- ------------------------------------------------------------
+             P3 . OTP - Enter code
+        ------------------------------------------------------------ -->
         <div class="page" id="p-otp">
             <div class="card">
                 <div class="hd-nav">
@@ -192,7 +192,7 @@
                         #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
@@ -254,9 +254,9 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P4 · FORM — Request details
-        ═══════════════════════════════════════ -->
+        <!-- ------------------------------------------------------------
+             P4 . FORM - Request details
+        ------------------------------------------------------------ -->
         <div class="page" id="p-form">
             <div class="card">
                 <div class="hd-nav">
@@ -265,7 +265,7 @@
                         #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
@@ -296,8 +296,8 @@
                             <i class="pi pi-file" style="color:#7EC8F5;font-size:18px"></i>
                         </div>
                         <div>
-                            <div class="cert-name" id="formCertName">—</div>
-                            <div class="cert-category" id="formCertCat">—</div>
+                            <div class="cert-name" id="formCertName">--</div>
+                            <div class="cert-category" id="formCertCat">--</div>
                         </div>
                     </div>
 
@@ -464,9 +464,9 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P5 · REVIEW
-        ═══════════════════════════════════════ -->
+        <!-- ------------------------------------------------------------
+             P5 . REVIEW
+        ------------------------------------------------------------ -->
         <div class="page" id="p-review">
             <div class="card">
                 <div class="hd-nav">
@@ -475,7 +475,7 @@
                         #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
@@ -532,9 +532,9 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P6 · CONFIRMATION
-        ═══════════════════════════════════════ -->
+        <!-- ------------------------------------------------------------
+             P6 . CONFIRMATION
+        ------------------------------------------------------------ -->
         <div class="page" id="p-confirm">
             <div class="card">
                 <div class="hd">
@@ -545,7 +545,7 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                         <div class="tagline">#{msg['brand.tagline']}</div>
                     </div>
                 </div>
@@ -618,9 +618,9 @@
             <div class="footer">#{msg['app.footer']}</div>
         </div>
 
-        <!-- ══════════════════════════════════════
-             P-TRACK · Track Request Status
-        ═══════════════════════════════════════ -->
+        <!-- ------------------------------------------------------------
+             P-TRACK . Track Request Status
+        ------------------------------------------------------------ -->
         <div class="page" id="p-track">
             <div class="card">
                 <div class="hd-nav">
@@ -629,7 +629,7 @@
                         #{msg['nav.back']}
                     </button>
                     <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">Secure<em>Doc</em></div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                     </div>
                 </div>
 
@@ -693,17 +693,17 @@
                             <div class="review-item">
                                 <span class="rv-key">#{msg['track.result.submitted']}</span>
                                 <span class="rv-val">
-                                    <h:outputText value="#{requestBean.trackedResult.createdAt}">
-                                        <f:convertDateTime type="localDateTime" pattern="MMM d, yyyy h:mm a"/>
-                                    </h:outputText>
+                                    <time datetime="#{requestBean.trackedResult.createdAt}" class="local-time" data-format="datetime">
+                                        <h:outputText value="#{requestBean.trackedResult.createdAt}"/>
+                                    </time>
                                 </span>
                             </div>
                             <div class="review-item">
                                 <span class="rv-key">#{msg['track.result.lastUpdate']}</span>
                                 <span class="rv-val">
-                                    <h:outputText value="#{requestBean.trackedResult.updatedAt}">
-                                        <f:convertDateTime type="localDateTime" pattern="MMM d, yyyy h:mm a"/>
-                                    </h:outputText>
+                                    <time datetime="#{requestBean.trackedResult.updatedAt}" class="local-time" data-format="datetime">
+                                        <h:outputText value="#{requestBean.trackedResult.updatedAt}"/>
+                                    </time>
                                 </span>
                             </div>
                         </div>

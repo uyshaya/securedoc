@@ -6,11 +6,11 @@
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Staff Management – SecureDoc Admin</title>
+        <title>#{msg['page.staff.title']}</title>
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">Staff Management</h1>
+        <h1 class="console-page-title">#{msg['page.staff.heading']}</h1>
     </ui:define>
 
     <ui:define name="content">
@@ -22,17 +22,26 @@
             <p:dataTable id="staffTable"
                          value="#{staffManagementBean.staffList}"
                          var="s"
-                         emptyMessage="No staff in this #{systemConfigBean.orgLabelLower} yet.">
+                         emptyMessage="#{i18n.get('staff.table.empty', systemConfigBean.orgLabelLower)}">
 
-                <p:column headerText="Name">
+                <p:column headerText="#{msg['staff.column.name']}">
                     <h:outputText value="#{s.fullName}"/>
                 </p:column>
 
-                <p:column headerText="Email">
+                <p:column headerText="#{msg['staff.column.email']}">
                     <h:outputText value="#{s.email}"/>
                 </p:column>
 
-                <p:column headerText="Role">
+                <p:column headerText="#{msg['staff.column.last.login']}">
+                    <h:panelGroup rendered="#{s.lastLogin != null}">
+                        <time datetime="#{s.lastLogin}" class="local-time" data-format="relative">
+                            <h:outputText value="#{s.lastLogin}"/>
+                        </time>
+                    </h:panelGroup>
+                    <h:outputText value="#{msg['staff.last.login.never']}" rendered="#{s.lastLogin == null}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['staff.column.role']}">
                     <p:selectOneMenu value="#{s.role}"
                                      disabled="#{s.id == authBean.authenticatedId}">
                         <f:selectItems value="#{staffManagementBean.roleOptions}"/>
@@ -41,27 +50,27 @@
                     </p:selectOneMenu>
                 </p:column>
 
-                <p:column headerText="Status">
-                    <h:outputText value="#{s.isActive ? 'Active' : 'Pending / Inactive'}"
-                                  style="color:#{s.isActive ? 'var(--green)' : 'var(--tx-m)'}"/>
+                <p:column headerText="#{msg['staff.column.status']}">
+                    <h:outputText value="#{s.active ? msg['staff.status.active'] : msg['staff.status.inactive']}"
+                                  style="color:#{s.active ? 'var(--green)' : 'var(--tx-m)'}"/>
                 </p:column>
 
-                <p:column headerText="Actions" style="white-space:nowrap">
-                    <p:commandButton value="#{s.isActive ? 'Deactivate' : 'Approve'}"
+                <p:column headerText="#{msg['staff.column.actions']}" style="white-space:nowrap">
+                    <p:commandButton value="#{s.active ? msg['staff.action.deactivate'] : msg['staff.action.approve']}"
                                      action="#{staffManagementBean.toggleActive(s)}"
                                      update="staffForm"
                                      process="@this"
-                                     icon="#{s.isActive ? 'pi pi-ban' : 'pi pi-check'}"
+                                     icon="#{s.active ? 'pi pi-ban' : 'pi pi-check'}"
                                      styleClass="ui-button-flat"/>
 
-                    <p:commandButton value="Delete"
+                    <p:commandButton value="#{msg['staff.action.delete']}"
                                      action="#{staffManagementBean.deleteStaff(s)}"
                                      update="staffForm"
                                      process="@this"
                                      icon="pi pi-trash"
                                      styleClass="ui-button-flat"
                                      rendered="#{s.id != authBean.authenticatedId}"
-                                     onclick="return confirm('Delete #{s.fullName}? This cannot be undone.');"/>
+                                     onclick="return confirm('#{i18n.get('staff.action.delete.confirm', s.fullName)}');"/>
                 </p:column>
             </p:dataTable>
 

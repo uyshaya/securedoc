@@ -1,19 +1,17 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="jakarta.faces.html"
-                xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Requests – SecureDoc Admin</title>
+        <title>#{msg['page.requests.title']}</title>
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">Requests</h1>
+        <h1 class="console-page-title">#{msg['page.requests.heading']}</h1>
     </ui:define>
 
     <ui:define name="content">
-        <p>Requests scaffold. Replace with request management UI.</p>
+        <p>#{msg['page.requests.placeholder']}</p>
     </ui:define>
 
 </ui:composition>

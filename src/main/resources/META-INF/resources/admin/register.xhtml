@@ -1,12 +1,11 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
-                xmlns:f="jakarta.faces.core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-auth-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Create Account – SecureDoc Admin</title>
+        <title>#{msg['page.register.title']}</title>
     </ui:define>
 
     <ui:define name="formContent">
@@ -17,44 +16,44 @@
                            styleClass="auth-panel">
 
                 <div>
-                    <div class="auth-step-title">Create an account</div>
+                    <div class="auth-step-title">#{msg['register.step.title']}</div>
                     <div class="auth-step-sub">
-                        Set up your admin profile to manage document requests.
+                        #{msg['register.step.sub']}
                     </div>
                 </div>
 
                 <p:outputLabel for="firstName"
                                styleClass="af-label"
-                               value="First name"/>
+                               value="#{msg['register.label.first.name']}"/>
                 <p:inputText id="firstName"
                              value="#{registerBean.firstName}"
-                             placeholder="Juan"
+                             placeholder="#{msg['register.placeholder.first.name']}"
                              styleClass="ui-inputfield"
                              required="true"
-                             requiredMessage="First name is required."/>
+                             requiredMessage="#{msg['register.required.first.name']}"/>
                 <p:message for="firstName"/>
 
                 <p:outputLabel for="lastName"
                                styleClass="af-label"
-                               value="Last name"/>
+                               value="#{msg['register.label.last.name']}"/>
                 <p:inputText id="lastName"
                              value="#{registerBean.lastName}"
-                             placeholder="Dela Cruz"
+                             placeholder="#{msg['register.placeholder.last.name']}"
                              styleClass="ui-inputfield"
                              required="true"
-                             requiredMessage="Last name is required."/>
+                             requiredMessage="#{msg['register.required.last.name']}"/>
                 <p:message for="lastName"/>
 
                 <p:outputLabel for="email"
                                styleClass="af-label"
-                               value="Email address"/>
+                               value="#{msg['register.label.email']}"/>
                 <p:inputText id="email"
                              value="#{registerBean.email}"
                              type="email"
-                             placeholder="admin@securedoc.gov.ph"
+                             placeholder="#{msg['register.placeholder.email']}"
                              styleClass="ui-inputfield"
                              required="true"
-                             requiredMessage="Email is required."/>
+                             requiredMessage="#{msg['register.required.email']}"/>
                 <p:message for="email"/>
 
                 <p:outputLabel for="organization"
@@ -70,51 +69,51 @@
                                 forceSelection="true"
                                 minQueryLength="2"
                                 queryDelay="200"
-                                placeholder="Search your #{systemConfigBean.orgLabelLower} by name or code…"
+                                placeholder="#{i18n.get('register.placeholder.organization', systemConfigBean.orgLabelLower)}"
                                 styleClass="ui-inputfield"
                                 required="true"
-                                requiredMessage="Please select your #{systemConfigBean.orgLabelLower}."/>
+                                requiredMessage="#{i18n.get('register.select.organization', systemConfigBean.orgLabelLower)}"/>
                 <p:message for="organization"/>
 
                 <p:outputLabel for="password"
                                styleClass="af-label"
-                               value="Password"/>
+                               value="#{msg['register.label.password']}"/>
                 <p:password id="password"
                             value="#{registerBean.password}"
-                            placeholder="••••••••"
+                            placeholder="********"
                             feedback="false"
                             toggleMask="true"
                             styleClass="ui-inputfield"
                             required="true"
-                            requiredMessage="Password is required."/>
+                            requiredMessage="#{msg['register.required.password']}"/>
                 <p:message for="password"/>
 
                 <p:outputLabel for="confirmPassword"
                                styleClass="af-label"
-                               value="Confirm password"/>
+                               value="#{msg['register.label.confirm.password']}"/>
                 <p:password id="confirmPassword"
                             value="#{registerBean.confirmPassword}"
-                            placeholder="••••••••"
+                            placeholder="********"
                             feedback="false"
                             toggleMask="true"
                             styleClass="ui-inputfield"
                             required="true"
-                            requiredMessage="Please confirm your password."/>
+                            requiredMessage="#{msg['register.required.confirm.password']}"/>
                 <p:message for="confirmPassword"/>
 
                 <p:messages globalOnly="true"
                             showSummary="true"
                             showDetail="false"/>
 
-                <p:commandButton value="Create Account"
+                <p:commandButton value="#{msg['register.button.create']}"
                                  styleClass="af-btn"
                                  action="#{registerBean.register}"
                                  update="registerForm"
                                  process="@form"/>
 
                 <div class="auth-footer-link">
-                    Already have an account?&#160;
-                    <h:link outcome="login">Sign in</h:link>
+                    #{msg['register.footer.have.account']}&#160;
+                    <h:link outcome="login">#{msg['register.footer.signin']}</h:link>
                 </div>
 
             </p:outputPanel>

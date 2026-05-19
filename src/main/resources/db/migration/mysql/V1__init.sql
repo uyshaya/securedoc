@@ -1,8 +1,18 @@
-USE securedoc;
+-- ------------------------------------------------------------
+-- V1__init.sql -- initial securedoc schema
+--
+-- AuditableEntity-bearing tables (organizations, staff, document_templates,
+-- requests) have their created_at / updated_at columns written by the JPA
+-- entity listener -- no MySQL DEFAULT / ON UPDATE clauses on those columns.
+--
+-- Tables with only a created_at column (staff_otps, resident_otps,
+-- org_certificates, requesters, audit_logs) keep MySQL's
+-- DEFAULT CURRENT_TIMESTAMP because no Java listener writes them.
+-- ------------------------------------------------------------
 
---  1. ORGANIZATIONS  (tenant root — staff, templates, requests, etc. scope to an organization;
+--  1. ORGANIZATIONS  (tenant root -- staff, templates, requests, etc. scope to an organization;
 --                    `type` discriminates barangay/school/city so the schema is open to more tenant types)
-CREATE TABLE organizations
+CREATE TABLE IF NOT EXISTS organizations
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     type           ENUM('barangay','school','city') NOT NULL DEFAULT 'barangay',
@@ -11,13 +21,13 @@ CREATE TABLE organizations
     address        TEXT,
     contact_number VARCHAR(20),
     email          VARCHAR(255),
-    is_active      BOOLEAN   DEFAULT TRUE,
-    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    is_active      BOOLEAN DEFAULT TRUE,
+    created_at     TIMESTAMP NOT NULL,
+    updated_at     TIMESTAMP NOT NULL
 );
 
 --  2. STAFF / ADMIN
-CREATE TABLE staff
+CREATE TABLE IF NOT EXISTS staff
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT       NOT NULL,
@@ -28,15 +38,15 @@ CREATE TABLE staff
     password_hash   VARCHAR(255) NOT NULL,
     role            ENUM('staff', 'admin') DEFAULT 'staff',
     is_active       BOOLEAN   DEFAULT TRUE,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at      TIMESTAMP NOT NULL,
+    updated_at      TIMESTAMP NOT NULL,
     last_login      DATETIME,
     UNIQUE (organization_id, email),
     FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );
 
 --  3. STAFF OTP  (login 2FA)
-CREATE TABLE staff_otps
+CREATE TABLE IF NOT EXISTS staff_otps
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
     staff_id     BIGINT     NOT NULL,
@@ -50,7 +60,7 @@ CREATE TABLE staff_otps
 );
 
 --  4. RESIDENT OTP  (email verification before submitting)
-CREATE TABLE resident_otps
+CREATE TABLE IF NOT EXISTS resident_otps
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
     email        VARCHAR(255) NOT NULL,
@@ -62,7 +72,7 @@ CREATE TABLE resident_otps
 );
 
 --  5. ORGANIZATION CERTIFICATE  (per-organization signing keypair metadata; private keys live off-DB)
-CREATE TABLE org_certificates
+CREATE TABLE IF NOT EXISTS org_certificates
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT       NOT NULL,
@@ -76,8 +86,8 @@ CREATE TABLE org_certificates
     FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );
 
---  6. DOCUMENT TEMPLATES  (per-organization issuable types; one row per org × doc_type)
-CREATE TABLE document_templates
+--  6. DOCUMENT TEMPLATES  (per-organization issuable types; one row per org x doc_type)
+CREATE TABLE IF NOT EXISTS document_templates
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT       NOT NULL,
@@ -89,13 +99,13 @@ CREATE TABLE document_templates
     template_data   LONGBLOB     NOT NULL,
     mime_type       VARCHAR(50) DEFAULT 'application/pdf',
     is_active       BOOLEAN     DEFAULT TRUE, -- allow deactivating old templates
-    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at      TIMESTAMP   NOT NULL,
+    updated_at      TIMESTAMP   NOT NULL,
     FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );
 
 --  7. REQUESTERS  (resident personal info per submission)
-CREATE TABLE requesters
+CREATE TABLE IF NOT EXISTS requesters
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     first_name     VARCHAR(100) NOT NULL,
@@ -111,7 +121,7 @@ CREATE TABLE requesters
 );
 
 --  8. REQUESTS
-CREATE TABLE requests
+CREATE TABLE IF NOT EXISTS requests
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id  BIGINT      NOT NULL,
@@ -127,8 +137,8 @@ CREATE TABLE requests
     purpose          VARCHAR(255),
     other_purpose    TEXT,
     request_note     TEXT,
-    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at       TIMESTAMP NOT NULL,
+    updated_at       TIMESTAMP NOT NULL,
     FOREIGN KEY (organization_id) REFERENCES organizations (id),
     FOREIGN KEY (requester_id) REFERENCES requesters (id),
     FOREIGN KEY (template_id) REFERENCES document_templates (id),
@@ -136,26 +146,26 @@ CREATE TABLE requests
 );
 
 --  9. ISSUED DOCUMENTS  (tamper-evident layer)
-CREATE TABLE documents
+CREATE TABLE IF NOT EXISTS documents
 (
     id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
     request_id         BIGINT       NOT NULL UNIQUE,
     org_certificate_id BIGINT       NOT NULL,
     issued_by          BIGINT       NOT NULL,        -- which staff member approved it
-    file_name          VARCHAR(255) NOT NULL,
-    document_data      LONGBLOB     NOT NULL,        -- PDF bytes
-    file_size          INT,
-    file_hash          VARCHAR(64)  NOT NULL,        -- SHA-256 hash of document_data (tamper detection)
-    digital_signature  TEXT,                         -- signature over file_hash
-    verification_token VARCHAR(128) NOT NULL UNIQUE, -- encoded as the QR image
-    issued_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    file_name           VARCHAR(255) NOT NULL,
+    document_data       LONGBLOB     NOT NULL,        -- PDF bytes
+    file_size           INT,
+    file_hash           VARCHAR(64)  NOT NULL,        -- SHA-256 hash of document_data (tamper detection)
+    digital_signature   TEXT,                         -- signature over file_hash
+    verification_token  VARCHAR(128) NOT NULL UNIQUE, -- encoded as the QR image
+    issued_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (request_id) REFERENCES requests (id),
     FOREIGN KEY (org_certificate_id) REFERENCES org_certificates (id),
     FOREIGN KEY (issued_by) REFERENCES staff (id)
 );
 
 --  10. AUDIT LOGS
-CREATE TABLE audit_logs
+CREATE TABLE IF NOT EXISTS audit_logs
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     actor_id    BIGINT,                -- staff who performed the action (NULL if system)

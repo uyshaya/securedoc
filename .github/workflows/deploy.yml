@@ -1,0 +1,123 @@
+# Build the Quarkus native binary on an ARM runner and deploy to EC2 via SSM Run
+# Command.
+#
+# The `native-release-pgo` profile builds THREE native binaries (normal,
+# instrumented, optimized) in a single Maven reactor, runs a 10-worker x 5-minute
+# load workload against each, prints a side-by-side comparison, and copies the
+# better of normal-vs-optimized to target/securedoc-*-runner. Lifecycle:
+#   prepare-package        docker compose up + build NORMAL
+#   package                save NORMAL + load-test NORMAL + reset DB + build INSTRUMENTED
+#   pre-integration-test   save INSTRUMENTED + load-test INSTRUMENTED + reset DB + build OPTIMIZED
+#   integration-test       save OPTIMIZED + load-test OPTIMIZED + compare + pick winner
+#   post-integration-test  docker compose down -v
+# The instrumented binary is throwaway (it only exists to produce the iprof that
+# feeds the optimized build) and is deleted by the select-winner step. Docker +
+# Compose are pre-installed on GitHub-hosted ubuntu-24.04-arm runners.
+#
+# CAVEAT: scripts/graalvm-pgo/workload.sh is currently a placeholder GET against
+# `/`. Until that is replaced with a representative auth + endpoint mix, the
+# captured iprof exercises almost no real code paths and the "optimized" binary
+# offers near-zero benefit over `normal`. The pipeline runs end-to-end either
+# way, so wiring stays in place; fill in workload.sh to make PGO meaningful.
+#
+# No SSH, no long-lived AWS keys -- OIDC federation lets this workflow assume an
+# IAM role at runtime, scoped via the role's trust policy to this repo + main
+# branch only.
+#
+# Required GitHub Actions secrets (configure under Settings → Secrets and
+# variables → Actions):
+#
+#   AWS_ROLE_ARN          IAM role assumed via OIDC. Trust policy must allow
+#                         token.actions.githubusercontent.com and scope to this
+#                         repo + main branch only. Required permissions:
+#                           s3:PutObject on the artifact bucket
+#                           ssm:SendCommand on the target EC2 instance
+#                           ssm:GetCommandInvocation for the wait
+#   AWS_REGION            Region of the artifact bucket and target instance
+#                         (e.g. ap-southeast-1).
+#   AWS_ARTIFACT_BUCKET   S3 bucket holding release binaries. The IAM role
+#                         needs PutObject here.
+#   AWS_INSTANCE_ID       EC2 instance ID running the securedoc systemd
+#                         service. Must have the SSM agent installed and an
+#                         instance profile that allows SSM.
+#
+# Infrastructure the workflow assumes is already provisioned (out of scope here):
+#   - The IAM role + OIDC trust policy referenced by AWS_ROLE_ARN
+#   - The S3 bucket referenced by AWS_ARTIFACT_BUCKET
+#   - The EC2 instance referenced by AWS_INSTANCE_ID with:
+#       * SSM agent running
+#       * /opt/securedoc/ owned by the securedoc:securedoc user
+#       * systemd unit at /etc/systemd/system/securedoc.service that launches
+#         /opt/securedoc/securedoc-runner as the securedoc user
+
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    timeout-minutes: 120
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25 (GraalVM)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'graalvm'
+          cache: 'maven'
+
+      - name: Run tests
+        run: ./mvnw -B test
+
+      - name: Build + load-test + select native binary
+        # `verify` walks the whole comparison lifecycle (prepare-package -> package
+        # -> pre-integration-test -> integration-test -> post-integration-test ->
+        # verify): three native builds, three load tests, comparison table,
+        # winner copied to target/securedoc-*-runner. Tests already ran in the
+        # prior step, so -DskipTests prevents surefire from re-executing them.
+        run: ./mvnw -B -Pnative-release-pgo verify -DskipTests
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload artifact to S3
+        env:
+          ARTIFACT_BUCKET: ${{ secrets.AWS_ARTIFACT_BUCKET }}
+        run: |
+          ARTIFACT_KEY="releases/$(git rev-parse --short HEAD).runner"
+          aws s3 cp target/securedoc-*-runner "s3://${ARTIFACT_BUCKET}/${ARTIFACT_KEY}"
+          echo "ARTIFACT_KEY=${ARTIFACT_KEY}" >> "$GITHUB_ENV"
+
+      - name: Deploy via SSM Run Command
+        env:
+          INSTANCE_ID: ${{ secrets.AWS_INSTANCE_ID }}
+          ARTIFACT_BUCKET: ${{ secrets.AWS_ARTIFACT_BUCKET }}
+        run: |
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "${INSTANCE_ID}" \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands="[
+              \"sudo systemctl stop securedoc || true\",
+              \"sudo aws s3 cp s3://${ARTIFACT_BUCKET}/${ARTIFACT_KEY} /opt/securedoc/securedoc-runner\",
+              \"sudo chmod +x /opt/securedoc/securedoc-runner\",
+              \"sudo chown securedoc:securedoc /opt/securedoc/securedoc-runner\",
+              \"sudo systemctl start securedoc\"
+            ]" \
+            --query 'Command.CommandId' --output text)
+          aws ssm wait command-executed --command-id "$CMD_ID" \
+            --instance-id "${INSTANCE_ID}"

@@ -16,7 +16,7 @@ html, body {
     display: none !important;
 }
 
-/* ── Auth scene ── */
+/* -- Auth scene -- */
 .auth-scene {
     min-height: 100vh;
     background: var(--bg);
@@ -40,7 +40,7 @@ html, body {
     min-height: 560px;
 }
 
-/* ── Brand panel ── */
+/* -- Brand panel -- */
 .auth-brand {
     width: 300px;
     flex-shrink: 0;
@@ -112,7 +112,7 @@ html, body {
     line-height: 1.65;
 }
 
-/* Feature list — p:dataList overrides */
+/* Feature list -- p:dataList overrides */
 .brand-features.ui-datalist {
     border: none !important;
     background: transparent !important;
@@ -150,7 +150,7 @@ html, body {
     color: rgba(255, 255, 255, 0.22);
 }
 
-/* ── Form panel ── */
+/* -- Form panel -- */
 .auth-form-panel {
     flex: 1;
     padding: 48px 44px;
@@ -191,7 +191,7 @@ html, body {
     line-height: 1.55;
 }
 
-/* ── Fields ── */
+/* -- Fields -- */
 .af-label {
     font-size: 12px;
     font-weight: 500;
@@ -243,7 +243,7 @@ html, body {
     width: 100%;
 }
 
-/* ── Two-column field row ── */
+/* -- Two-column field row -- */
 .af-row.ui-panelgrid {
     border: none !important;
     width: 100% !important;
@@ -277,7 +277,7 @@ html, body {
     background: transparent !important;
 }
 
-/* ── OTP (custom 6-cell row, mirrors request.css) ── */
+/* -- OTP (custom 6-cell row, mirrors request.css) -- */
 .otp-row {
     display: flex;
     gap: 10px;
@@ -315,7 +315,7 @@ html, body {
     color: var(--tx-f);
 }
 
-/* ── Error / Notice ── */
+/* -- Error / Notice -- */
 .af-error {
     background: var(--red-tint);
     border: 0.5px solid var(--red-bdr);
@@ -353,7 +353,7 @@ html, body {
     padding: 0 !important;
 }
 
-/* ── Buttons ── */
+/* -- Buttons -- */
 .af-btn {
     width: 100%;
     background: var(--navy) !important;
@@ -434,7 +434,7 @@ html, body {
     text-decoration: underline;
 }
 
-/* ── Success state ── */
+/* -- Success state -- */
 .auth-success-icon {
     width: 60px;
     height: 60px;
@@ -460,13 +460,13 @@ html, body {
     line-height: 1.6;
 }
 
-/* ── p:separator ── */
+/* -- p:separator -- */
 .ui-separator-horizontal {
     border-top: 0.5px solid var(--border-soft) !important;
     margin: 4px 0 !important;
 }
 
-/* ── p:message ── */
+/* -- p:message -- */
 .ui-message-error, .ui-messages-error {
     font-family: 'DM Sans', sans-serif !important;
     font-size: 12px !important;
@@ -493,7 +493,7 @@ html, body {
     min-height: 100vh;
 }
 
-/* ── Sidebar ── */
+/* -- Sidebar -- */
 .console-sidebar {
     width: 240px;
     flex-shrink: 0;
@@ -539,7 +539,7 @@ html, body {
     text-transform: uppercase;
 }
 
-/* ── Nav ── */
+/* -- Nav -- */
 .console-nav {
     display: flex;
     flex-direction: column;
@@ -581,7 +581,7 @@ html, body {
     color: currentColor;
 }
 
-/* ── Sidebar footer ── */
+/* -- Sidebar footer -- */
 .console-sidebar-footer {
     padding: 16px 24px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -684,7 +684,7 @@ html, body {
     overflow: visible !important;
 }
 
-/* ── Main content ── */
+/* -- Main content -- */
 .console-main {
     flex: 1;
     min-width: 0;

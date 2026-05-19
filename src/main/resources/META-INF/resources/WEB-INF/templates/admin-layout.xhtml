@@ -12,8 +12,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </f:facet>
 
+    <f:loadBundle basename="messages" var="msg"/>
+
     <ui:insert name="pageTitle">
-        <title>Admin Console – SecureDoc</title>
+        <title>#{msg['layout.admin.title']}</title>
     </ui:insert>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -24,6 +26,8 @@
     <h:outputStylesheet library="css" name="global.css"/>
     <h:outputStylesheet library="css" name="admin.css"/>
 
+    <h:outputScript library="js" name="local-time.js"/>
+
     <ui:insert name="extraStyles"/>
 </h:head>
 
@@ -31,7 +35,7 @@
     <f:loadBundle basename="messages" var="msg"/>
     <div class="console">
 
-        <!-- ══ Sidebar ══ -->
+        <!-- == Sidebar == -->
         <aside class="console-sidebar">
             <div class="console-brand">
                 <div class="console-brand-icon">
@@ -43,8 +47,8 @@
                     </svg>
                 </div>
                 <div>
-                    <span class="brand-name">Secure<em>Doc</em></span>
-                    <div class="console-brand-tag">Admin Console</div>
+                    <span class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></span>
+                    <div class="console-brand-tag">#{msg['layout.admin.brand.tag']}</div>
                 </div>
             </div>
 
@@ -54,32 +58,32 @@
                         <span class="console-nav-icon">
                             <i class="pi pi-home"></i>
                         </span>
-                        Dashboard
+                        #{msg['nav.dashboard']}
                     </h:link>
                     <h:link outcome="/admin/requests" styleClass="console-nav-item">
                         <span class="console-nav-icon">
                             <i class="pi pi-inbox"></i>
                         </span>
-                        Requests
+                        #{msg['nav.requests']}
                     </h:link>
                     <h:link outcome="/admin/templates" styleClass="console-nav-item">
                         <span class="console-nav-icon">
                             <i class="pi pi-file-edit"></i>
                         </span>
-                        Templates
+                        #{msg['nav.templates']}
                     </h:link>
                     <h:link outcome="/admin/audit" styleClass="console-nav-item">
                         <span class="console-nav-icon">
                             <i class="pi pi-history"></i>
                         </span>
-                        Audit Log
+                        #{msg['nav.audit']}
                     </h:link>
                     <h:link outcome="/admin/staff/staff-management" styleClass="console-nav-item"
                             rendered="#{authBean.admin}">
                         <span class="console-nav-icon">
                             <i class="pi pi-users"></i>
                         </span>
-                        Staff
+                        #{msg['nav.staff']}
                     </h:link>
                 </ui:insert>
             </nav>
@@ -98,7 +102,7 @@
                         </span>
                     </h:panelGroup>
                     <h:form id="signOutForm">
-                        <p:commandButton value="Sign out"
+                        <p:commandButton value="#{msg['nav.signout']}"
                                          icon="pi pi-sign-out"
                                          action="#{authBean.signOut}"
                                          ajax="false"
@@ -106,17 +110,17 @@
                     </h:form>
                     <div class="console-footer-meta">
                         <span class="console-footer-text">#{msg['app.footer']}</span>
-                        <span class="console-version">v1.0.0</span>
+                        <span class="console-version">#{msg['app.version']}</span>
                     </div>
                 </ui:insert>
             </div>
         </aside>
 
-        <!-- ══ Main ══ -->
+        <!-- == Main == -->
         <main class="console-main">
             <header class="console-topbar">
                 <ui:insert name="pageHeader">
-                    <h1 class="console-page-title">Admin Console</h1>
+                    <h1 class="console-page-title">#{msg['layout.admin.console']}</h1>
                 </ui:insert>
                 <div class="console-topbar-actions">
                     <ui:insert name="topbarActions"/>

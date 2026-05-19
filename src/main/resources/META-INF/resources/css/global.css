@@ -43,7 +43,7 @@ html, body {
     font-family: 'DM Sans', sans-serif;
 }
 
-/* ── Scene ── */
+/* -- Scene -- */
 .scene {
     min-height: 100vh;
     background: var(--bg);
@@ -57,7 +57,7 @@ html, body {
     gap: 36px;
 }
 
-/* ── Brand ── */
+/* -- Brand -- */
 .brand {
     display: flex;
     flex-direction: column;
@@ -97,7 +97,7 @@ html, body {
     letter-spacing: 0.3px;
 }
 
-/* ── Portal grid ── */
+/* -- Portal grid -- */
 .portal-grid {
     display: flex;
     flex-direction: column;
@@ -106,7 +106,7 @@ html, body {
     max-width: 480px;
 }
 
-/* ── Portal card ── */
+/* -- Portal card -- */
 .portal-card {
     background: var(--white);
     border: 1px solid var(--border);
@@ -265,7 +265,7 @@ html, body {
     transform: translateX(3px);
 }
 
-/* ── Divider ── */
+/* -- Divider -- */
 .portal-divider {
     display: flex;
     align-items: center;
@@ -288,7 +288,7 @@ html, body {
     white-space: nowrap;
 }
 
-/* ── Footer ── */
+/* -- Footer -- */
 .footer {
     font-size: 11px;
     color: var(--tx-f);
@@ -296,7 +296,7 @@ html, body {
     text-align: center;
 }
 
-/* ── Responsive ── */
+/* -- Responsive -- */
 @media (max-width: 480px) {
     .brand .brand-name {
         font-size: 26px;

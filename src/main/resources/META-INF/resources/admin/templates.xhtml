@@ -6,51 +6,50 @@
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Templates – SecureDoc Admin</title>
+        <title>#{msg['page.templates.title']}</title>
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">Document Templates</h1>
+        <h1 class="console-page-title">#{msg['page.templates.heading']}</h1>
     </ui:define>
 
     <ui:define name="content">
 
         <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
 
-        <!-- ══ Upload card ══ -->
+        <!-- == Upload card == -->
         <h:form id="uploadForm" enctype="multipart/form-data">
             <p:card styleClass="template-upload-card">
-                <f:facet name="title">Upload a new template</f:facet>
+                <f:facet name="title">#{msg['template.upload.card.title']}</f:facet>
                 <f:facet name="subtitle">
-                    PDF only. Templates are scoped to your active
-                    #{systemConfigBean.orgLabelLower}.
+                    #{i18n.get('template.upload.card.subtitle', systemConfigBean.orgLabelLower)}
                 </f:facet>
 
                 <div class="template-upload-grid">
                     <div class="fwrap">
-                        <p:outputLabel for="templateName" value="Template name"/>
+                        <p:outputLabel for="templateName" value="#{msg['template.field.name']}"/>
                         <p:inputText id="templateName"
                                      value="#{templateManagementBean.newName}"
-                                     placeholder="e.g. Barangay Apas Clearance"/>
+                                     placeholder="#{msg['template.field.name.placeholder']}"/>
                     </div>
 
                     <div class="fwrap">
-                        <p:outputLabel for="templateDocType" value="Certificate type"/>
+                        <p:outputLabel for="templateDocType" value="#{msg['template.field.doctype']}"/>
                         <p:selectOneMenu id="templateDocType"
                                          value="#{templateManagementBean.newDocType}">
                             <f:selectItem itemValue="#{null}"
-                                          itemLabel="Select a certificate type…"
+                                          itemLabel="#{msg['template.field.doctype.placeholder']}"
                                           noSelectionOption="true"/>
                             <f:selectItems value="#{templateManagementBean.docTypeOptions}"/>
                         </p:selectOneMenu>
                     </div>
 
                     <div class="fwrap template-full-row">
-                        <p:outputLabel for="templateDescription" value="Description"/>
+                        <p:outputLabel for="templateDescription" value="#{msg['template.field.description']}"/>
                         <p:inputTextarea id="templateDescription"
                                          value="#{templateManagementBean.newDescription}"
                                          rows="2"
-                                         placeholder="Optional short note about this template version."/>
+                                         placeholder="#{msg['template.field.description.placeholder']}"/>
                     </div>
                 </div>
 
@@ -61,8 +60,8 @@
                                   skinSimple="true"
                                   accept="application/pdf,.pdf"
                                   chooseIcon="pi pi-cloud-upload"
-                                  label="Choose PDF"/>
-                    <p:commandButton value="Save template"
+                                  label="#{msg['template.button.choose.pdf']}"/>
+                    <p:commandButton value="#{msg['template.button.save']}"
                                      icon="pi pi-save"
                                      action="#{templateManagementBean.upload}"
                                      ajax="false"
@@ -71,46 +70,46 @@
             </p:card>
         </h:form>
 
-        <!-- ══ Templates table ══ -->
+        <!-- == Templates table == -->
         <h:form id="templateListForm">
             <p:dataTable id="templateTable"
                          value="#{templateManagementBean.templates}"
                          var="template"
-                         emptyMessage="No templates yet for this #{systemConfigBean.orgLabelLower}. Upload one above.">
+                         emptyMessage="#{i18n.get('template.table.empty', systemConfigBean.orgLabelLower)}">
 
-                <p:column headerText="Name">
+                <p:column headerText="#{msg['template.column.name']}">
                     <h:outputText value="#{template.name}" style="font-weight:500"/>
                 </p:column>
 
-                <p:column headerText="Certificate type">
+                <p:column headerText="#{msg['template.column.doctype']}">
                     <h:outputText value="#{templateManagementBean.labelOf(template.docType)}"/>
                 </p:column>
 
-                <p:column headerText="Description">
+                <p:column headerText="#{msg['template.column.description']}">
                     <h:outputText value="#{empty template.description ? '—' : template.description}"
                                   style="color:var(--tx-m)"/>
                 </p:column>
 
-                <p:column headerText="Uploaded" style="white-space:nowrap">
-                    <h:outputText value="#{template.createdAt}">
-                        <f:convertDateTime type="localDateTime" pattern="MMM d, yyyy"/>
-                    </h:outputText>
+                <p:column headerText="#{msg['template.column.uploaded']}" style="white-space:nowrap">
+                    <time datetime="#{template.createdAt}" class="local-time" data-format="date">
+                        <h:outputText value="#{template.createdAt}"/>
+                    </time>
                 </p:column>
 
-                <p:column headerText="Actions" style="white-space:nowrap;width:220px">
+                <p:column headerText="#{msg['template.column.actions']}" style="white-space:nowrap;width:220px">
                     <p:button href="#{request.contextPath}/admin/templates/preview?id=#{template.id}"
                               target="_blank"
-                              value="Preview"
+                              value="#{msg['template.button.preview']}"
                               icon="pi pi-eye"
                               styleClass="ui-button-flat"/>
 
-                    <p:commandButton value="Delete"
+                    <p:commandButton value="#{msg['template.button.delete']}"
                                      action="#{templateManagementBean.deleteTemplate(template)}"
                                      update="templateListForm"
                                      process="@this"
                                      styleClass="ui-button-flat">
-                        <p:confirm header="Delete template"
-                                   message="Delete &quot;#{template.name}&quot;? This cannot be undone."/>
+                        <p:confirm header="#{msg['template.confirm.delete.header']}"
+                                   message="#{i18n.get('template.confirm.delete.message', template.name)}"/>
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
@@ -118,10 +117,10 @@
 
         <!-- Global confirm dialog wired by <p:confirm> delete button -->
         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
-            <p:commandButton value="Delete"
+            <p:commandButton value="#{msg['template.button.delete']}"
                              type="button"
                              styleClass="ui-confirmdialog-yes"/>
-            <p:commandButton value="Cancel"
+            <p:commandButton value="#{msg['common.cancel']}"
                              type="button"
                              styleClass="ui-button-flat ui-confirmdialog-no"/>
         </p:confirmDialog>

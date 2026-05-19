@@ -1,16 +1,21 @@
 package com.oppshan.securedoc.service;
 
 import com.oppshan.securedoc.dto.DocumentTemplateView;
+import com.oppshan.securedoc.dto.TemplateContentView;
+import com.oppshan.securedoc.exception.BusinessException;
 import com.oppshan.securedoc.model.DocumentTemplate;
-import com.oppshan.securedoc.model.Organization;
 import com.oppshan.securedoc.repository.DocumentTemplateRepository;
 import com.oppshan.securedoc.repository.OrganizationRepository;
+import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.jboss.logging.Logger;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Admin-driven CRUD for {@link DocumentTemplate}, scoped to the calling
@@ -20,41 +25,59 @@ import java.util.Optional;
 @ApplicationScoped
 public class TemplateManagementService {
 
-    @Inject
-    DocumentTemplateRepository templateRepo;
+    private static final String DEFAULT_MIME_TYPE = "application/pdf";
+
+    private final DocumentTemplateRepository templateRepo;
+
+    private final OrganizationRepository organizationRepo;
+
+    private final Logger logger;
 
     @Inject
-    OrganizationRepository organizationRepo;
+    public TemplateManagementService(DocumentTemplateRepository templateRepo,
+                                     OrganizationRepository organizationRepo,
+                                     Logger logger) {
+        this.templateRepo = templateRepo;
+        this.organizationRepo = organizationRepo;
+        this.logger = logger;
+    }
 
-    public List<DocumentTemplateView> listByOrganization(Long organizationId) {
+    @Transactional
+    public List<DocumentTemplateView> listByOrganization(@Nullable UUID organizationId) {
+        logger.tracef("Listing active templates in organization %s", organizationId);
         if (organizationId == null) {
             return List.of();
         }
+
         return templateRepo.listActiveByOrganizationId(organizationId).stream()
                 .map(DocumentTemplate::toView)
                 .toList();
     }
 
     @Transactional
-    public DocumentTemplateView createTemplate(Long organizationId,
-                                               String name,
-                                               String description,
-                                               DocumentTemplate.DocType docType,
-                                               byte[] data,
-                                               String mimeType) {
-        Organization org = organizationRepo.findById(organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown organization: " + organizationId));
+    public DocumentTemplateView createTemplate(@NotNull UUID organizationId,
+                                               @NotBlank String name,
+                                               @Nullable String description,
+                                               @NotNull DocumentTemplate.DocType docType,
+                                               @NotNull byte[] data,
+                                               @Nullable String mimeType) {
+        logger.tracef("Creating template %s (%s, %d bytes, %s) in organization %s",
+                name, docType, data == null ? 0 : data.length, mimeType, organizationId);
+        final var organization = organizationRepo.findById(organizationId)
+                .orElseThrow(() -> BusinessException.unknownOrganization(organizationId));
 
-        DocumentTemplate t = new DocumentTemplate();
-        t.setOrganization(org);
-        t.setName(name.trim());
-        t.setDescription(description == null ? null : description.trim());
-        t.setDocType(docType);
-        t.setTemplateData(data);
-        t.setMimeType(mimeType == null || mimeType.isBlank() ? "application/pdf" : mimeType);
-        t.setIsActive(Boolean.TRUE);
-        templateRepo.save(t);
-        return t.toView();
+        final var template = new DocumentTemplate()
+                .setOrganization(organization)
+                .setName(name.trim())
+                .setDescription(description == null ? null : description.trim())
+                .setDocType(docType)
+                .setTemplateData(data)
+                .setMimeType(mimeType == null || mimeType.isBlank() ? DEFAULT_MIME_TYPE : mimeType)
+                .setActive(true);
+        templateRepo.insertWithSession(template);
+        logger.debugf("Created document template %s (%s) in organization %s",
+                template.getId(), docType, organizationId);
+        return template.toView();
     }
 
     /**
@@ -62,18 +85,26 @@ public class TemplateManagementService {
      * belonging to a different tenant is silently no-op'd.
      */
     @Transactional
-    public void deleteTemplate(Long organizationId, Long templateId) {
+    public void deleteTemplate(@Nullable UUID organizationId, @Nullable UUID templateId) {
+        logger.tracef("Deleting template %s on behalf of organization %s", templateId, organizationId);
         if (organizationId == null || templateId == null) {
             return;
         }
-        Optional<DocumentTemplate> match = templateRepo.findById(templateId);
+
+        final var match = templateRepo.findById(templateId);
         if (match.isEmpty()) {
+            logger.debugf("Skipped deleting template %s -- not found", templateId);
             return;
         }
+
         if (!match.get().getOrganization().getId().equals(organizationId)) {
+            logger.debugf("Skipped deleting template %s -- caller organization %s does not own it (belongs to %s)",
+                    templateId, organizationId, match.get().getOrganization().getId());
             return;
         }
+
         templateRepo.deleteById(templateId);
+        logger.debugf("Deleted document template %s in organization %s", templateId, organizationId);
     }
 
     /**
@@ -81,16 +112,18 @@ public class TemplateManagementService {
      * {@code null} if the row doesn't exist or belongs to a different
      * organization than the caller's active one.
      */
-    public TemplateContent loadForPreview(Long organizationId, Long templateId) {
+    @Transactional
+    @Nullable
+    public TemplateContentView loadForPreview(@Nullable UUID organizationId, @Nullable UUID templateId) {
+        logger.tracef("Loading template %s for preview on behalf of organization %s", templateId, organizationId);
         if (organizationId == null || templateId == null) {
             return null;
         }
+
         return templateRepo.findById(templateId)
-                .filter(t -> t.getOrganization().getId().equals(organizationId))
-                .map(t -> new TemplateContent(t.getTemplateData(), t.getName(), t.getMimeType()))
+                .filter(template -> template.getOrganization().getId().equals(organizationId))
+                .map(template -> new TemplateContentView(template.getTemplateData(), template.getName(), template.getMimeType()))
                 .orElse(null);
     }
 
-    public record TemplateContent(byte[] data, String fileName, String mimeType) {
-    }
 }

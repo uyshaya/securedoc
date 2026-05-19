@@ -1,8 +1,8 @@
-/* ═══════════════════════════════════════════════════════════════
-   Resident · Request a Document — multi-step wizard
-   ═══════════════════════════════════════════════════════════════ */
+/* ------------------------------------------------------------
+   Resident . Request a Document -- multi-step wizard
+   ------------------------------------------------------------ */
 
-/* ─ SCENE ─ */
+/* - SCENE - */
 .scene {
     min-height: 100vh;
     background: var(--bg);
@@ -15,7 +15,7 @@
     padding: 40px 20px;
 }
 
-/* ─ CARD ─ */
+/* - CARD - */
 .card {
     background: var(--white);
     border-radius: var(--r);
@@ -26,7 +26,7 @@
     overflow: hidden;
 }
 
-/* ─ HEADER ─ */
+/* - HEADER - */
 .hd {
     background: var(--navy);
     padding: 28px 40px 24px;
@@ -92,7 +92,7 @@
     background: rgba(255, 255, 255, 0.16);
 }
 
-/* ─ STEPS ─ */
+/* - STEPS - */
 .steps {
     background: var(--navy);
     padding: 0 40px 20px;
@@ -154,7 +154,7 @@
     margin: 0 8px;
 }
 
-/* ─ BODY ─ */
+/* - BODY - */
 .bd {
     padding: 28px 40px 36px;
     display: flex;
@@ -190,7 +190,7 @@ hr.div {
     border-top: 0.5px solid var(--border-soft);
 }
 
-/* ─ NOTICE ─ */
+/* - NOTICE - */
 .notice {
     background: var(--blue-tint);
     border: 0.5px solid var(--blue-bdr);
@@ -320,7 +320,7 @@ textarea {
     font-weight: 500;
 }
 
-/* ─ OTP ─ */
+/* - OTP - */
 .otp-row {
     display: flex;
     gap: 10px;
@@ -409,7 +409,7 @@ textarea {
     text-decoration: none;
 }
 
-/* ─ EMAIL FIELD WITH SEND BUTTON ─ */
+/* - EMAIL FIELD WITH SEND BUTTON - */
 .email-send-row {
     display: flex;
     gap: 8px;
@@ -420,7 +420,7 @@ textarea {
     flex: 1;
 }
 
-/* ─ HOURS ─ */
+/* - HOURS - */
 .hours-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -500,7 +500,7 @@ textarea {
     }
 }
 
-/* ─ CERT SUMMARY ─ */
+/* - CERT SUMMARY - */
 .cert-pill {
     background: var(--blue-tint);
     border: 0.5px solid var(--blue-bdr);
@@ -534,7 +534,7 @@ textarea {
     margin-top: 1px;
 }
 
-/* ─ UPLOAD ─ */
+/* - UPLOAD - */
 .upload-zone {
     border: 1.5px dashed #C2CDD9;
     border-radius: 10px;
@@ -589,7 +589,7 @@ textarea {
     display: none;
 }
 
-/* ─ REVIEW ─ */
+/* - REVIEW - */
 .review-list {
     border: 0.5px solid var(--border);
     border-radius: 10px;
@@ -623,7 +623,7 @@ textarea {
     text-align: right;
 }
 
-/* ─ CONFIRM ─ */
+/* - CONFIRM - */
 .confirm-icon {
     width: 64px;
     height: 64px;
@@ -733,7 +733,7 @@ textarea {
     box-shadow: none;
 }
 
-/* ─── PrimeFaces saga override ─── */
+/* --- PrimeFaces saga override --- */
 .ui-button.btn-primary,
 .ui-button.btn-primary.ui-state-default {
     background: var(--navy) !important;
@@ -818,7 +818,7 @@ body .ui-button.ui-button-text-only .ui-button-text,
     padding: 11px 16px !important;
 }
 
-/* ─── PrimeFaces saga override: theme.css ships ~1rem (≈16px) on inputs
+/* --- PrimeFaces saga override: theme.css ships ~1rem (≈16px) on inputs
        and dropdown panels, update to 13.5px scale. */
 .ui-inputfield,
 .ui-autocomplete-input,
@@ -1031,7 +1031,7 @@ select {
     color: var(--navy);
 }
 
-/* ─ FOOTER ─ */
+/* - FOOTER - */
 .footer {
     text-align: center;
     font-size: 11px;
@@ -1040,7 +1040,7 @@ select {
     margin-top: 18px;
 }
 
-/* ─ PAGES ─ */
+/* - PAGES - */
 .page {
     display: none;
     flex-direction: column;
@@ -1096,7 +1096,7 @@ select {
     }
 }
 
-/* ─ TRACK STATUS ─ */
+/* - TRACK STATUS - */
 .track-input-row {
     display: flex;
     gap: 8px;

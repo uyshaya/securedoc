@@ -187,7 +187,7 @@ function resendOtp() {
   startResendTimer(30);
 }
 
-/* ─ FORM STEP ─ */
+/* - FORM STEP - */
 function onPurposeChange() {
   const purposeField = document.getElementById('detailsForm:fPurpose');
   if (!purposeField) return;

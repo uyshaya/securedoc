@@ -1,57 +1,56 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
-                xmlns:f="jakarta.faces.core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-auth-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Sign In – SecureDoc Admin</title>
+        <title>#{msg['page.login.title']}</title>
     </ui:define>
 
     <ui:define name="formContent">
         <h:form id="loginForm">
 
-            <!-- ══ Sign-in panel ══ -->
+            <!-- == Sign-in panel == -->
             <p:outputPanel id="signinPanel"
                            rendered="#{not authBean.otpSent}"
                            layout="block"
                            styleClass="auth-panel">
 
                 <div>
-                    <div class="auth-step-title">Sign in</div>
+                    <div class="auth-step-title">#{msg['login.step.title']}</div>
                     <div class="auth-step-sub">
-                        Enter your admin credentials to continue.
+                        #{msg['login.step.sub']}
                     </div>
                 </div>
 
                 <h:panelGroup layout="block"
                               styleClass="af-error"
                               rendered="#{param.expired == '1'}">
-                    Your session expired. Please sign in again.
+                    #{msg['login.session.expired']}
                 </h:panelGroup>
 
                 <h:panelGroup layout="block"
                               styleClass="af-error"
                               rendered="#{param.inactive == '1'}">
-                    Your account has been deactivated. Contact your #{systemConfigBean.orgLabelLower} administrator.
+                    #{i18n.get('login.account.deactivated', systemConfigBean.orgLabelLower)}
                 </h:panelGroup>
 
                 <p:outputLabel for="email"
                                styleClass="af-label"
-                               value="Email address"/>
+                               value="#{msg['login.label.email']}"/>
                 <p:inputText id="email"
                              value="#{authBean.email}"
                              type="email"
-                             placeholder="admin@securedoc.gov.ph"
+                             placeholder="#{msg['login.placeholder.email']}"
                              styleClass="ui-inputfield"/>
 
                 <p:outputLabel for="password"
                                styleClass="af-label"
-                               value="Password"/>
+                               value="#{msg['login.label.password']}"/>
                 <p:password id="password"
                             value="#{authBean.password}"
-                            placeholder="••••••••"
+                            placeholder="********"
                             feedback="false"
                             toggleMask="true"
                             styleClass="ui-inputfield"/>
@@ -60,7 +59,7 @@
                             showSummary="true"
                             showDetail="false"/>
 
-                <p:commandButton value="Continue"
+                <p:commandButton value="#{msg['login.button.continue']}"
                                  styleClass="af-btn"
                                  iconPos="right"
                                  action="#{authBean.signIn}"
@@ -68,13 +67,13 @@
                                  process="@form"/>
 
                 <div class="auth-footer-link">
-                    Don't have an account?&#160;
-                    <h:link outcome="register">Create one</h:link>
+                    #{msg['login.footer.no.account']}&#160;
+                    <h:link outcome="register">#{msg['login.footer.create.one']}</h:link>
                 </div>
 
             </p:outputPanel>
 
-            <!-- ══ OTP panel ══ -->
+            <!-- == OTP panel == -->
             <p:outputPanel id="otpPanel"
                            rendered="#{authBean.otpSent}"
                            layout="block"
@@ -83,14 +82,14 @@
                 <div>
                     <p:commandButton styleClass="auth-back-link"
                                      icon="pi pi-angle-left"
-                                     value="Back"
+                                     value="#{msg['login.button.back']}"
                                      action="#{authBean.cancelOtp}"
                                      update="loginForm"
                                      ajax="true"
                                      immediate="true"/>
-                    <div class="auth-step-title">Verify it's you</div>
+                    <div class="auth-step-title">#{msg['login.otp.title']}</div>
                     <div class="auth-step-sub">
-                        We sent a 6-digit code to
+                        #{msg['login.otp.sub.prefix']}
                         <strong style="color:var(--navy)">
                             <h:outputText value="#{authBean.email}"/>
                         </strong>.
@@ -158,8 +157,8 @@
                 </script>
 
                 <div class="otp-resend">
-                    Didn't receive it?&#160;
-                    <p:commandButton value="Resend code"
+                    #{msg['login.otp.resend.prompt']}&#160;
+                    <p:commandButton value="#{msg['login.otp.resend']}"
                                      style="background:none;border:none;
                                         color:var(--navy-mid);font-weight:500;
                                         font-size:12px;text-decoration:underline;
@@ -170,7 +169,7 @@
                                      ajax="true"/>
                 </div>
 
-                <p:commandButton value="Verify &amp; Sign In"
+                <p:commandButton value="#{msg['login.button.verify']}"
                                  styleClass="af-btn"
                                  action="#{authBean.verifyOtp}"
                                  update="loginForm"
