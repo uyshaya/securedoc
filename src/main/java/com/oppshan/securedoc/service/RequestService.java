@@ -1,5 +1,6 @@
 package com.oppshan.securedoc.service;
 
+import com.oppshan.securedoc.dto.RequestAdminView;
 import com.oppshan.securedoc.dto.RequestCreate;
 import com.oppshan.securedoc.dto.RequestSubmissionView;
 import com.oppshan.securedoc.dto.RequestTrackingView;
@@ -24,6 +25,7 @@ import org.jspecify.annotations.NonNull;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -160,6 +162,22 @@ public class RequestService {
         logger.debugf("Persisted request %s in organization %s using template %s",
                 request.getReferenceNumber(), organization.getId(), template.getId());
         return request.toSubmissionView();
+    }
+
+    /**
+     * Admin/staff list of requests scoped to one organization. The
+     * PrimeFaces DataTable on {@code /admin/requests.xhtml} handles
+     * pagination, sort, and column filters in memory over this list.
+     * Returns empty when no active org is in session so the page renders
+     * its empty-message instead of throwing.
+     */
+    @Transactional
+    public List<RequestAdminView> listForOrganization(UUID organizationId) {
+        logger.tracef("Listing requests for organization %s", organizationId);
+        if (organizationId == null) {
+            return List.of();
+        }
+        return requestRepo.listForOrganization(organizationId);
     }
 
     /**

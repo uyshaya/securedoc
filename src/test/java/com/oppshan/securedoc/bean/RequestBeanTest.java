@@ -6,8 +6,8 @@ import com.oppshan.securedoc.dto.RequestCreate;
 import com.oppshan.securedoc.dto.RequestSubmissionView;
 import com.oppshan.securedoc.dto.RequestTrackingView;
 import com.oppshan.securedoc.model.Request;
-import com.oppshan.securedoc.repository.DocumentTemplateRepository;
 import com.oppshan.securedoc.service.RequestService;
+import com.oppshan.securedoc.service.TemplateManagementService;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
@@ -31,15 +31,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willAnswer;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +45,7 @@ class RequestBeanTest {
     private SystemConfigBean system;
 
     @Mock
-    private DocumentTemplateRepository templateRepo;
+    private TemplateManagementService templateManagementService;
 
     @Mock
     private RequestService requestService;
@@ -83,7 +78,7 @@ class RequestBeanTest {
         given(i18n.get(anyString(), any(Object[].class)))
                 .willAnswer(invocation -> invocation.getArgument(0));
 
-        bean = new RequestBean(system, templateRepo, requestService, i18n, logger);
+        bean = new RequestBean(system, templateManagementService, requestService, i18n, logger);
 
         capturedMessages = new ArrayList<>();
         willAnswer(invocation -> {

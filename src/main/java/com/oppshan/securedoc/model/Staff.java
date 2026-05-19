@@ -374,7 +374,17 @@ public class Staff
     }
 
     public enum Role {
-        ADMIN,
-        STAFF
+        ADMIN("Admin"),
+        STAFF("Staff");
+
+        private final String label;
+
+        Role(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 }

@@ -22,6 +22,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -199,6 +202,68 @@ class RequestServiceTest {
         assertThat(requestService.lookupByReference("   ").isEmpty(), is(true));
     }
 
+    @Test
+    @Transactional
+    void shouldListRequestsForOrganizationWithProjectedFields() {
+        final var organization = seedOrganization("REQ-LST-");
+        final var template = seedTemplate(organization);
+        entityManager.flush();
+
+        final var submittedA = requestService.submitRequest(newRequestCreate(
+                organization.getId(), template.getId(),
+                "list.a+" + System.nanoTime() + "@example.test"));
+        final var submittedB = requestService.submitRequest(newRequestCreate(
+                organization.getId(), template.getId(),
+                "list.b+" + System.nanoTime() + "@example.test"));
+        entityManager.flush();
+
+        final var rows = requestService.listForOrganization(organization.getId());
+
+        // Both submissions should appear; the projection populates the fields
+        // the staff DataTable renders (name, doc, status, timestamps).
+        assertThat(rows, containsInAnyOrder(
+                rowWithReference(submittedA.getReferenceNumber()),
+                rowWithReference(submittedB.getReferenceNumber())));
+        for (final var row : rows) {
+            assertThat(row.getId(), is(notNullValue()));
+            assertThat(row.getFullName(), is("Test Resident"));
+            assertThat(row.getDocumentName(), is(template.getName()));
+            assertThat(row.getDocType(), is(DocumentTemplate.DocType.BARANGAY_CLEARANCE));
+            // Fresh submissions land as PENDING (Request.status default).
+            assertThat(row.getStatus().name(), is("PENDING"));
+            assertThat(row.getCreatedAt(), is(notNullValue()));
+        }
+    }
+
+    @Test
+    @Transactional
+    void shouldScopeListForOrganizationToTheGivenOrganization() {
+        final var orgA = seedOrganization("REQ-SCP-A-");
+        final var orgB = seedOrganization("REQ-SCP-B-");
+        final var templateA = seedTemplate(orgA);
+        final var templateB = seedTemplate(orgB);
+        entityManager.flush();
+
+        final var inA = requestService.submitRequest(newRequestCreate(
+                orgA.getId(), templateA.getId(),
+                "scope.a+" + System.nanoTime() + "@example.test"));
+        requestService.submitRequest(newRequestCreate(
+                orgB.getId(), templateB.getId(),
+                "scope.b+" + System.nanoTime() + "@example.test"));
+        entityManager.flush();
+
+        final var rowsForA = requestService.listForOrganization(orgA.getId());
+
+        assertThat(rowsForA, contains(rowWithReference(inA.getReferenceNumber())));
+    }
+
+    @Test
+    void shouldReturnEmptyListForNullOrganizationId() {
+        // Null orgId is the "no active organization in session" branch the
+        // bean leans on -- the service must not throw or hit the repo.
+        assertThat(requestService.listForOrganization(null), is(empty()));
+    }
+
     private Organization seedOrganization(String codePrefix) {
         final var organization = new Organization()
                 .setType(Organization.Type.BARANGAY)
@@ -243,5 +308,25 @@ class RequestServiceTest {
                 .setSex("M")
                 .setDateOfBirth(LocalDate.of(1990, 1, 1))
                 .setPurpose("employment");
+    }
+
+    /**
+     * Hamcrest matcher narrowed to reference-number equality. The row DTO
+     * exposes more fields than these tests want to assert collectively;
+     * matching on the server-generated reference is enough to identify
+     * "this is the row I just submitted."
+     */
+    private static org.hamcrest.Matcher<com.oppshan.securedoc.dto.RequestAdminView> rowWithReference(String referenceNumber) {
+        return new org.hamcrest.TypeSafeMatcher<>() {
+            @Override
+            protected boolean matchesSafely(com.oppshan.securedoc.dto.RequestAdminView row) {
+                return referenceNumber.equals(row.getReferenceNumber());
+            }
+
+            @Override
+            public void describeTo(org.hamcrest.Description description) {
+                description.appendText("RequestAdminView with reference ").appendValue(referenceNumber);
+            }
+        };
     }
 }
