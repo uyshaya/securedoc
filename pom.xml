@@ -35,6 +35,7 @@
         <guava.version>33.5.0-jre</guava.version>
 
         <skipITs>true</skipITs>
+        <docker.check.skip>${skipTests}</docker.check.skip>
 
         <native.march>-march=compatibility</native.march>
         <native.resources.includes>
@@ -436,6 +437,9 @@
                 the fill-in list.
             -->
             <id>native-release-pgo</id>
+            <properties>
+                <docker.check.skip>false</docker.check.skip>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -470,7 +474,10 @@
                                     <executable>bash</executable>
                                     <arguments>
                                         <argument>-c</argument>
-                                        <argument>mkdir -p ${project.build.directory}/runners &amp;&amp; mv ${project.build.directory}/securedoc-*-runner ${project.build.directory}/runners/normal-runner</argument>
+                                        <argument>mkdir -p ${project.build.directory}/runners &amp;&amp; mv
+                                            ${project.build.directory}/securedoc-*-runner
+                                            ${project.build.directory}/runners/normal-runner
+                                        </argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -518,7 +525,9 @@
                                     <executable>bash</executable>
                                     <arguments>
                                         <argument>-c</argument>
-                                        <argument>mv ${project.build.directory}/securedoc-*-runner ${project.build.directory}/runners/instrumented-runner</argument>
+                                        <argument>mv ${project.build.directory}/securedoc-*-runner
+                                            ${project.build.directory}/runners/instrumented-runner
+                                        </argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -559,7 +568,9 @@
                                     <executable>bash</executable>
                                     <arguments>
                                         <argument>-c</argument>
-                                        <argument>mv ${project.build.directory}/securedoc-*-runner ${project.build.directory}/runners/optimized-runner</argument>
+                                        <argument>mv ${project.build.directory}/securedoc-*-runner
+                                            ${project.build.directory}/runners/optimized-runner
+                                        </argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -636,8 +647,10 @@
                                     <properties>
                                         <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
                                         <quarkus.native.enabled>true</quarkus.native.enabled>
-                                        <quarkus.native.additional-build-args>${native.build.args.base}</quarkus.native.additional-build-args>
-                                        <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+                                        <quarkus.native.additional-build-args>${native.build.args.base}
+                                        </quarkus.native.additional-build-args>
+                                        <quarkus.native.resources.includes>${native.resources.includes}
+                                        </quarkus.native.resources.includes>
                                     </properties>
                                 </configuration>
                             </execution>
@@ -651,8 +664,11 @@
                                     <properties>
                                         <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
                                         <quarkus.native.enabled>true</quarkus.native.enabled>
-                                        <quarkus.native.additional-build-args>${native.build.args.base} --pgo-instrument,</quarkus.native.additional-build-args>
-                                        <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+                                        <quarkus.native.additional-build-args>${native.build.args.base}
+                                            --pgo-instrument,
+                                        </quarkus.native.additional-build-args>
+                                        <quarkus.native.resources.includes>${native.resources.includes}
+                                        </quarkus.native.resources.includes>
                                     </properties>
                                 </configuration>
                             </execution>
@@ -666,8 +682,11 @@
                                     <properties>
                                         <quarkus.package.jar.enabled>false</quarkus.package.jar.enabled>
                                         <quarkus.native.enabled>true</quarkus.native.enabled>
-                                        <quarkus.native.additional-build-args>${native.build.args.base} --pgo=${project.build.directory}/pgo-run/default.iprof,</quarkus.native.additional-build-args>
-                                        <quarkus.native.resources.includes>${native.resources.includes}</quarkus.native.resources.includes>
+                                        <quarkus.native.additional-build-args>${native.build.args.base}
+                                            --pgo=${project.build.directory}/pgo-run/default.iprof,
+                                        </quarkus.native.additional-build-args>
+                                        <quarkus.native.resources.includes>${native.resources.includes}
+                                        </quarkus.native.resources.includes>
                                     </properties>
                                 </configuration>
                             </execution>
@@ -763,8 +782,85 @@
                                     <executable>pwsh</executable>
                                     <arguments>
                                         <argument>-File</argument>
-                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-select-winner.ps1</argument>
+                                        <argument>${project.basedir}/scripts/graalvm-pgo/pgo-select-winner.ps1
+                                        </argument>
                                     </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!--
+            Docker pre-flight probe. Two OS-family profiles auto-activate
+            based on host OS; each contributes its own ensure-docker
+            execution to exec-maven-plugin. The probe binds to
+            process-test-resources (phase 12) so it runs strictly before
+            pull-mysql-image (process-test-classes, phase 14) regardless of
+            plugin-declaration order. Skip behavior is driven by the
+            docker.check.skip property declared at the top of this pom
+            (defaults to ${skipTests}; overridden to false by
+            native-release-pgo).
+        -->
+        <profile>
+            <id>docker-check-unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>ensure-docker</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/scripts/ensure-docker.sh</argument>
+                                    </arguments>
+                                    <skip>${docker.check.skip}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-check-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>ensure-docker</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>pwsh</executable>
+                                    <arguments>
+                                        <argument>-File</argument>
+                                        <argument>${project.basedir}/scripts/ensure-docker.ps1</argument>
+                                    </arguments>
+                                    <skip>${docker.check.skip}</skip>
                                 </configuration>
                             </execution>
                         </executions>
