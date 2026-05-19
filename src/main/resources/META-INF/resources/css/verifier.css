@@ -1,8 +1,8 @@
-/* ═══════════════════════════════════════════════════════════════
-   Verifier portal — extends shared wizard chrome from request.css
-   ═══════════════════════════════════════════════════════════════ */
+/* ------------------------------------------------------------
+   Verifier portal -- extends shared wizard chrome from request.css
+   ------------------------------------------------------------ */
 
-/* ── Method-chooser options ── */
+/* -- Method-chooser options -- */
 .verify-options {
     display: flex;
     flex-direction: column;

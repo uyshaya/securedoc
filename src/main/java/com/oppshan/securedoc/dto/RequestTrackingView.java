@@ -1,16 +1,18 @@
 package com.oppshan.securedoc.dto;
 
+import com.google.common.base.MoreObjects;
 import com.oppshan.securedoc.model.Request;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Objects;
 
 /**
  * Narrow projection returned by {@code RequestService.lookupByReference}
  * for the resident-facing status check on the {@code p-track} scene.
  *
- * <p>Carries only the public-facing fields — no requester PII — since
+ * <p>Carries only the public-facing fields -- no requester PII -- since
  * the lookup is unauthenticated. The constructor matches the JPQL
  * projection on {@link com.oppshan.securedoc.repository.RequestRepository#findTrackingByReferenceNumber}
  * so the issuing template's LONGBLOB is never selected just to render
@@ -22,11 +24,16 @@ public class RequestTrackingView implements Serializable {
     private static final long serialVersionUID = 6371928374129384721L;
 
     private String referenceNumber;
+
     private Request.Status status;
+
     private String certificateName;
+
     private String organizationName;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
 
     public RequestTrackingView() {
     }
@@ -35,8 +42,8 @@ public class RequestTrackingView implements Serializable {
                                Request.Status status,
                                String certificateName,
                                String organizationName,
-                               LocalDateTime createdAt,
-                               LocalDateTime updatedAt) {
+                               Instant createdAt,
+                               Instant updatedAt) {
         this.referenceNumber = referenceNumber;
         this.status = status;
         this.certificateName = certificateName;
@@ -53,62 +60,114 @@ public class RequestTrackingView implements Serializable {
         if (status == null) {
             return "";
         }
-        String[] parts = status.name().toLowerCase().split("_");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < parts.length; i++) {
-            if (i > 0) {
-                sb.append(' ');
+
+        final var parts = status.name().toLowerCase().split("_");
+        final var label = new StringBuilder();
+        for (int index = 0; index < parts.length; index++) {
+            if (index > 0) {
+                label.append(' ');
             }
-            sb.append(Character.toUpperCase(parts[i].charAt(0))).append(parts[i].substring(1));
+
+            label.append(Character.toUpperCase(parts[index].charAt(0)))
+                    .append(parts[index].substring(1));
         }
-        return sb.toString();
+
+        return label.toString();
     }
 
     public String getReferenceNumber() {
         return referenceNumber;
     }
 
-    public void setReferenceNumber(String referenceNumber) {
+    public RequestTrackingView setReferenceNumber(String referenceNumber) {
         this.referenceNumber = referenceNumber;
+        return this;
     }
 
     public Request.Status getStatus() {
         return status;
     }
 
-    public void setStatus(Request.Status status) {
+    public RequestTrackingView setStatus(Request.Status status) {
         this.status = status;
+        return this;
     }
 
     public String getCertificateName() {
         return certificateName;
     }
 
-    public void setCertificateName(String certificateName) {
+    public RequestTrackingView setCertificateName(String certificateName) {
         this.certificateName = certificateName;
+        return this;
     }
 
     public String getOrganizationName() {
         return organizationName;
     }
 
-    public void setOrganizationName(String organizationName) {
+    public RequestTrackingView setOrganizationName(String organizationName) {
         this.organizationName = organizationName;
+        return this;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public RequestTrackingView setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+        return this;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public RequestTrackingView setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof final RequestTrackingView that)) {
+            return false;
+        }
+
+        return Objects.equals(referenceNumber, that.referenceNumber) &&
+               status == that.status &&
+               Objects.equals(certificateName, that.certificateName) &&
+               Objects.equals(organizationName, that.organizationName) &&
+               Objects.equals(createdAt, that.createdAt) &&
+               Objects.equals(updatedAt, that.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                referenceNumber,
+                status,
+                certificateName,
+                organizationName,
+                createdAt,
+                updatedAt
+        );
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("referenceNumber", referenceNumber)
+                .add("status", status)
+                .add("certificateName", certificateName)
+                .add("organizationName", organizationName)
+                .add("createdAt", createdAt)
+                .add("updatedAt", updatedAt)
+                .toString();
     }
 }

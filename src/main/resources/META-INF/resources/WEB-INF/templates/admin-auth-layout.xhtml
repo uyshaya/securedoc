@@ -13,7 +13,7 @@
     </f:facet>
 
     <ui:insert name="pageTitle">
-        <title>Admin Console – SecureDoc</title>
+        <title>#{msg['layout.admin.title']}</title>
     </ui:insert>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -23,6 +23,8 @@
     <h:outputStylesheet library="css" name="global.css"/>
     <h:outputStylesheet library="css" name="admin.css"/>
 
+    <h:outputScript library="js" name="local-time.js"/>
+
     <ui:insert name="extraStyles"/>
 </h:head>
 
@@ -31,7 +33,7 @@
     <div class="auth-scene">
         <div class="auth-wrap">
 
-            <!-- ══ Brand panel ══ -->
+            <!-- == Brand panel == -->
             <p:outputPanel styleClass="auth-brand" layout="block">
 
                 <!-- Logo -->
@@ -45,8 +47,8 @@
                         </svg>
                     </p:outputPanel>
                     <p:outputPanel layout="block">
-                        <span class="brand-name">Secure<em>Doc</em></span><br/>
-                        <p:outputLabel styleClass="auth-brand-tag" value="Admin Console"/>
+                        <span class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></span><br/>
+                        <p:outputLabel styleClass="auth-brand-tag" value="#{msg['layout.admin.brand.tag']}"/>
                     </p:outputPanel>
                 </p:outputPanel>
 
@@ -54,40 +56,40 @@
                 <p:outputPanel styleClass="auth-brand-body" layout="block">
                     <p:outputPanel layout="block">
                 <span class="auth-brand-headline">
-                    Document management, <em>simplified.</em>
+                    #{msg['authlayout.headline.before']} <em>#{msg['authlayout.headline.emphasized']}</em>
                 </span>
                         <p:outputLabel styleClass="auth-brand-desc"
                                        style="display:block;margin-top:12px"
-                                       value="Authorized access only. All activity is logged and monitored."/>
+                                       value="#{msg['authlayout.desc']}"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="auth-brand-features" layout="block">
                         <p:outputPanel styleClass="auth-feature" layout="block">
                             <p:outputLabel styleClass="auth-feature-text"
-                                           value="• Review and approve document requests"/>
+                                           value="#{msg['authlayout.feature.review']}"/>
                         </p:outputPanel>
                         <p:outputPanel styleClass="auth-feature" layout="block">
                             <p:outputLabel styleClass="auth-feature-text"
-                                           value="• Manage official document templates"/>
+                                           value="#{msg['authlayout.feature.manage']}"/>
                         </p:outputPanel>
                         <p:outputPanel styleClass="auth-feature" layout="block">
                             <p:outputLabel styleClass="auth-feature-text"
-                                           value="• Generate and export operational reports"/>
+                                           value="#{msg['authlayout.feature.reports']}"/>
                         </p:outputPanel>
                         <p:outputPanel styleClass="auth-feature" layout="block">
                             <p:outputLabel styleClass="auth-feature-text"
-                                           value="• Audit trail of all admin actions"/>
+                                           value="#{msg['authlayout.feature.audit']}"/>
                         </p:outputPanel>
                     </p:outputPanel>
                 </p:outputPanel>
 
                 <!-- Footer -->
                 <p:outputLabel styleClass="auth-brand-footer"
-                               value="&#169; 2026 SecureDoc | All Rights Reserved"/>
+                               value="#{msg['app.copyright']}"/>
 
             </p:outputPanel>
 
-            <!-- ══ Form panel ══ -->
+            <!-- == Form panel == -->
             <p:outputPanel styleClass="auth-form-panel" layout="block">
                 <ui:insert name="formContent"/>
             </p:outputPanel>

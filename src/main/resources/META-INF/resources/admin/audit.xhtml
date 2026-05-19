@@ -1,19 +1,17 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="jakarta.faces.html"
-                xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
     <ui:define name="pageTitle">
-        <title>Audit Log – SecureDoc Admin</title>
+        <title>#{msg['page.audit.title']}</title>
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">Audit Log</h1>
+        <h1 class="console-page-title">#{msg['page.audit.heading']}</h1>
     </ui:define>
 
     <ui:define name="content">
-        <p>Audit log scaffold. Replace with audit log viewer.</p>
+        <p>#{msg['page.audit.placeholder']}</p>
     </ui:define>
 
 </ui:composition>

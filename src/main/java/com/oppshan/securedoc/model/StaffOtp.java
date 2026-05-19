@@ -1,149 +1,275 @@
 package com.oppshan.securedoc.model;
 
-import jakarta.persistence.*;
+import com.google.common.base.MoreObjects;
+import com.oppshan.securedoc.common.AuditableEntity;
+import com.oppshan.securedoc.common.AuditableEntityEntityListener;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.UuidGenerator.Style;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
-@Table(name = "staff_otps")
-public class StaffOtp implements Serializable {
+@EntityListeners({
+        AuditableEntityEntityListener.class
+})
+@Table(name = "staff_otp",
+        indexes = {
+                @Index(
+                        name = "idx_staff_otps_staff_id",
+                        columnList = "staff_id"
+                ),
+                @Index(
+                        name = "idx_staff_otps_lookup",
+                        columnList = "staff_id,otp_type,used,id"
+                )
+        }
+)
+public class StaffOtp
+        implements AuditableEntity<StaffOtp>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 4225984107533782641L;
 
-    public enum Type {
-        LOGIN,
-        PASSWORD_RESET
-    }
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Basic(optional = false)
+    @Column(name = "id",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "CHAR(36) NOT NULL")
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @UuidGenerator(style = Style.VERSION_7)
+    @NotNull
+    private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "staff_id", nullable = false)
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            optional = false,
+            targetEntity = Staff.class
+    )
+    @JoinColumn(
+            name = "staff_id",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "CHAR(36) NOT NULL"
+    )
+    @NotNull
     private Staff staff;
 
-    @Column(name = "otp_code", nullable = false, length = 6)
+    @Basic(optional = false)
+    @Column(name = "otp_code",
+            nullable = false,
+            updatable = false,
+            length = 6)
+    @NotEmpty
     private String otpCode;
 
-    @Convert(converter = TypeConverter.class)
-    @Column(name = "otp_type", columnDefinition = "ENUM('login','password_reset') DEFAULT 'login'")
+    @Basic(optional = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "otp_type",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "ENUM('LOGIN','PASSWORD_RESET') NOT NULL DEFAULT 'LOGIN'")
+    @NotNull
     private Type otpType = Type.LOGIN;
 
-    @Column(name = "otp_attempts")
-    private Integer otpAttempts = 0;
+    @Basic(optional = false)
+    @Column(name = "otp_attempts",
+            nullable = false)
+    @PositiveOrZero
+    private int otpAttempts = 0;
 
-    @Column(name = "is_used")
-    private Boolean isUsed = Boolean.FALSE;
+    @Basic(optional = false)
+    @Column(name = "used",
+            nullable = false)
+    private boolean used = false;
 
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    @Basic(optional = false)
+    @Column(name = "expires_at",
+            nullable = false,
+            updatable = false)
+    @NotNull
+    private Instant expiresAt;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Basic(optional = false)
+    @Column(name = "created_at",
+            nullable = false,
+            updatable = false)
+    @NotNull
+    private Instant createdAt;
+
+    @Basic(optional = false)
+    @Column(name = "updated_at",
+            nullable = false)
+    @NotNull
+    private Instant lastModifiedAt;
 
     public StaffOtp() {
     }
 
-    public Long getId() {
+    @Override
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    @Override
+    public StaffOtp setId(UUID id) {
         this.id = id;
+        return this;
     }
 
     public Staff getStaff() {
         return staff;
     }
 
-    public void setStaff(Staff staff) {
+    public StaffOtp setStaff(Staff staff) {
         this.staff = staff;
+        return this;
     }
 
     public String getOtpCode() {
         return otpCode;
     }
 
-    public void setOtpCode(String otpCode) {
+    public StaffOtp setOtpCode(String otpCode) {
         this.otpCode = otpCode;
+        return this;
     }
 
     public Type getOtpType() {
         return otpType;
     }
 
-    public void setOtpType(Type otpType) {
+    public StaffOtp setOtpType(Type otpType) {
         this.otpType = otpType;
+        return this;
     }
 
-    public Integer getOtpAttempts() {
+    public int getOtpAttempts() {
         return otpAttempts;
     }
 
-    public void setOtpAttempts(Integer otpAttempts) {
+    public StaffOtp setOtpAttempts(int otpAttempts) {
         this.otpAttempts = otpAttempts;
+        return this;
     }
 
-    public Boolean getIsUsed() {
-        return isUsed;
+    public boolean isUsed() {
+        return used;
     }
 
-    public void setIsUsed(Boolean isUsed) {
-        this.isUsed = isUsed;
+    public StaffOtp setUsed(boolean used) {
+        this.used = used;
+        return this;
     }
 
-    public LocalDateTime getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
+    public StaffOtp setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public boolean isExpired() {
-        return expiresAt == null || LocalDateTime.now().isAfter(expiresAt);
+        return this;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    @Override
+    public StaffOtp setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    @Override
+    public Instant getLastModifiedAt() {
+        return lastModifiedAt;
+    }
+
+    @Override
+    public StaffOtp setLastModifiedAt(Instant lastModifiedAt) {
+        this.lastModifiedAt = lastModifiedAt;
+        return this;
+    }
+
+    public boolean isExpired() {
+        return expiresAt == null || Instant.now().isAfter(expiresAt);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
-        if (!(o instanceof StaffOtp)) {
+
+        if (!(other instanceof final StaffOtp that)) {
             return false;
         }
-        return Objects.equals(id, ((StaffOtp) o).id);
+
+        return Objects.equals(id, that.id) &&
+               Objects.equals(staff, that.staff) &&
+               Objects.equals(otpCode, that.otpCode) &&
+               otpType == that.otpType &&
+               otpAttempts == that.otpAttempts &&
+               used == that.used &&
+               Objects.equals(expiresAt, that.expiresAt) &&
+               Objects.equals(createdAt, that.createdAt) &&
+               Objects.equals(lastModifiedAt, that.lastModifiedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(
+                id,
+                staff,
+                otpCode,
+                otpType,
+                otpAttempts,
+                used,
+                expiresAt,
+                createdAt,
+                lastModifiedAt
+        );
     }
 
-    /**
-     * Bridges Java {@link Type} (uppercase) with the lowercase
-     * MySQL ENUM('login','password_reset') in staff_otps.otp_type.
-     */
-    @Converter
-    public static class TypeConverter implements AttributeConverter<Type, String> {
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("staff", staff)
+                .add("otpType", otpType)
+                .add("otpAttempts", otpAttempts)
+                .add("used", used)
+                .add("expiresAt", expiresAt)
+                .add("createdAt", createdAt)
+                .add("lastModifiedAt", lastModifiedAt)
+                .toString();
+    }
 
-        @Override
-        public String convertToDatabaseColumn(Type type) {
-            return type == null ? null : type.name().toLowerCase();
-        }
-
-        @Override
-        public Type convertToEntityAttribute(String s) {
-            return s == null ? null : Type.valueOf(s.toUpperCase());
-        }
+    public enum Type {
+        LOGIN,
+        PASSWORD_RESET
     }
 }

@@ -80,11 +80,18 @@ During verification, the portal:
 
 | Layer | Technology |
 |---|---|
-| **Backend** | Java, Jakarta EE 10 |
-| **Frontend Framework** | JSF (JavaServer Faces) + PrimeFaces 13 |
-| **Database** | MySQL |
-| **Security** | SHA-256, ECDSA P-256 Asymmetric Key Signing, AES-256 |
-| **Build / Server** | Maven, Apache Tomcat / GlassFish |
+| **Runtime** | Quarkus 3.35.1 on Oracle GraalVM 25 |
+| **Servlet container** | Undertow (embedded), with a virtual-thread-per-task executor wired via SPI |
+| **REST** | RESTEasy Classic (`quarkus-resteasy`, blocking) -- needed for `@SessionScoped` JSF beans |
+| **Frontend Framework** | JSF (MyFaces) + PrimeFaces 4.15.15 via `io.quarkiverse.primefaces` |
+| **Persistence** | Jakarta Data 1.0 over Hibernate ORM 7.3 (CrudRepository + StatefulWriteRepository) |
+| **Schema migrations** | Flyway, `db/migration/mysql/V{N}__*.sql` |
+| **Database** | MySQL 8 (DevServices container in dev/test; `QUARKUS_DATASOURCE_*` env vars in prod) |
+| **i18n** | `messages.properties` via JSF `<resource-bundle>` (app-wide) + `I18n` CDI service for Java code |
+| **Security** | BCrypt (BouncyCastle direct API) for passwords; SHA-256 / ECDSA P-256 / AES-256 for documents (designed, not yet implemented) |
+| **Build** | Maven (wrapper committed), Java 25 source/target |
+| **Native** | GraalVM native-image profiles `-Pnative` (debug) and `-Pnative-release` (optimized) |
+| **CI/CD** | GitHub Actions: `maven.yml` (JaCoCo coverage), `deploy.yml` (AWS OIDC -> S3 -> SSM Run Command) |
 | **Fonts** | DM Serif Display, DM Sans |
 
 ---
@@ -92,50 +99,45 @@ During verification, the portal:
 ## Project Structure
 
 ```
-SecureDoc/
-├── src/
-│   └── main/
-│       ├── java/
-│       │   └── com/SecureDoc/
-│       │       ├── beans/
-│       │       │   ├── AuthBean.java          # Login, OTP, session management
-│       │       │   ├── RequestBean.java        # Document request lifecycle
-│       │       │   ├── TemplateBean.java       # Document template management
-│       │       │   ├── ReportBean.java         # Report generation
-│       │       │   ├── AuditBean.java          # Audit log viewing
-│       │       │   └── ResidentBean.java       # Resident-facing request flow
-│       │       ├── models/
-│       │       │   ├── Staff.java
-│       │       │   ├── DocumentRequest.java
-│       │       │   ├── DocumentTemplate.java
-│       │       │   └── AuditLog.java
-│       │       ├── services/
-│       │       │   ├── CryptoService.java      # SHA-256, ECDSA P-256, AES operations
-│       │       │   ├── QRCodeService.java      # QR code generation
-│       │       │   └── VerificationService.java # Tamper-evident verification logic
-│       │       └── util/
-│       │           ├── DBUtil.java             # Database connection pooling
-│       │           └── MailUtil.java           # OTP email delivery
-│       └── webapp/
-│           ├── admin/
-│           │   ├── dashboard.xhtml
-│           │   ├── requests.xhtml
-│           │   ├── templates.xhtml
-│           │   ├── reports.xhtml
-│           │   └── audit.xhtml
-│           ├── user/
-│           │   └── request.xhtml
-│           ├── verify/
-│           │   └── index.xhtml                # Zero-registration verifier portal
-│           ├── login.xhtml
-│           └── WEB-INF/
-│               ├── web.xml
-│               ├── faces-config.xml
-│               └── templates/
-│                   └── layout.xhtml
-├── database/
-│   └── SecureDoc_schema.sql
-├── docs/
+securedoc/
++- src/
+|  +- main/
+|  |  +- java/com/oppshan/securedoc/
+|  |  |  +- common/      # AuditableEntity, AuditableEntityEntityListener,
+|  |  |  |               # StatefulWriteRepository, VirtualThreadServletExtension, I18n
+|  |  |  +- bean/        # JSF @Named managed beans (AdminAuthBean, RequestBean,
+|  |  |  |               # OrganizationBean, StaffManagementBean, ...)
+|  |  |  +- service/     # @ApplicationScoped business logic; transactional boundary
+|  |  |  +- repository/  # Jakarta Data @Repository interfaces (CrudRepository<T, UUID>
+|  |  |  |               # + StatefulWriteRepository<T>); impls generated at compile time
+|  |  |  +- model/       # JPA @Entity classes (Organization, Staff, StaffOtp, DocumentTemplate)
+|  |  |  +- dto/         # Read-only projections across the bean/service boundary
+|  |  |  +- web/         # AdminAuthFilter, OrganizationViewConverter
+|  |  +- resources/
+|  |     +- application.properties
+|  |     +- messages.properties             # i18n strings (English baseline)
+|  |     +- META-INF/
+|  |     |  +- web.xml
+|  |     |  +- faces-config.xml             # Application-wide <resource-bundle> binding
+|  |     |  +- services/
+|  |     |  |  +- io.undertow.servlet.ServletExtension  # Virtual-thread executor SPI
+|  |     |  +- resources/
+|  |     |     +- index.xhtml               # Portal landing page
+|  |     |     +- admin/                    # login, register, dashboard, requests,
+|  |     |     |                            # templates, audit, staff/staff-management
+|  |     |     +- user/request.xhtml        # Resident multi-scene request flow
+|  |     |     +- verifier/verify.xhtml     # Zero-registration verification portal
+|  |     |     +- WEB-INF/templates/        # admin-layout, admin-auth-layout,
+|  |     |     |                            # resident-layout, verifier-layout
+|  |     |     +- css/, js/                 # global.css, admin.css, request.css,
+|  |     |                                  # verifier.css, request.js, local-time.js
+|  |     +- db/
+|  |        +- setup.sql                    # DB + dev user provisioning (run once)
+|  |        +- migration/mysql/             # Flyway migrations (V1__init.sql, V2__...)
+|  +- test/java/com/oppshan/securedoc/
+|     +- SchemaSmokeTest.java               # @QuarkusTest -- MySQL container + Flyway + JPA round-trip
++- .github/workflows/                       # maven.yml, deploy.yml
++- docs/
 │   └── conceptual_framework.md
 └── README.md
 ```

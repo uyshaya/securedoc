@@ -9,7 +9,7 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </f:facet>
-    <title>SecureDoc – Official Document Services</title>
+    <title>#{msg['layout.resident.title']}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&amp;display=swap"
@@ -23,7 +23,7 @@
 <h:body>
     <div class="scene">
 
-        <!-- ══ Brand ══ -->
+        <!-- == Brand == -->
         <div class="brand">
             <div class="brand-icon">
                 <!-- Shield + check mark -->
@@ -37,12 +37,12 @@
                 </svg>
             </div>
             <div>
-                <div class="brand-name">Secure<em>Doc</em></div>
-                <div class="brand-tagline">Secured Document Services</div>
+                <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
+                <div class="brand-tagline">#{msg['index.brand.tagline']}</div>
             </div>
         </div>
 
-        <!-- ══ Main portal cards ══ -->
+        <!-- == Main portal cards == -->
         <div class="portal-grid">
 
             <!-- Resident -->
@@ -57,13 +57,11 @@
                     </svg>
                 </div>
                 <div class="portal-body">
-                    <div class="portal-eyebrow">For Residents</div>
-                    <div class="portal-title">Request a Document</div>
-                    <div class="portal-desc">Apply for barangay clearances, certificates of residency,
-                        indigency, and other official documents.
-                    </div>
+                    <div class="portal-eyebrow">#{msg['index.resident.eyebrow']}</div>
+                    <div class="portal-title">#{msg['index.resident.title']}</div>
+                    <div class="portal-desc">#{msg['index.resident.desc']}</div>
                     <div class="portal-badge">
-                        No account required
+                        #{msg['index.resident.badge']}
                     </div>
                 </div>
                 <div class="portal-arrow">
@@ -83,13 +81,11 @@
                     </svg>
                 </div>
                 <div class="portal-body">
-                    <div class="portal-eyebrow">For Verifiers</div>
-                    <div class="portal-title">Verify a Document</div>
-                    <div class="portal-desc">Employers, institutions, and government agencies can
-                        authenticate the validity of SecureDoc-issued documents.
-                    </div>
+                    <div class="portal-eyebrow">#{msg['index.verifier.eyebrow']}</div>
+                    <div class="portal-title">#{msg['index.verifier.title']}</div>
+                    <div class="portal-desc">#{msg['index.verifier.desc']}</div>
                     <div class="portal-badge">
-                        Tamper-evident verification
+                        #{msg['index.verifier.badge']}
                     </div>
                 </div>
                 <div class="portal-arrow">
@@ -99,12 +95,12 @@
 
         </div>
 
-        <!-- ══ Staff divider ══ -->
+        <!-- == Staff divider == -->
         <div class="portal-divider">
-            <span>Staff &amp; Administration</span>
+            <span>#{msg['index.staff.divider']}</span>
         </div>
 
-        <!-- ══ Admin card ══ -->
+        <!-- == Admin card == -->
         <div class="portal-grid" style="margin-top:-24px">
             <h:link styleClass="portal-card admin" outcome="/admin/login">
                 <div class="portal-icon">
@@ -120,13 +116,11 @@
                     </svg>
                 </div>
                 <div class="portal-body">
-                    <div class="portal-eyebrow">Authorized Personnel</div>
-                    <div class="portal-title">Staff / Admin Console</div>
-                    <div class="portal-desc">Sign in to review requests, manage templates, and generate
-                        reports. Restricted to authorized barangay staff.
-                    </div>
+                    <div class="portal-eyebrow">#{msg['index.admin.eyebrow']}</div>
+                    <div class="portal-title">#{msg['index.admin.title']}</div>
+                    <div class="portal-desc">#{msg['index.admin.desc']}</div>
                     <div class="portal-badge">
-                        Requires staff credentials
+                        #{msg['index.admin.badge']}
                     </div>
                 </div>
                 <div class="portal-arrow">
@@ -135,8 +129,8 @@
             </h:link>
         </div>
 
-        <!-- ══ Footer ══ -->
-        <div class="footer">© 2026 SecureDoc | All Rights Reserved</div>
+        <!-- == Footer == -->
+        <div class="footer">#{msg['app.copyright']}</div>
 
     </div>
 </h:body>
