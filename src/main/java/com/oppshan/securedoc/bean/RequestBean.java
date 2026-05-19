@@ -6,9 +6,8 @@ import com.oppshan.securedoc.dto.OrganizationView;
 import com.oppshan.securedoc.dto.RequestCreate;
 import com.oppshan.securedoc.dto.RequestTrackingView;
 import com.oppshan.securedoc.exception.BusinessException;
-import com.oppshan.securedoc.model.DocumentTemplate;
-import com.oppshan.securedoc.repository.DocumentTemplateRepository;
 import com.oppshan.securedoc.service.RequestService;
+import com.oppshan.securedoc.service.TemplateManagementService;
 import jakarta.annotation.Nullable;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
@@ -52,7 +51,7 @@ public class RequestBean implements Serializable {
 
     private final SystemConfigBean system;
 
-    private final DocumentTemplateRepository templateRepo;
+    private final TemplateManagementService templateService;
 
     private final RequestService requestService;
 
@@ -148,12 +147,12 @@ public class RequestBean implements Serializable {
 
     @Inject
     public RequestBean(SystemConfigBean system,
-                       DocumentTemplateRepository templateRepo,
+                       TemplateManagementService templateService,
                        RequestService requestService,
                        I18n i18n,
                        Logger logger) {
         this.system = system;
-        this.templateRepo = templateRepo;
+        this.templateService = templateService;
         this.requestService = requestService;
         this.i18n = i18n;
         this.logger = logger;
@@ -178,14 +177,8 @@ public class RequestBean implements Serializable {
                 selectedOrganization == null ? null : selectedOrganization.getId());
         selectedTemplateId = null;
 
-        if (selectedOrganization == null || selectedOrganization.getId() == null) {
-            availableTemplates = List.of();
-            return;
-        }
-
-        availableTemplates = templateRepo.listActiveByOrganizationId(selectedOrganization.getId()).stream()
-                .map(DocumentTemplate::toView)
-                .toList();
+        availableTemplates = templateService.listByOrganization(
+                selectedOrganization == null ? null : selectedOrganization.getId());
     }
 
     /**

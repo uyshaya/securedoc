@@ -2,7 +2,7 @@ package com.oppshan.securedoc.bean;
 
 import com.oppshan.securedoc.dto.OrganizationView;
 import com.oppshan.securedoc.model.Organization;
-import com.oppshan.securedoc.repository.OrganizationRepository;
+import com.oppshan.securedoc.service.OrganizationService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -20,17 +20,17 @@ public class SystemConfigBean {
     public static final String APPLICATION_VERSION = "1.0.0";
 
     private final Organization.Type activeOrgType;
-    private final OrganizationRepository organizationRepo;
+    private final OrganizationService organizationService;
     private final Logger logger;
 
     @Inject
     public SystemConfigBean(@ConfigProperty(name = "securedoc.org.active-type",
-                                            defaultValue = "BARANGAY")
+                                    defaultValue = "BARANGAY")
                             Organization.Type activeOrgType,
-                            OrganizationRepository organizationRepo,
+                            OrganizationService organizationService,
                             Logger logger) {
         this.activeOrgType = activeOrgType;
-        this.organizationRepo = organizationRepo;
+        this.organizationService = organizationService;
         this.logger = logger;
     }
 
@@ -45,23 +45,13 @@ public class SystemConfigBean {
      * the table.
      */
     public List<OrganizationView> searchOrganizations(String query) {
-        logger.tracef("Searching %s organizations matching '%s'", activeOrgType, query);
-        if (query == null || query.isBlank()) {
-            return List.of();
-        }
-
-        return organizationRepo.searchByTypeAndQuery(activeOrgType, query.trim()).stream()
-                .map(Organization::toView)
-                .toList();
+        logger.tracef("Start organization search for active type %s, query '%s'", activeOrgType, query);
+        return organizationService.searchByTypeAndQuery(activeOrgType, query);
     }
 
     public OrganizationView findOrganizationById(UUID id) {
-        logger.tracef("Looking up organization by id %s", id);
-        if (id == null) {
-            return null;
-        }
-
-        return organizationRepo.findById(id).map(Organization::toView).orElse(null);
+        logger.tracef("Start organization lookup for id %s", id);
+        return organizationService.findById(id);
     }
 
     public Organization.Type getActiveOrgType() {

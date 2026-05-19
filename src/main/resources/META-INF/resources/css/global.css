@@ -361,3 +361,40 @@ body .ui-selectonemenu {
     padding: 2px 0 0 !important;
     margin: 0 !important;
 }
+
+/* Request.Status pills — shared by the resident track scene and the
+   admin requests table. Class name carries the enum literal so the
+   XHTML can do `status-#{r.status}` and we cover all values in CSS. */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.status-PENDING {
+    background: #F3F4F6;
+    color: #4B5563;
+}
+
+.status-UNDER_REVIEW {
+    background: #E0F2FE;
+    color: #075985;
+}
+
+.status-PROCESSING {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.status-COMPLETED {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.status-REJECTED {
+    background: #FEE2E2;
+    color: #991B1B;
+}
