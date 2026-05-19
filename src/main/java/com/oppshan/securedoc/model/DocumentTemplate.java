@@ -302,8 +302,18 @@ public class DocumentTemplate
     }
 
     public enum DocType {
-        BARANGAY_CLEARANCE,
-        CERTIFICATE_OF_RESIDENCY,
-        CERTIFICATE_OF_INDIGENCY
+        BARANGAY_CLEARANCE("Barangay Clearance"),
+        CERTIFICATE_OF_RESIDENCY("Certificate of Residency"),
+        CERTIFICATE_OF_INDIGENCY("Certificate of Indigency");
+
+        private final String label;
+
+        DocType(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 }

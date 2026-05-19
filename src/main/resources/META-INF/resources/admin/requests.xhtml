@@ -1,4 +1,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
@@ -7,11 +10,84 @@
     </ui:define>
 
     <ui:define name="pageHeader">
-        <h1 class="console-page-title">#{msg['page.requests.heading']}</h1>
+        <h1 class="console-page-title">#{msg['admin.requests.header']}</h1>
     </ui:define>
 
     <ui:define name="content">
-        <p>#{msg['page.requests.placeholder']}</p>
+
+        <p:messages globalOnly="true" showSummary="true" showDetail="false" closable="true"/>
+
+        <h:form id="requestsForm">
+
+            <p:dataTable id="requestsTable"
+                         widgetVar="requestsTableW"
+                         value="#{requestManagementBean.requestList}"
+                         var="documentRequest"
+                         paginator="true"
+                         rows="10"
+                         rowsPerPageTemplate="10,25,50"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg['admin.requests.paginator.report']}"
+                         emptyMessage="#{msg['admin.requests.empty'].formatted(systemConfigBean.orgLabelLower)}">
+
+                <p:column headerText="#{msg['admin.requests.col.refNo']}"
+                          sortBy="#{documentRequest.referenceNumber}"
+                          filterBy="#{documentRequest.referenceNumber}"
+                          filterMatchMode="contains"
+                          style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px">
+                    <h:outputText value="#{documentRequest.referenceNumber}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['admin.requests.col.resident']}"
+                          sortBy="#{documentRequest.fullName}"
+                          filterBy="#{documentRequest.fullName}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{documentRequest.fullName}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['admin.requests.col.docType']}"
+                          sortBy="#{documentRequest.docType}"
+                          filterBy="#{documentRequest.docType}"
+                          filterMatchMode="equals">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('requestsTableW').filter()">
+                            <f:selectItem itemLabel="#{msg['admin.requests.filter.all']}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{requestManagementBean.docTypeOptions}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{documentRequest.documentName}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['admin.requests.col.status']}"
+                          sortBy="#{documentRequest.status}"
+                          filterBy="#{documentRequest.status}"
+                          filterMatchMode="equals">
+                    <f:facet name="filter">
+                        <p:selectOneMenu onchange="PF('requestsTableW').filter()">
+                            <f:selectItem itemLabel="#{msg['admin.requests.filter.all']}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{requestManagementBean.statusOptions}"/>
+                        </p:selectOneMenu>
+                    </f:facet>
+                    <h:outputText value="#{documentRequest.status.label}"
+                                  styleClass="status-badge status-#{documentRequest.status}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['admin.requests.col.submitted']}"
+                          sortBy="#{documentRequest.createdAt}"
+                          filterBy="#{documentRequest.createdAtDisplay}"
+                          filterMatchMode="contains"
+                          style="white-space:nowrap">
+                    <f:facet name="filter">
+                        <p:inputText placeholder="#{msg['admin.requests.filter.submittedPlaceholder']}"
+                                     onkeyup="PF('requestsTableW').filter()"/>
+                    </f:facet>
+                    <h:outputText value="#{documentRequest.createdAtDisplay}"/>
+                </p:column>
+            </p:dataTable>
+
+        </h:form>
+
     </ui:define>
 
 </ui:composition>

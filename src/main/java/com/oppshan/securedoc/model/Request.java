@@ -372,10 +372,20 @@ public class Request
     }
 
     public enum Status {
-        PENDING,
-        UNDER_REVIEW,
-        PROCESSING,
-        COMPLETED,
-        REJECTED
+        PENDING("Pending"),
+        UNDER_REVIEW("Under Review"),
+        PROCESSING("Processing"),
+        COMPLETED("Completed"),
+        REJECTED("Rejected");
+
+        private final String label;
+
+        Status(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 }
