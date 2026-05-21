@@ -335,6 +335,28 @@ html, body {
 
 /* Shared PrimeFaces overrides */
 
+body .ui-button {
+    background: var(--navy);
+    border: none;
+}
+
+body .ui-button.ui-state-hover {
+    background: var(--navy-mid);
+    border: none;
+}
+
+/* PrimeFaces button icon spans get both .ui-icon and .pi classes; saga's
+   .ui-icon rule wins on specificity over .pi and drops font-family back
+   to the body font, rendering icons as tofu. Restoring the primeicons
+   font on the icon span fixes it across every portal. */
+.ui-button > .ui-button-icon-left.pi,
+.ui-button > .ui-button-icon-right.pi,
+.ui-button > .ui-button-icon-only.pi {
+    font-family: "primeicons" !important;
+    text-indent: 0 !important;
+    overflow: visible !important;
+}
+
 body .ui-selectonemenu {
     border: none;
 }
@@ -352,14 +374,58 @@ body .ui-selectonemenu {
 }
 
 /* Strip the saga info-banner panel chrome so info messages render as
-   inline text (mirrors the error treatment used in request.css /
-   admin.css). Text color is left to each portal's stylesheet. */
+   inline text. Text color is left to each portal's stylesheet. */
 .ui-message-info,
 .ui-messages-info {
     background: transparent !important;
     border: none !important;
     padding: 2px 0 0 !important;
     margin: 0 !important;
+}
+
+/* Shared inline error banner. The manual <h:panelGroup styleClass="notice-error">
+   on the resident track scene and the PrimeFaces <p:messages> summary banner
+   both render with this look so we have a consistent error styling. */
+.notice-error,
+.ui-messages-error {
+    background: var(--red-tint) !important;
+    border: 0.5px solid var(--red-bdr) !important;
+    border-left: 3px solid var(--red) !important;
+    border-radius: var(--r-sm) !important;
+    padding: 10px 13px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 12.5px !important;
+    color: #7F1D1D !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+}
+
+/* PF wraps message text in <ul><li>; flatten the list so each line sits
+   inline inside the banner instead of indented. */
+.ui-messages-error ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.ui-messages-error li + li {
+    margin-top: 2px;
+}
+
+.ui-messages-error-summary {
+    color: #7F1D1D !important;
+    font-weight: 500 !important;
+    font-size: 12.5px !important;
+}
+
+/* Hide PF's error message icon */
+.ui-messages-error .ui-messages-error-icon {
+    display: none !important;
+}
+
+.ui-messages-close {
+    display: none !important;
 }
 
 /* Request.Status pills — shared by the resident track scene and the

@@ -18,11 +18,14 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.validation.ConstraintViolationException;
 import org.jboss.logging.Logger;
+import org.primefaces.model.file.UploadedFile;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -48,6 +51,15 @@ public class RequestBean implements Serializable {
 
     private static final Pattern EMAIL_REGEX =
             Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+
+    private static final long MAX_ID_IMAGE_BYTES = 5L * 1024 * 1024;
+
+    private static final Set<String> ALLOWED_ID_IMAGE_MIME_TYPES = Set.of(
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "application/pdf"
+    );
 
     private final SystemConfigBean system;
 
@@ -111,6 +123,26 @@ public class RequestBean implements Serializable {
 
     @Nullable
     private String idType;
+
+    /**
+     * Bound by JSF during a multipart submit of the details form (the
+     * {@code p:fileUpload} on the details scene). Lives for the request that
+     * actually carries the multipart; we read its bytes into
+     * {@link #idImageData} immediately so the session-scoped state survives
+     * the round-trip to the review scene without holding the temp file
+     * reference.
+     */
+    @Nullable
+    private UploadedFile uploadedIdFile;
+
+    @Nullable
+    private byte[] idImageData;
+
+    @Nullable
+    private String idImageMimeType;
+
+    @Nullable
+    private String idImageFileName;
 
     /**
      * Reference number for the just-submitted request, surfaced on
@@ -322,15 +354,74 @@ public class RequestBean implements Serializable {
      */
     public String proceedToReview() {
         logger.tracef("Validating details scene for purpose %s", purpose);
+        final var facesContext = FacesContext.getCurrentInstance();
+
         // Cross-field check: "Other" purpose requires the free-text reason.
         if ("other".equals(purpose) && (otherPurpose == null || otherPurpose.isBlank())) {
             logger.debugf("Rejected details scene -- purpose is 'other' but the free-text reason is empty");
-            final var facesContext = FacesContext.getCurrentInstance();
             facesContext.addMessage(null, error(i18n.get("request.details.other.purpose.required")));
             facesContext.validationFailed();
         }
 
+        if (!consumeUploadedIdFile(facesContext)) {
+            return null;
+        }
+
+        if (idImageData == null || idImageData.length == 0) {
+            logger.debugf("Rejected details scene -- valid ID upload is missing");
+            facesContext.addMessage(null, error(i18n.get("request.details.upload.required")));
+            facesContext.validationFailed();
+        }
+
         return null;
+    }
+
+    /**
+     * Reads the multipart {@code p:fileUpload} payload into {@link #idImageData}
+     * if a new file was attached on this submit. Validates size + MIME type
+     * and surfaces a per-issue error in the global panel. Returns false when
+     * a new upload was attempted but rejected -- the caller stops further
+     * checks in that case so the resident sees one focused message.
+     */
+    private boolean consumeUploadedIdFile(FacesContext facesContext) {
+        if (uploadedIdFile == null || uploadedIdFile.getSize() <= 0) {
+            return true;
+        }
+
+        try {
+            if (uploadedIdFile.getSize() > MAX_ID_IMAGE_BYTES) {
+                logger.debugf("Rejected ID upload -- %s bytes exceeds %s byte cap",
+                        uploadedIdFile.getSize(), MAX_ID_IMAGE_BYTES);
+                facesContext.addMessage(null, error(i18n.get("request.details.upload.too.large")));
+                facesContext.validationFailed();
+                return false;
+            }
+
+            final var contentType = uploadedIdFile.getContentType();
+            if (contentType == null
+                    || !ALLOWED_ID_IMAGE_MIME_TYPES.contains(contentType.toLowerCase(Locale.ROOT))) {
+                logger.debugf("Rejected ID upload -- unsupported mime type %s", contentType);
+                facesContext.addMessage(null, error(i18n.get("request.details.upload.invalid.type")));
+                facesContext.validationFailed();
+                return false;
+            }
+
+            try {
+                this.idImageData = uploadedIdFile.getContent();
+            } catch (RuntimeException readFailure) {
+                logger.warnf(readFailure, "Failed to read resident ID upload for %s", email);
+                facesContext.addMessage(null,
+                        error(i18n.get("request.details.upload.read.failed", readFailure.getMessage())));
+                facesContext.validationFailed();
+                return false;
+            }
+
+            this.idImageMimeType = contentType;
+            this.idImageFileName = uploadedIdFile.getFileName();
+            return true;
+        } finally {
+            this.uploadedIdFile = null;
+        }
     }
 
     /**
@@ -562,6 +653,20 @@ public class RequestBean implements Serializable {
     }
 
     @Nullable
+    public UploadedFile getUploadedIdFile() {
+        return uploadedIdFile;
+    }
+
+    public void setUploadedIdFile(@Nullable UploadedFile uploadedIdFile) {
+        this.uploadedIdFile = uploadedIdFile;
+    }
+
+    @Nullable
+    public String getIdImageFileName() {
+        return idImageFileName;
+    }
+
+    @Nullable
     public String getSubmittedReference() {
         return submittedReference;
     }
@@ -615,6 +720,7 @@ public class RequestBean implements Serializable {
                 .setSex(sex)
                 .setContactNumber(contactNumber)
                 .setIdType(idType)
+                .setIdImageData(idImageData)
                 .setPurpose(purpose)
                 .setOtherPurpose(otherPurpose);
     }

@@ -307,6 +307,7 @@ class RequestServiceTest {
                 .setLastName("Resident")
                 .setSex("M")
                 .setDateOfBirth(LocalDate.of(1990, 1, 1))
+                .setIdImageData(new byte[]{1, 2, 3, 4})
                 .setPurpose("employment");
     }
 

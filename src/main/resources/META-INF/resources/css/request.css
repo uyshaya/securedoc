@@ -214,23 +214,6 @@ hr.div {
     margin-bottom: 1px;
 }
 
-.notice-error {
-    background: var(--red-tint);
-    border: 0.5px solid var(--red-bdr);
-    border-left: 3px solid var(--red);
-    border-radius: var(--r-sm);
-    padding: 10px 13px;
-    font-size: 12.5px;
-    color: #7F1D1D;
-    display: none;
-    align-items: center;
-    gap: 9px;
-}
-
-.notice-error.show {
-    display: flex;
-}
-
 /* ─ FIELDS ─ */
 
 .flabel {
@@ -825,7 +808,6 @@ body .ui-button.ui-button-text-only .ui-button-text,
 .ui-autocomplete-panel,
 .ui-autocomplete-panel .ui-autocomplete-item,
 .ui-messages,
-.ui-messages-error-summary,
 .ui-messages-info-summary,
 select {
     font-family: 'DM Sans', sans-serif !important;
@@ -937,16 +919,15 @@ select {
     width: 100% !important;
 }
 
-/* ─── p:messages — match the admin's minimal inline red-text error style
-       (admin.css :470). The default saga rendering is a chunky banner; we
-       want a quiet inline hint that sits above the submit button. */
+/* Per-field <p:message> stays as a quiet inline red hint sitting under
+   the field. Summary <p:messages> is styled as the shared error banner
+   in global.css. */
 .ui-messages,
 .ui-message {
     font-family: 'DM Sans', sans-serif !important;
 }
 
-.ui-message-error,
-.ui-messages-error {
+.ui-message-error {
     font-family: 'DM Sans', sans-serif !important;
     font-size: 12px !important;
     color: #7F1D1D !important;
@@ -954,22 +935,6 @@ select {
     border: none !important;
     padding: 2px 0 0 !important;
     margin: 0 !important;
-}
-
-.ui-messages-error ul {
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-.ui-messages-error-summary {
-    color: #7F1D1D !important;
-    font-weight: 500 !important;
-}
-
-/* Hide the default close icon */
-.ui-messages-close {
-    display: none !important;
 }
 
 .btn-secondary {

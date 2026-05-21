@@ -2,6 +2,7 @@ package com.oppshan.securedoc.repository;
 
 import com.oppshan.securedoc.common.StatefulWriteRepository;
 import com.oppshan.securedoc.dto.RequestAdminView;
+import com.oppshan.securedoc.dto.RequestDetailView;
 import com.oppshan.securedoc.dto.RequestTrackingView;
 import com.oppshan.securedoc.model.Request;
 import jakarta.data.repository.CrudRepository;
@@ -54,4 +55,28 @@ public interface RequestRepository
             ORDER BY r.createdAt DESC
             """)
     List<RequestAdminView> listForOrganization(UUID organizationId);
+
+    /**
+     * Single-row detail projection for the staff-facing detail sidebar
+     * on {@code /admin/requests.xhtml}. Unlike {@link #listForOrganization},
+     * this DOES pull the requester's {@code id_image_data} LONGBLOB so
+     * staff can review the uploaded ID. The query is scoped by both
+     * request id and organization id so a staff member can never load a
+     * request belonging to another tenant by guessing its UUID.
+     */
+    @Query("""
+            SELECT new com.oppshan.securedoc.dto.RequestDetailView(
+                r.id, r.referenceNumber, r.status,
+                r.purpose, r.otherPurpose, r.requestNote,
+                r.createdAt, r.lastModifiedAt,
+                t.name,
+                rq.firstName, rq.middleName, rq.lastName, rq.email,
+                rq.sex, rq.dateOfBirth, rq.contactNumber,
+                rq.idType, rq.idImageData)
+            FROM Request r
+            JOIN r.template t
+            JOIN r.requester rq
+            WHERE r.id = :id AND r.organization.id = :organizationId
+            """)
+    Optional<RequestDetailView> findDetailByIdAndOrganization(UUID id, UUID organizationId);
 }

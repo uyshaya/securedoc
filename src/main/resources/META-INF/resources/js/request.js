@@ -36,17 +36,17 @@ function onEmailInput() {
 
 /* Called from the JSF p:commandButton oncomplete on the email scene.
    Pushes the just-sent email into the OTP scene's display and into
-   detailsForm:fEmail. The latter is bean-bound and readonly, but the
+   detailsForm:fieldEmail. The latter is bean-bound and readonly, but the
    send button only AJAX-updates emailForm, so the field would otherwise
    stay blank until detailsForm itself is re-rendered.
    (JSF prefixes input ids with the parent form's NamingContainer, so
-   the rendered DOM id is "detailsForm:fEmail".) */
+   the rendered DOM id is "detailsForm:fieldEmail".) */
 function enterOtpScene() {
   const emailField = document.getElementById('emailForm:emailInput');
   const email = emailField ? emailField.value.trim() : '';
   const displaySpan = document.getElementById('otpEmailDisplay');
   if (displaySpan) displaySpan.textContent = email;
-  const detailsEmailField = document.getElementById('detailsForm:fEmail');
+  const detailsEmailField = document.getElementById('detailsForm:fieldEmail');
   if (detailsEmailField) detailsEmailField.value = email;
   resetOtp();
   goTo('p-otp');
@@ -189,25 +189,10 @@ function resendOtp() {
 
 /* - FORM STEP - */
 function onPurposeChange() {
-  const purposeField = document.getElementById('detailsForm:fPurpose');
+  const purposeField = document.getElementById('detailsForm:fieldPurpose');
   if (!purposeField) return;
   const wrap = document.getElementById('otherPurposeWrap');
   if (wrap) wrap.style.display = purposeField.value === 'other' ? 'flex' : 'none';
-}
-
-function onFileSelected(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const fileNameLabel = document.getElementById('uploadFname');
-  if (fileNameLabel) {
-    fileNameLabel.textContent = '📎 ' + file.name;
-    fileNameLabel.style.display = 'block';
-  }
-  const zone = document.getElementById('uploadZone');
-  if (zone) {
-    zone.style.borderColor = 'var(--navy-mid)';
-    zone.style.background = 'var(--blue-tint)';
-  }
 }
 
 /* Returns the trimmed value of a JSF-prefixed input id (or empty string).
@@ -248,29 +233,29 @@ function enterReviewScene() {
       ? certSelect.options[certSelect.selectedIndex] : null;
 
   const fullName = [
-    detailsValue('fFirst'),
-    detailsValue('fMiddle'),
-    detailsValue('fLast')
+    detailsValue('fieldFirst'),
+    detailsValue('fieldMiddle'),
+    detailsValue('fieldLast')
   ].filter(Boolean).join(' ') || '—';
 
-  const sexValue = detailsValue('fSex');
+  const sexValue = detailsValue('fieldSex');
   const sexLabel = sexValue === 'M' ? 'Male' : sexValue === 'F' ? 'Female' : '—';
 
-  const purposeValue = detailsValue('fPurpose');
+  const purposeValue = detailsValue('fieldPurpose');
   const purposeDisplay = purposeValue === 'other'
-      ? (detailsValue('fOtherPurpose') || '—')
-      : (detailsLabel('fPurpose') || '—');
+      ? (detailsValue('fieldOtherPurpose') || '—')
+      : (detailsLabel('fieldPurpose') || '—');
 
   const rows = [
     { key: 'Certificate Type', value: certOption ? certOption.text : '—' },
     { key: 'Full Name', value: fullName },
-    { key: 'Date of Birth', value: formatDate(detailsValue('fDob')) },
+    { key: 'Date of Birth', value: formatDate(detailsValue('fieldDob')) },
     { key: 'Sex', value: sexLabel },
-    { key: 'Contact Number', value: detailsValue('fPhone') || '—' },
-    { key: 'Email Address', value: detailsValue('fEmail') || '—' },
+    { key: 'Contact Number', value: detailsValue('fieldPhone') || '—' },
+    { key: 'Email Address', value: detailsValue('fieldEmail') || '—' },
     { key: 'Purpose', value: purposeDisplay },
-    { key: 'Valid ID Type', value: detailsLabel('fIdType') || '—' },
-    { key: 'ID Uploaded', value: document.getElementById('uploadFname')?.textContent ? 'Yes ✓' : 'No' },
+    { key: 'Valid ID Type', value: detailsLabel('fieldIdType') || '—' },
+    { key: 'ID Uploaded', value: (document.getElementById('detailsForm:fieldIdFileName')?.textContent || '').trim() || 'No' },
   ];
 
   const listNode = document.getElementById('reviewList');
