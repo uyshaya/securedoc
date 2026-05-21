@@ -303,7 +303,7 @@
 
                     <hr class="div"/>
 
-                    <h:form id="detailsForm">
+                    <h:form id="detailsForm" enctype="multipart/form-data">
                         <f:event type="postValidate"
                                  listener="#{requestBean.summarizeDetailsValidation}"/>
                         <div style="display:flex;flex-direction:column;gap:14px">
@@ -311,8 +311,8 @@
 
                             <div class="frow">
                                 <div class="fwrap">
-                                    <p:outputLabel for="fFirst" styleClass="flabel" value="#{msg['details.firstName.label']}"/>
-                                    <p:inputText id="fFirst"
+                                    <p:outputLabel for="fieldFirst" styleClass="flabel" value="#{msg['details.firstName.label']}"/>
+                                    <p:inputText id="fieldFirst"
                                                  value="#{requestBean.firstName}"
                                                  placeholder="#{msg['details.firstName.placeholder']}"
                                                  required="true"
@@ -320,16 +320,16 @@
                                     />
                                 </div>
                                 <div class="fwrap">
-                                    <p:outputLabel for="fMiddle" styleClass="flabel" value="#{msg['details.middleName.label']}"/>
-                                    <p:inputText id="fMiddle"
+                                    <p:outputLabel for="fieldMiddle" styleClass="flabel" value="#{msg['details.middleName.label']}"/>
+                                    <p:inputText id="fieldMiddle"
                                                  value="#{requestBean.middleName}"
                                                  placeholder="#{msg['details.middleName.placeholder']}"/>
                                 </div>
                             </div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fLast" styleClass="flabel" value="#{msg['details.lastName.label']}"/>
-                                <p:inputText id="fLast"
+                                <p:outputLabel for="fieldLast" styleClass="flabel" value="#{msg['details.lastName.label']}"/>
+                                <p:inputText id="fieldLast"
                                              value="#{requestBean.lastName}"
                                              placeholder="#{msg['details.lastName.placeholder']}"
                                              required="true"
@@ -339,8 +339,8 @@
 
                             <div class="frow">
                                 <div class="fwrap">
-                                    <p:outputLabel for="fDob" styleClass="flabel" value="#{msg['details.dob.label']}"/>
-                                    <p:datePicker id="fDob"
+                                    <p:outputLabel for="fieldDob" styleClass="flabel" value="#{msg['details.dob.label']}"/>
+                                    <p:datePicker id="fieldDob"
                                                   value="#{requestBean.dateOfBirth}"
                                                   pattern="yyyy-MM-dd"
                                                   showIcon="false"
@@ -349,8 +349,8 @@
                                     />
                                 </div>
                                 <div class="fwrap">
-                                    <p:outputLabel for="fSex" styleClass="flabel" value="#{msg['details.sex.label']}"/>
-                                    <p:selectOneMenu id="fSex"
+                                    <p:outputLabel for="fieldSex" styleClass="flabel" value="#{msg['details.sex.label']}"/>
+                                    <p:selectOneMenu id="fieldSex"
                                                      value="#{requestBean.sex}"
                                                      required="true"
                                                      requiredMessage="#{msg['details.sex.required']}"
@@ -368,8 +368,8 @@
                             <div class="sec-lbl">#{msg['details.section.contact']}</div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fPhone" styleClass="flabel" value="#{msg['details.phone.label']}"/>
-                                <p:inputText id="fPhone"
+                                <p:outputLabel for="fieldPhone" styleClass="flabel" value="#{msg['details.phone.label']}"/>
+                                <p:inputText id="fieldPhone"
                                              value="#{requestBean.contactNumber}"
                                              placeholder="#{msg['details.phone.placeholder']}"
                                 />
@@ -383,15 +383,15 @@
                                         #{msg['details.email.verified']}
                                     </span>
                                 </label>
-                                <p:inputText id="fEmail"
+                                <p:inputText id="fieldEmail"
                                              value="#{requestBean.email}"
                                              readonly="true"
                                              styleClass="email-locked"/>
                             </div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fPurpose" styleClass="flabel" value="#{msg['details.purpose.label']}"/>
-                                <p:selectOneMenu id="fPurpose"
+                                <p:outputLabel for="fieldPurpose" styleClass="flabel" value="#{msg['details.purpose.label']}"/>
+                                <p:selectOneMenu id="fieldPurpose"
                                                  value="#{requestBean.purpose}"
                                                  required="true"
                                                  requiredMessage="#{msg['details.purpose.required']}"
@@ -403,10 +403,10 @@
                             </div>
 
                             <div class="fwrap" id="otherPurposeWrap" style="display:none">
-                                <p:outputLabel for="fOtherPurpose" styleClass="flabel">
+                                <p:outputLabel for="fieldOtherPurpose" styleClass="flabel">
                                     #{msg['details.otherPurpose.label']} <span class="req">#{msg['common.required']}</span>
                                 </p:outputLabel>
-                                <p:inputText id="fOtherPurpose"
+                                <p:inputText id="fieldOtherPurpose"
                                              value="#{requestBean.otherPurpose}"
                                              placeholder="#{msg['details.otherPurpose.placeholder']}"
                                 />
@@ -419,12 +419,11 @@
                             <div class="sec-lbl">#{msg['details.section.id']}</div>
 
                             <div class="fwrap">
-                                <p:outputLabel for="fIdType" styleClass="flabel" value="#{msg['details.idType.label']}"/>
-                                <p:selectOneMenu id="fIdType"
+                                <p:outputLabel for="fieldIdType" styleClass="flabel" value="#{msg['details.idType.label']}"/>
+                                <p:selectOneMenu id="fieldIdType"
                                                  value="#{requestBean.idType}"
                                                  required="true"
-                                                 requiredMessage="#{msg['details.idType.required']}"
-                                >
+                                                 requiredMessage="#{msg['details.idType.required']}">
                                     <f:selectItem itemValue="#{null}" itemLabel="#{msg['details.idType.placeholder']}"
                                                   noSelectionOption="true"/>
                                     <f:selectItems value="#{requestBean.idTypeOptions}"/>
@@ -432,17 +431,21 @@
                             </div>
 
                             <div class="fwrap">
-                                <label class="flabel">#{msg['details.upload.label']} <span class="req">#{msg['common.required']}</span></label>
-                                <div class="upload-zone" id="uploadZone">
-                                    <input type="file" accept="image/*,.pdf" onchange="onFileSelected(event);"/>
-                                    <div class="upload-icon">
-                                        <i class="pi pi-cloud-upload" style="color:#6B7A8D;font-size:18px"></i>
-                                    </div>
-                                    <div class="upload-lbl">#{msg['details.upload.cta']}</div>
-                                    <div class="upload-sub">#{msg['details.upload.formats']}</div>
-                                    <div class="upload-fname" id="uploadFname"></div>
-                                </div>
-                                <span class="fhint">#{msg['details.upload.hint']}</span>
+                                <label class="flabel" for="fieldIdFile">#{msg['details.upload.label']}
+                                    <span class="req">#{msg['common.required']}</span>
+                                </label>
+                                <p:fileUpload id="fieldIdFile"
+                                              value="#{requestBean.uploadedIdFile}"
+                                              mode="simple"
+                                              skinSimple="true"
+                                              accept="image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf"
+                                              chooseIcon="pi pi-cloud-upload"
+                                              chooseLabel="#{msg['details.upload.cta']}"/>
+                                <h:outputText id="fieldIdFileName"
+                                              value="#{requestBean.idImageFileName}"
+                                              styleClass="upload-fname"
+                                              rendered="#{not empty requestBean.idImageFileName}"/>
+                                <span class="fhint">#{msg['details.upload.formats']} · #{msg['details.upload.hint']}</span>
                             </div>
                         </div>
 

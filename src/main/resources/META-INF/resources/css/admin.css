@@ -466,8 +466,9 @@ html, body {
     margin: 4px 0 !important;
 }
 
-/* -- p:message -- */
-.ui-message-error, .ui-messages-error {
+/* Per-field <p:message> under the field.
+   Summary <p:messages> is styled as the shared error banner in global.css. */
+.ui-message-error {
     font-family: 'DM Sans', sans-serif !important;
     font-size: 12px !important;
     color: #7F1D1D !important;
@@ -673,17 +674,6 @@ html, body {
     border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
-/* PrimeFaces button icon spans get both .ui-icon and .pi classes; a
-   .ui-icon rule from the theme wins on specificity over .pi and drops
-   font-family back to the body font, rendering icons as tofu. */
-.ui-button > .ui-button-icon-left.pi,
-.ui-button > .ui-button-icon-right.pi,
-.ui-button > .ui-button-icon-only.pi {
-    font-family: "primeicons" !important;
-    text-indent: 0 !important;
-    overflow: visible !important;
-}
-
 /* -- Main content -- */
 .console-main {
     flex: 1;
@@ -833,4 +823,149 @@ html, body {
 
 body .ui-dialog.ui-confirm-dialog .ui-dialog-content>span {
     margin: 0;
+}
+
+/* -- Admin requests detail sidebar -- */
+.request-detail-sidebar.ui-sidebar {
+    padding: 0 !important;
+}
+
+.request-detail-body {
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    padding: 28px 28px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.request-detail-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.request-detail-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    color: var(--tx-m);
+}
+
+.request-detail-title {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 15px;
+    margin: 0;
+    color: var(--tx);
+    word-break: break-all;
+}
+
+.request-detail-header .status-badge {
+    align-self: flex-start;
+    margin-top: 4px;
+}
+
+.request-detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.request-detail-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--tx-m);
+    margin: 0;
+}
+
+.request-detail-list {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    column-gap: 14px;
+    row-gap: 8px;
+    margin: 0;
+}
+
+.request-detail-list dt {
+    color: var(--tx-m);
+    font-size: 12px;
+    margin: 0;
+}
+
+.request-detail-list dd {
+    color: var(--tx);
+    font-size: 13px;
+    margin: 0;
+    word-break: break-word;
+}
+
+.request-detail-muted {
+    color: var(--tx-m);
+    font-style: italic;
+}
+
+.request-detail-id-image {
+    margin-top: 4px;
+}
+
+.request-detail-id-thumb {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: block;
+}
+
+.request-detail-id-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--navy-mid);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.request-detail-id-link:hover {
+    text-decoration: underline;
+}
+
+.request-detail-reject-note,
+.request-detail-reject-note.ui-inputtextarea {
+    width: 100%;
+    resize: vertical;
+}
+
+.request-detail-actions {
+    flex: 0 0 auto;
+    padding: 16px 28px;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Approve = solid green */
+.request-detail-btn-approve.ui-button,
+.request-detail-btn-approve.ui-button:enabled:hover,
+.request-detail-btn-approve.ui-button:enabled:focus {
+    background: var(--green, #15803D);
+    border-color: var(--green, #15803D);
+    color: #fff;
+}
+
+/* Reject = red text */
+.request-detail-btn-reject.ui-button .ui-button-text {
+    color: #B91C1C;
+}
+
+.request-detail-btn-reject.ui-button:enabled:hover {
+    background: #FEF2F2;
 }

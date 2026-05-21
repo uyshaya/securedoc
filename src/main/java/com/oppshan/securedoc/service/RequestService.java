@@ -2,6 +2,7 @@ package com.oppshan.securedoc.service;
 
 import com.oppshan.securedoc.dto.RequestAdminView;
 import com.oppshan.securedoc.dto.RequestCreate;
+import com.oppshan.securedoc.dto.RequestDetailView;
 import com.oppshan.securedoc.dto.RequestSubmissionView;
 import com.oppshan.securedoc.dto.RequestTrackingView;
 import com.oppshan.securedoc.exception.BusinessException;
@@ -181,6 +182,21 @@ public class RequestService {
     }
 
     /**
+     * Single-row detail for the staff-facing detail sidebar. Scoped by
+     * organization so a staff member can only see requests inside their
+     * own tenant -- returns empty if either id is missing or the request
+     * belongs to a different organization.
+     */
+    @Transactional
+    public Optional<RequestDetailView> getDetail(UUID requestId, UUID organizationId) {
+        logger.tracef("Loading request detail %s for organization %s", requestId, organizationId);
+        if (requestId == null || organizationId == null) {
+            return Optional.empty();
+        }
+        return requestRepo.findDetailByIdAndOrganization(requestId, organizationId);
+    }
+
+    /**
      * Resident-facing status lookup by UUID reference number. No
      * authentication -- the reference itself is the secret. Returns a narrow
      * projection that omits requester PII so an unauthenticated caller with
@@ -206,7 +222,8 @@ public class RequestService {
                 .setSex(form.getSex())
                 .setDateOfBirth(form.getDateOfBirth())
                 .setContactNumber(form.getContactNumber() == null ? null : form.getContactNumber().trim())
-                .setIdType(form.getIdType());
+                .setIdType(form.getIdType())
+                .setIdImageData(form.getIdImageData());
     }
 
     private String generateOtpCode() {

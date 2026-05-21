@@ -84,7 +84,173 @@
                     </f:facet>
                     <h:outputText value="#{documentRequest.createdAtDisplay}"/>
                 </p:column>
+
+                <p:column headerText="#{msg['admin.requests.col.actions']}"
+                          style="white-space:nowrap;width:6rem;text-align:center">
+                    <p:commandButton icon="pi pi-eye"
+                                     title="#{msg['admin.requests.action.view']}"
+                                     action="#{requestManagementBean.loadDetail(documentRequest)}"
+                                     process="@this"
+                                     update=":detailForm"
+                                     oncomplete="PF('detailSidebarW').show()"
+                                     styleClass="ui-button-flat"/>
+                </p:column>
             </p:dataTable>
+
+        </h:form>
+
+        <h:form id="detailForm">
+
+            <p:sidebar widgetVar="detailSidebarW"
+                       position="right"
+                       showCloseIcon="true"
+                       dismissible="true"
+                       styleClass="request-detail-sidebar"
+                       style="width:480px;max-width:100%">
+
+                <ui:fragment rendered="#{requestManagementBean.selectedRequest != null}">
+
+                  <h:panelGroup layout="block" styleClass="request-detail-body">
+
+                    <header class="request-detail-header">
+                        <span class="request-detail-eyebrow">#{msg['admin.requests.detail.eyebrow']}</span>
+                        <h2 class="request-detail-title">#{requestManagementBean.selectedRequest.referenceNumber}</h2>
+                        <h:outputText value="#{requestManagementBean.selectedRequest.status.label}"
+                                      styleClass="status-badge status-#{requestManagementBean.selectedRequest.status}"/>
+                    </header>
+
+                    <section class="request-detail-section">
+                        <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.resident']}</h3>
+                        <dl class="request-detail-list">
+                            <dt>#{msg['admin.requests.detail.field.fullName']}</dt>
+                            <dd>#{requestManagementBean.selectedRequest.fullName}</dd>
+
+                            <dt>#{msg['admin.requests.detail.field.email']}</dt>
+                            <dd>#{requestManagementBean.selectedRequest.email}</dd>
+
+                            <dt>#{msg['admin.requests.detail.field.sex']}</dt>
+                            <dd>#{requestManagementBean.selectedRequest.sexLabel}</dd>
+
+                            <dt>#{msg['admin.requests.detail.field.dateOfBirth']}</dt>
+                            <dd>#{requestManagementBean.selectedRequest.dateOfBirthDisplay}</dd>
+
+                            <dt>#{msg['admin.requests.detail.field.contact']}</dt>
+                            <dd>
+                                <h:outputText value="#{requestManagementBean.selectedRequest.contactNumber}"
+                                              rendered="#{not empty requestManagementBean.selectedRequest.contactNumber}"/>
+                                <h:outputText value="#{msg['admin.requests.detail.notProvided']}"
+                                              styleClass="request-detail-muted"
+                                              rendered="#{empty requestManagementBean.selectedRequest.contactNumber}"/>
+                            </dd>
+                        </dl>
+                    </section>
+
+                    <section class="request-detail-section">
+                        <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.identification']}</h3>
+                        <dl class="request-detail-list">
+                            <dt>#{msg['admin.requests.detail.field.idType']}</dt>
+                            <dd>
+                                <h:outputText value="#{requestManagementBean.selectedRequest.idType}"
+                                              rendered="#{not empty requestManagementBean.selectedRequest.idType}"/>
+                                <h:outputText value="#{msg['admin.requests.detail.notProvided']}"
+                                              styleClass="request-detail-muted"
+                                              rendered="#{empty requestManagementBean.selectedRequest.idType}"/>
+                            </dd>
+                        </dl>
+
+                        <h:panelGroup layout="block"
+                                      styleClass="request-detail-id-image"
+                                      rendered="#{requestManagementBean.selectedRequest.hasIdImage}">
+                            <h:panelGroup rendered="#{requestManagementBean.selectedRequest.idImageDisplayable}">
+                                <img src="#{requestManagementBean.selectedRequest.idImageDataUrl}"
+                                     alt="#{msg['admin.requests.detail.idImage.alt']}"
+                                     class="request-detail-id-thumb"/>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{requestManagementBean.selectedRequest.idImagePdf}">
+                                <a href="#{requestManagementBean.selectedRequest.idImageDataUrl}"
+                                   target="_blank"
+                                   rel="noopener"
+                                   class="request-detail-id-link">
+                                    <i class="pi pi-file-pdf"></i>
+                                    #{msg['admin.requests.detail.idImage.openPdf']}
+                                </a>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                        <h:outputText value="#{msg['admin.requests.detail.idImage.missing']}"
+                                      styleClass="request-detail-muted"
+                                      rendered="#{not requestManagementBean.selectedRequest.hasIdImage}"/>
+                    </section>
+
+                    <section class="request-detail-section">
+                        <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.document']}</h3>
+                        <dl class="request-detail-list">
+                            <dt>#{msg['admin.requests.detail.field.documentType']}</dt>
+                            <dd>#{requestManagementBean.selectedRequest.documentName}</dd>
+
+                            <dt>#{msg['admin.requests.detail.field.purpose']}</dt>
+                            <dd>
+                                <h:outputText value="#{requestManagementBean.selectedRequest.purpose}"
+                                              rendered="#{not empty requestManagementBean.selectedRequest.purpose}"/>
+                                <h:outputText value="#{msg['admin.requests.detail.notProvided']}"
+                                              styleClass="request-detail-muted"
+                                              rendered="#{empty requestManagementBean.selectedRequest.purpose}"/>
+                            </dd>
+
+                            <ui:fragment rendered="#{not empty requestManagementBean.selectedRequest.otherPurpose}">
+                                <dt>#{msg['admin.requests.detail.field.otherPurpose']}</dt>
+                                <dd>#{requestManagementBean.selectedRequest.otherPurpose}</dd>
+                            </ui:fragment>
+
+                            <ui:fragment rendered="#{not empty requestManagementBean.selectedRequest.requestNote}">
+                                <dt>#{msg['admin.requests.detail.field.staffNote']}</dt>
+                                <dd>#{requestManagementBean.selectedRequest.requestNote}</dd>
+                            </ui:fragment>
+                        </dl>
+                    </section>
+
+                    <section class="request-detail-section">
+                        <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.timestamps']}</h3>
+                        <dl class="request-detail-list">
+                            <dt>#{msg['admin.requests.detail.field.submitted']}</dt>
+                            <dd>#{requestManagementBean.selectedRequest.createdAtDisplay}</dd>
+
+                            <dt>#{msg['admin.requests.detail.field.lastUpdated']}</dt>
+                            <dd>#{requestManagementBean.selectedRequest.lastModifiedAtDisplay}</dd>
+                        </dl>
+                    </section>
+
+                    <section class="request-detail-section">
+                        <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.rejectNote']}</h3>
+                        <p:inputTextarea id="rejectNote"
+                                         value="#{requestManagementBean.rejectNote}"
+                                         rows="3"
+                                         autoResize="false"
+                                         styleClass="request-detail-reject-note"
+                                         placeholder="#{msg['admin.requests.detail.rejectNote.placeholder']}"/>
+                    </section>
+
+                  </h:panelGroup>
+
+                    <footer class="request-detail-actions">
+                        <p:commandButton value="#{msg['admin.requests.detail.btn.reject']}"
+                                         action="#{requestManagementBean.reject()}"
+                                         process="@form"
+                                         update="@form"
+                                         oncomplete="PF('detailSidebarW').hide()"
+                                         icon="pi pi-times"
+                                         styleClass="ui-button-flat request-detail-btn-reject"/>
+                        <p:commandButton value="#{msg['admin.requests.detail.btn.approve']}"
+                                         action="#{requestManagementBean.approve()}"
+                                         process="@this"
+                                         update="@form"
+                                         oncomplete="PF('detailSidebarW').hide()"
+                                         icon="pi pi-check"
+                                         styleClass="request-detail-btn-approve"/>
+                    </footer>
+
+                </ui:fragment>
+
+            </p:sidebar>
 
         </h:form>
 

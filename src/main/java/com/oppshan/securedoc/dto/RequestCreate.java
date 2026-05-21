@@ -63,6 +63,9 @@ public class RequestCreate implements Serializable {
     @Size(max = 50)
     private String idType;
 
+    @NotNull
+    private byte[] idImageData;
+
     @Nullable
     @Size(max = 50)
     private String purpose;
@@ -164,6 +167,15 @@ public class RequestCreate implements Serializable {
 
     public RequestCreate setIdType(@Nullable String idType) {
         this.idType = idType;
+        return this;
+    }
+
+    public byte[] getIdImageData() {
+        return idImageData;
+    }
+
+    public RequestCreate setIdImageData(byte[] idImageData) {
+        this.idImageData = idImageData;
         return this;
     }
 

@@ -41,7 +41,7 @@ class RequesterRepositoryTest {
                 .setDateOfBirth(LocalDate.of(1990, 1, 15))
                 .setContactNumber("09171234567")
                 .setIdType("Drivers License")
-                .setIdImagePath("/uploads/dummy.png");
+                .setIdImageData(new byte[]{1, 2, 3, 4, 5});
 
         requesterRepository.insertWithSession(requester);
         entityManager.flush();
@@ -64,6 +64,6 @@ class RequesterRepositoryTest {
         assertThat(reloaded.getDateOfBirth(), is(LocalDate.of(1990, 1, 15)));
         assertThat(reloaded.getContactNumber(), is("09171234567"));
         assertThat(reloaded.getIdType(), is("Drivers License"));
-        assertThat(reloaded.getIdImagePath(), is("/uploads/dummy.png"));
+        assertThat(reloaded.getIdImageData(), is(new byte[]{1, 2, 3, 4, 5}));
     }
 }

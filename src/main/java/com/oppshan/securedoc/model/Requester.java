@@ -110,10 +110,16 @@ public class Requester
     @Nullable
     private String idType;
 
-    @Column(name = "id_image_path",
-            length = 500)
+    // Eagerly loaded for the same reason DocumentTemplate.templateData is:
+    // Jakarta Data repos run on a StatelessSession that closes when the
+    // method returns, so @Basic(fetch=LAZY) here would throw
+    // LazyInitializationException for any service that later reads the bytes.
+    // The list/admin queries on RequestRepository project into DTOs via
+    // JPQL constructor expressions, so this column never enters those SELECTs.
+    @Column(name = "id_image_data",
+            columnDefinition = "LONGBLOB")
     @Nullable
-    private String idImagePath;
+    private byte[] idImageData;
 
     @Basic(optional = false)
     @Column(name = "created_at",
@@ -218,12 +224,12 @@ public class Requester
     }
 
     @Nullable
-    public String getIdImagePath() {
-        return idImagePath;
+    public byte[] getIdImageData() {
+        return idImageData;
     }
 
-    public Requester setIdImagePath(@Nullable String idImagePath) {
-        this.idImagePath = idImagePath;
+    public Requester setIdImageData(@Nullable byte[] idImageData) {
+        this.idImageData = idImageData;
         return this;
     }
 
@@ -268,7 +274,6 @@ public class Requester
                Objects.equals(dateOfBirth, that.dateOfBirth) &&
                Objects.equals(contactNumber, that.contactNumber) &&
                Objects.equals(idType, that.idType) &&
-               Objects.equals(idImagePath, that.idImagePath) &&
                Objects.equals(createdAt, that.createdAt) &&
                Objects.equals(lastModifiedAt, that.lastModifiedAt);
     }
@@ -285,7 +290,6 @@ public class Requester
                 dateOfBirth,
                 contactNumber,
                 idType,
-                idImagePath,
                 createdAt,
                 lastModifiedAt
         );
