@@ -45,6 +45,7 @@ public class RequestDetailView implements Serializable {
     private String requestNote;
     private Instant createdAt;
     private Instant lastModifiedAt;
+    private UUID templateId;
     private String documentName;
     private String firstName;
     @Nullable
@@ -71,6 +72,7 @@ public class RequestDetailView implements Serializable {
                              @Nullable String requestNote,
                              Instant createdAt,
                              Instant lastModifiedAt,
+                             UUID templateId,
                              String documentName,
                              String firstName,
                              @Nullable String middleName,
@@ -89,6 +91,7 @@ public class RequestDetailView implements Serializable {
         this.requestNote = requestNote;
         this.createdAt = createdAt;
         this.lastModifiedAt = lastModifiedAt;
+        this.templateId = templateId;
         this.documentName = documentName;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -237,6 +240,17 @@ public class RequestDetailView implements Serializable {
         this.status = status;
     }
 
+    /**
+     * True while the request is still in a state staff can act on -- i.e.
+     * not in a terminal state. The detail sidebar uses this to hide the
+     * reject-note input and the approve/reject buttons once the request
+     * is COMPLETED or REJECTED, since those decisions are immutable.
+     */
+    public boolean isActionable() {
+        return status != Request.Status.COMPLETED
+                && status != Request.Status.REJECTED;
+    }
+
     @Nullable
     public String getPurpose() {
         return purpose;
@@ -278,6 +292,14 @@ public class RequestDetailView implements Serializable {
 
     public void setLastModifiedAt(Instant lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
+    }
+
+    public UUID getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(UUID templateId) {
+        this.templateId = templateId;
     }
 
     public String getDocumentName() {

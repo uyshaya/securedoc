@@ -61,9 +61,9 @@
                                             value="#{requestBean.selectedOrganization}"
                                             completeMethod="#{requestBean.completeOrganization}"
                                             converter="organizationConverter"
-                                            var="o"
-                                            itemLabel="#{o.name}"
-                                            itemValue="#{o}"
+                                            var="organization"
+                                            itemLabel="#{organization.name}"
+                                            itemValue="#{organization}"
                                             forceSelection="true"
                                             minQueryLength="2"
                                             queryDelay="200"
@@ -87,9 +87,9 @@
                                               itemLabel="#{requestBean.certTypePlaceholder}"
                                               noSelectionOption="true"/>
                                 <f:selectItems value="#{requestBean.availableTemplates}"
-                                               var="t"
-                                               itemValue="#{t.id}"
-                                               itemLabel="#{t.name}"/>
+                                               var="template"
+                                               itemValue="#{template.id}"
+                                               itemLabel="#{template.docType.label}"/>
                             </h:selectOneMenu>
                             <span class="cert-hint">#{msg['landing.cert.hint']}</span>
                         </h:panelGroup>

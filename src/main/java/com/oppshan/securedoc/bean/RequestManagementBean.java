@@ -4,6 +4,7 @@ import com.oppshan.securedoc.dto.RequestAdminView;
 import com.oppshan.securedoc.dto.RequestDetailView;
 import com.oppshan.securedoc.model.DocumentTemplate;
 import com.oppshan.securedoc.model.Request;
+import com.oppshan.securedoc.service.DocumentService;
 import com.oppshan.securedoc.service.RequestService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Nullable;
@@ -34,7 +35,13 @@ public class RequestManagementBean implements Serializable {
     RequestService service;
 
     @Inject
+    DocumentService documentService;
+
+    @Inject
     OrganizationBean organizationBean;
+
+    @Inject
+    AdminAuthBean adminAuthBean;
 
     private List<RequestAdminView> requestList;
 
@@ -84,12 +91,26 @@ public class RequestManagementBean implements Serializable {
     }
 
     /**
-     * Stub -- the actual status transition + processed_by stamping is
-     * deferred until the issuance flow is built. Leaving the action wired
-     * to a no-op so the button can be styled and tested in place.
+     * Approves the selected request: generates the PDF from the request's
+     * template, persists a {@code document} row tied 1:1 to the request,
+     * stamps {@code processed_by} with the acting admin, and flips the
+     * request to COMPLETED. All in one transaction inside
+     * {@link DocumentService#issueForRequest}, so the table never reflects
+     * a half-issued state. PKI signing + QR + verifier portal land in
+     * later tickets.
      */
     public void approve() {
-        // TODO: advance status (PENDING -> UNDER_REVIEW etc.), stamp processed_by, refresh list.
+        if (selectedRequest == null) {
+            return;
+        }
+        final var issued = documentService.issueForRequest(
+                selectedRequest.getId(),
+                organizationBean.getActiveId(),
+                adminAuthBean.getAuthenticatedId());
+        if (issued) {
+            requestList = service.listForOrganization(organizationBean.getActiveId());
+        }
+        closeDetail();
     }
 
     /**

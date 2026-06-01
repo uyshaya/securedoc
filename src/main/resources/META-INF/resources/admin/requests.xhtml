@@ -65,7 +65,9 @@
                           filterMatchMode="equals">
                     <f:facet name="filter">
                         <p:selectOneMenu onchange="PF('requestsTableW').filter()">
-                            <f:selectItem itemLabel="#{msg['admin.requests.filter.all']}" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="#{msg['admin.requests.filter.all']}"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true"/>
                             <f:selectItems value="#{requestManagementBean.statusOptions}"/>
                         </p:selectOneMenu>
                     </f:facet>
@@ -86,13 +88,20 @@
                 </p:column>
 
                 <p:column headerText="#{msg['admin.requests.col.actions']}"
-                          style="white-space:nowrap;width:6rem;text-align:center">
+                          style="white-space:nowrap;width:8rem;text-align:center">
                     <p:commandButton icon="pi pi-eye"
                                      title="#{msg['admin.requests.action.view']}"
                                      action="#{requestManagementBean.loadDetail(documentRequest)}"
                                      process="@this"
                                      update=":detailForm"
                                      oncomplete="PF('detailSidebarW').show()"
+                                     styleClass="ui-button-flat"/>
+                    <!-- Opens the on-demand generated PDF (RequestDocumentServlet) in a new tab. -->
+                    <p:commandButton type="button"
+                                     icon="pi pi-file-o"
+                                     title="#{msg['admin.requests.action.viewDocument']}"
+                                     onclick="window.open('#{facesContext.externalContext.requestContextPath}/admin/requests/document?id=#{documentRequest.id}', '_blank')"
+                                     rendered="#{documentRequest.status == 'COMPLETED'}"
                                      styleClass="ui-button-flat"/>
                 </p:column>
             </p:dataTable>
@@ -219,34 +228,38 @@
                         </dl>
                     </section>
 
-                    <section class="request-detail-section">
-                        <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.rejectNote']}</h3>
-                        <p:inputTextarea id="rejectNote"
-                                         value="#{requestManagementBean.rejectNote}"
-                                         rows="3"
-                                         autoResize="false"
-                                         styleClass="request-detail-reject-note"
-                                         placeholder="#{msg['admin.requests.detail.rejectNote.placeholder']}"/>
-                    </section>
+                    <ui:fragment rendered="#{requestManagementBean.selectedRequest.actionable}">
+                        <section class="request-detail-section">
+                            <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.rejectNote']}</h3>
+                            <p:inputTextarea id="rejectNote"
+                                             value="#{requestManagementBean.rejectNote}"
+                                             rows="3"
+                                             autoResize="false"
+                                             styleClass="request-detail-reject-note"
+                                             placeholder="#{msg['admin.requests.detail.rejectNote.placeholder']}"/>
+                        </section>
+                    </ui:fragment>
 
                   </h:panelGroup>
 
-                    <footer class="request-detail-actions">
-                        <p:commandButton value="#{msg['admin.requests.detail.btn.reject']}"
-                                         action="#{requestManagementBean.reject()}"
-                                         process="@form"
-                                         update="@form"
-                                         oncomplete="PF('detailSidebarW').hide()"
-                                         icon="pi pi-times"
-                                         styleClass="ui-button-flat request-detail-btn-reject"/>
-                        <p:commandButton value="#{msg['admin.requests.detail.btn.approve']}"
-                                         action="#{requestManagementBean.approve()}"
-                                         process="@this"
-                                         update="@form"
-                                         oncomplete="PF('detailSidebarW').hide()"
-                                         icon="pi pi-check"
-                                         styleClass="request-detail-btn-approve"/>
-                    </footer>
+                    <ui:fragment rendered="#{requestManagementBean.selectedRequest.actionable}">
+                        <footer class="request-detail-actions">
+                            <p:commandButton value="#{msg['admin.requests.detail.btn.reject']}"
+                                             action="#{requestManagementBean.reject()}"
+                                             process="@form"
+                                             update="@form"
+                                             oncomplete="PF('detailSidebarW').hide()"
+                                             icon="pi pi-times"
+                                             styleClass="ui-button-flat request-detail-btn-reject"/>
+                            <p:commandButton value="#{msg['admin.requests.detail.btn.approve']}"
+                                             action="#{requestManagementBean.approve()}"
+                                             process="@this"
+                                             update=":requestsForm:requestsTable :detailForm"
+                                             oncomplete="PF('detailSidebarW').hide()"
+                                             icon="pi pi-check"
+                                             styleClass="request-detail-btn-approve"/>
+                        </footer>
+                    </ui:fragment>
 
                 </ui:fragment>
 
