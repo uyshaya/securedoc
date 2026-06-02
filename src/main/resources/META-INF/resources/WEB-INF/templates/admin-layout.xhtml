@@ -78,6 +78,13 @@
                         </span>
                         #{msg['nav.audit']}
                     </h:link>
+                    <h:link outcome="/admin/residents/residents-management" styleClass="console-nav-item"
+                            rendered="#{authBean.admin}">
+                        <span class="console-nav-icon">
+                            <i class="pi pi-id-card"></i>
+                        </span>
+                        #{msg['nav.residents']}
+                    </h:link>
                     <h:link outcome="/admin/staff/staff-management" styleClass="console-nav-item"
                             rendered="#{authBean.admin}">
                         <span class="console-nav-icon">

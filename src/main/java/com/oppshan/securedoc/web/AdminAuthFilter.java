@@ -34,7 +34,8 @@ public class AdminAuthFilter implements Filter {
     );
 
     private static final List<String> ADMIN_ONLY_PREFIXES = List.of(
-            "/admin/staff/"
+            "/admin/staff/",
+            "/admin/residents/"
     );
 
     private final AdminAuthBean adminAuthBean;
