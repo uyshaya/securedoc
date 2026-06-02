@@ -69,7 +69,7 @@ public interface RequestRepository
                 r.id, r.referenceNumber, r.status,
                 r.purpose, r.otherPurpose, r.requestNote,
                 r.createdAt, r.lastModifiedAt,
-                t.name,
+                t.id, t.name,
                 rq.firstName, rq.middleName, rq.lastName, rq.email,
                 rq.sex, rq.dateOfBirth, rq.contactNumber,
                 rq.idType, rq.idImageData)
