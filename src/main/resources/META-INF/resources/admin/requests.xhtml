@@ -129,7 +129,15 @@
                     </header>
 
                     <section class="request-detail-section">
-                        <h3 class="request-detail-section-title">#{msg['admin.requests.detail.section.resident']}</h3>
+                        <h3 class="request-detail-section-title">
+                            #{msg['admin.requests.detail.section.resident']}
+                            <h:outputText value="#{msg['admin.requests.detail.masterlist.matched']}"
+                                          styleClass="masterlist-badge masterlist-badge-matched"
+                                          rendered="#{requestManagementBean.masterlistMatched}"/>
+                            <h:outputText value="#{msg['admin.requests.detail.masterlist.unmatched']}"
+                                          styleClass="masterlist-badge masterlist-badge-unmatched"
+                                          rendered="#{not requestManagementBean.masterlistMatched}"/>
+                        </h3>
                         <dl class="request-detail-list">
                             <dt>#{msg['admin.requests.detail.field.fullName']}</dt>
                             <dd>#{requestManagementBean.selectedRequest.fullName}</dd>

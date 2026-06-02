@@ -2,10 +2,12 @@ package com.oppshan.securedoc.bean;
 
 import com.oppshan.securedoc.dto.RequestAdminView;
 import com.oppshan.securedoc.dto.RequestDetailView;
+import com.oppshan.securedoc.dto.ResidentView;
 import com.oppshan.securedoc.model.DocumentTemplate;
 import com.oppshan.securedoc.model.Request;
 import com.oppshan.securedoc.service.DocumentService;
 import com.oppshan.securedoc.service.RequestService;
+import com.oppshan.securedoc.service.ResidentDirectoryService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Nullable;
 import jakarta.faces.model.SelectItem;
@@ -38,6 +40,9 @@ public class RequestManagementBean implements Serializable {
     DocumentService documentService;
 
     @Inject
+    ResidentDirectoryService residentDirectoryService;
+
+    @Inject
     OrganizationBean organizationBean;
 
     @Inject
@@ -47,6 +52,9 @@ public class RequestManagementBean implements Serializable {
 
     @Nullable
     private RequestDetailView selectedRequest;
+
+    @Nullable
+    private ResidentView matchedResident;
 
     @Nullable
     private String rejectNote;
@@ -82,11 +90,20 @@ public class RequestManagementBean implements Serializable {
             return;
         }
         selectedRequest = service.getDetail(row.getId(), organizationBean.getActiveId()).orElse(null);
+        matchedResident = selectedRequest == null
+                ? null
+                : residentDirectoryService.findMatchForRequester(
+                        organizationBean.getActiveId(),
+                        selectedRequest.getFirstName(),
+                        selectedRequest.getLastName(),
+                        selectedRequest.getDateOfBirth())
+                .orElse(null);
         rejectNote = null;
     }
 
     public void closeDetail() {
         selectedRequest = null;
+        matchedResident = null;
         rejectNote = null;
     }
 
@@ -124,6 +141,15 @@ public class RequestManagementBean implements Serializable {
     @Nullable
     public RequestDetailView getSelectedRequest() {
         return selectedRequest;
+    }
+
+    @Nullable
+    public ResidentView getMatchedResident() {
+        return matchedResident;
+    }
+
+    public boolean isMasterlistMatched() {
+        return matchedResident != null;
     }
 
     public boolean isDetailVisible() {

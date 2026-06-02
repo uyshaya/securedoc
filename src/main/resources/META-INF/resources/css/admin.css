@@ -882,6 +882,28 @@ body .ui-dialog.ui-confirm-dialog .ui-dialog-content>span {
     margin: 0;
 }
 
+.masterlist-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.masterlist-badge-matched {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.masterlist-badge-unmatched {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
 .request-detail-list {
     display: grid;
     grid-template-columns: 130px 1fr;
@@ -968,4 +990,37 @@ body .ui-dialog.ui-confirm-dialog .ui-dialog-content>span {
 
 .request-detail-btn-reject.ui-button:enabled:hover {
     background: #FEF2F2;
+}
+
+/* == Residents management page == */
+.residents-upload-intro {
+    margin: 0 0 12px 0;
+    color: var(--tx-m);
+    font-size: .92rem;
+}
+
+.residents-csv-sample {
+    background: var(--bg-s);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: .85rem;
+    overflow-x: auto;
+    margin: 0;
+}
+
+.residents-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 18px 0 8px 0;
+}
+
+.residents-toolbar-count {
+    color: var(--tx-m);
+    font-size: .92rem;
+}
+
+.residents-col-dob {
+    white-space: nowrap;
+    width: 140px;
 }

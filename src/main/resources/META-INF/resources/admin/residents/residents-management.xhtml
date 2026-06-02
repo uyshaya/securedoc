@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/admin-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>#{msg['page.residents.title']}</title>
+    </ui:define>
+
+    <ui:define name="pageHeader">
+        <h1 class="console-page-title">#{msg['page.residents.heading']}</h1>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:messages globalOnly="true" showSummary="true" showDetail="false" closable="true"/>
+
+        <h:form id="residentUploadForm" enctype="multipart/form-data">
+            <p:card styleClass="template-upload-card">
+                <f:facet name="title">#{msg['residents.upload.card.title']}</f:facet>
+                <f:facet name="subtitle">
+                    #{i18n.get('residents.upload.card.subtitle', systemConfigBean.orgLabelLower)}
+                </f:facet>
+
+                <p class="residents-upload-intro">
+                    #{msg['residents.upload.csv.header.intro']}
+                </p>
+                <pre class="residents-csv-sample">first_name,middle_name,last_name,sex,date_of_birth,address
+Juan,Santos,Dela Cruz,M,1990-05-12,12 Mabini St.</pre>
+
+                <f:facet name="footer">
+                    <p:fileUpload id="residentFile"
+                                  value="#{residentDirectoryBean.newFile}"
+                                  mode="simple"
+                                  skinSimple="true"
+                                  accept=".csv,text/csv"
+                                  chooseIcon="pi pi-cloud-upload"
+                                  label="#{msg['residents.button.choose.csv']}"/>
+                    <p:commandButton value="#{msg['residents.button.upload']}"
+                                     icon="pi pi-upload"
+                                     action="#{residentDirectoryBean.upload}"
+                                     ajax="false"
+                                     styleClass="btn-template-primary"/>
+                </f:facet>
+            </p:card>
+        </h:form>
+
+        <h:form id="residentListForm">
+            <div class="residents-toolbar">
+                <span class="residents-toolbar-count">
+                    #{i18n.get('residents.count', residentDirectoryBean.residentCount)}
+                </span>
+                <p:commandButton value="#{msg['residents.button.clear']}"
+                                 icon="pi pi-trash"
+                                 action="#{residentDirectoryBean.clearAll}"
+                                 update="residentListForm"
+                                 process="@this"
+                                 styleClass="ui-button-flat"
+                                 disabled="#{residentDirectoryBean.residentCount == 0}">
+                    <p:confirm header="#{msg['residents.confirm.clear.header']}"
+                               message="#{msg['residents.confirm.clear.message']}"/>
+                </p:commandButton>
+            </div>
+
+            <p:dataTable id="residentTable"
+                         value="#{residentDirectoryBean.residents}"
+                         var="resident"
+                         emptyMessage="#{i18n.get('residents.table.empty', systemConfigBean.orgLabelLower)}">
+
+                <p:column headerText="#{msg['residents.column.lastname']}">
+                    <h:outputText value="#{resident.lastName}" style="font-weight:500"/>
+                </p:column>
+
+                <p:column headerText="#{msg['residents.column.firstname']}">
+                    <h:outputText value="#{resident.firstName}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['residents.column.middlename']}">
+                    <h:outputText value="#{empty resident.middleName ? '—' : resident.middleName}"
+                                  style="color:var(--tx-m)"/>
+                </p:column>
+
+                <p:column headerText="#{msg['residents.column.sex']}" style="width:80px">
+                    <h:outputText value="#{resident.sex}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['residents.column.dob']}" styleClass="residents-col-dob">
+                    <h:outputText value="#{resident.dateOfBirth}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['residents.column.address']}">
+                    <h:outputText value="#{resident.address}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+            <p:commandButton value="#{msg['residents.button.clear']}"
+                             type="button"
+                             styleClass="ui-confirmdialog-yes"/>
+            <p:commandButton value="#{msg['common.cancel']}"
+                             type="button"
+                             styleClass="ui-button-flat ui-confirmdialog-no"/>
+        </p:confirmDialog>
+
+    </ui:define>
+
+</ui:composition>
