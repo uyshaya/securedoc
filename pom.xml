@@ -18,21 +18,21 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.5.5</maven.surefire.plugin.version>
-        <maven.failsafe.plugin.version>3.5.5</maven.failsafe.plugin.version>
-        <jacoco.plugin.version>0.8.14</jacoco.plugin.version>
+        <maven.surefire.plugin.version>3.5.6</maven.surefire.plugin.version>
+        <maven.failsafe.plugin.version>3.5.6</maven.failsafe.plugin.version>
+        <jacoco.plugin.version>0.8.15</jacoco.plugin.version>
         <exec.maven.plugin.version>3.6.3</exec.maven.plugin.version>
 
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.35.3</quarkus.platform.version>
+        <quarkus.platform.version>3.36.1</quarkus.platform.version>
 
         <jakarta.data-api.version>1.0.1</jakarta.data-api.version>
         <quarkus.primefaces.version>4.15.15</quarkus.primefaces.version>
         <pdfbox.version>3.0.7</pdfbox.version>
         <quarkus.pdfbox.version>1.2.2</quarkus.pdfbox.version>
         <bouncycastle.version>1.84</bouncycastle.version>
-        <guava.version>33.5.0-jre</guava.version>
+        <guava.version>33.6.0-jre</guava.version>
 
         <skipITs>true</skipITs>
         <docker.check.skip>${skipTests}</docker.check.skip>
