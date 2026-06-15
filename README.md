@@ -126,9 +126,9 @@ securedoc/
 |  |     |     +- admin/                    # login, register, dashboard, requests,
 |  |     |     |                            # templates, audit, staff/staff-management
 |  |     |     +- user/request.xhtml        # Resident multi-scene request flow
-|  |     |     +- verifier/verify.xhtml     # Zero-registration verification portal
+|  |     |     +- verify.xhtml              # Zero-registration verification portal
 |  |     |     +- WEB-INF/templates/        # admin-layout, admin-auth-layout,
-|  |     |     |                            # resident-layout, verifier-layout
+|  |     |     |                            # resident-layout, verify-layout
 |  |     |     +- css/, js/                 # global.css, admin.css, request.css,
 |  |     |                                  # verifier.css, request.js, local-time.js
 |  |     +- db/
