@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/resident-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>#{msg['page.notFound.title']}</title>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="page active">
+            <div class="card">
+                <div class="hd">
+                    <div class="logo-icon">
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                            <path d="M14 3L5 7V14C5 18.97 9.02 23.57 14 24.93C18.98 23.57 23 18.97 23 14V7L14 3Z" fill="#0C3B6E"/>
+                            <path d="M9.5 14L12.5 17L18.5 11" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
+                        <div class="tagline">#{msg['brand.tagline']}</div>
+                    </div>
+                </div>
+
+                <div class="bd">
+                    <div>
+                        <div class="sec-title">#{msg['notFound.title']}</div>
+                        <div class="sec-sub">#{msg['notFound.subtitle']}</div>
+                    </div>
+
+                    <div class="notice">
+                        <i class="pi pi-info-circle notice-icon"></i>
+                        <div class="notice-text">
+                            <strong>#{msg['notFound.notice.title']}</strong>
+                            #{msg['notFound.notice.body']}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">#{msg['app.footer']}</div>
+        </div>
+    </ui:define>
+
+</ui:composition>

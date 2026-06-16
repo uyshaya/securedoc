@@ -31,16 +31,12 @@ import java.util.regex.Pattern;
 
 /**
  * Backs the multi-scene resident document-request flow on
- * /user/request.xhtml. Session-scoped because the user walks through
+ * /user/{slug}/request.xhtml. Session-scoped because the user walks through
  * scenes (landing -> email -> otp -> details -> review -> confirm) via JS
  * scene transitions, and the picked organization/template selections
- * must persist across them. Anonymous flow -- no login required.
- *
- * <p>JSF-bound scenes: landing (org autocomplete + cert-type dropdown),
- * email (send OTP), otp (verify OTP), details (field-level
- * {@code required="true"} plus {@link #summarizeDetailsValidation}).
- * Review and confirm scenes are still JS-only stubs until the
- * persistence + verification-token backend lands.
+ * must persist across them. Anonymous flow -- no login required. The
+ * organization is pinned by the URL slug via {@link #initFromUrl()}, not
+ * chosen on the landing scene.
  */
 @Named("requestBean")
 @SessionScoped
@@ -73,6 +69,12 @@ public class RequestBean implements Serializable {
 
     @Nullable
     private OrganizationView selectedOrganization;
+
+    /**
+     * Bound from the {@code orgCode} query parameter by {@code <f:viewParam>}.
+     */
+    @Nullable
+    private String urlOrgCode;
 
     @Nullable
     private UUID selectedTemplateId;
@@ -194,43 +196,83 @@ public class RequestBean implements Serializable {
         this(null, null, null, null, null);
     }
 
-    /** Called by the autocomplete's {@code completeMethod} as the resident types. */
-    public List<OrganizationView> completeOrganization(String query) {
-        return system.searchOrganizations(query);
+    /**
+     * View-action that pins {@link #selectedOrganization} to the org named
+     * by the URL slug and pre-loads its templates. On a slug change within
+     * the same session, the accumulated wizard state is wiped -- a different
+     * org means a different request. The slug is trusted: the
+     * {@link com.oppshan.securedoc.web.ResidentScopeFilter} has already
+     * validated it, so an unresolved lookup here is a defensive no-op.
+     */
+    public void initFromUrl() {
+        logger.tracef("Initializing resident portal from slug '%s'", urlOrgCode);
+        if (urlOrgCode == null || urlOrgCode.isBlank()) {
+            return;
+        }
+
+        if (selectedOrganization != null
+                && urlOrgCode.equals(selectedOrganization.getCode())) {
+            return;
+        }
+
+        resetWizardState();
+
+        final var resolved = system.findOrganizationByCode(urlOrgCode);
+        if (resolved.isEmpty()) {
+            logger.debugf("Slug '%s' did not resolve at view-init time (filter should have 404'd)", urlOrgCode);
+            return;
+        }
+
+        selectedOrganization = resolved.get();
+        loadTemplatesForSelectedOrganization();
     }
 
-    /**
-     * AJAX listener fired when the resident picks an organization. Loads
-     * that org's active templates so the cert-type dropdown can populate
-     * without a full page reload.
-     */
-    public void onOrganizationSelected() {
-        logger.tracef("Resident picked organization %s; loading its templates",
-                selectedOrganization == null ? null : selectedOrganization.getId());
+    private void resetWizardState() {
+        selectedOrganization = null;
         selectedTemplateId = null;
+        availableTemplates = List.of();
 
+        email = null;
+        otpInput = null;
+        emailVerified = false;
+
+        firstName = null;
+        middleName = null;
+        lastName = null;
+        dateOfBirth = null;
+        sex = null;
+        contactNumber = null;
+        purpose = null;
+        otherPurpose = null;
+        idType = null;
+
+        uploadedIdFile = null;
+        idImageData = null;
+        idImageMimeType = null;
+        idImageFileName = null;
+
+        submittedReference = null;
+
+        trackReference = null;
+        trackedResult = null;
+        trackingNotFound = false;
+    }
+
+    private void loadTemplatesForSelectedOrganization() {
+        selectedTemplateId = null;
         availableTemplates = templateService.listByOrganization(
                 selectedOrganization == null ? null : selectedOrganization.getId());
     }
 
     /**
      * Server-side validation invoked by the landing-scene "Proceed" button.
-     * Returns null in all cases -- scene advancement is driven by the
-     * button's {@code oncomplete} callback, which checks
-     * {@code args.validationFailed} before calling {@code goTo('p-email')}.
+     * Returns null in all cases; scene advancement is driven by the
+     * button's {@code oncomplete} callback.
      */
     public String proceedFromLanding() {
         logger.tracef("Validating landing scene with organization %s and template %s",
                 selectedOrganization == null ? null : selectedOrganization.getId(), selectedTemplateId);
         final var facesContext = FacesContext.getCurrentInstance();
-
-        if (selectedOrganization == null || selectedOrganization.getId() == null) {
-            logger.debugf("Rejected landing scene -- no organization selected");
-            facesContext.addMessage(null,
-                    error(i18n.get("request.landing.organization.required", system.getOrgLabelLower())));
-            facesContext.validationFailed();
-            return null;
-        }
 
         if (selectedTemplateId == null) {
             logger.debugf("Rejected landing scene -- no certificate type chosen");
@@ -537,6 +579,15 @@ public class RequestBean implements Serializable {
     }
 
     @Nullable
+    public String getUrlOrgCode() {
+        return urlOrgCode;
+    }
+
+    public void setUrlOrgCode(@Nullable String urlOrgCode) {
+        this.urlOrgCode = urlOrgCode;
+    }
+
+    @Nullable
     public UUID getSelectedTemplateId() {
         return selectedTemplateId;
     }
@@ -690,13 +741,11 @@ public class RequestBean implements Serializable {
     }
 
     /**
-     * Placeholder text for the cert-type dropdown, reflecting the org-selection state.
+     * Placeholder text for the cert-type dropdown. The organization is
+     * always set by the slug filter before this page renders, so the only
+     * variation is whether the org actually has any active templates.
      */
     public String getCertTypePlaceholder() {
-        if (selectedOrganization == null) {
-            return i18n.get("request.landing.certificate.placeholder.no.org", system.getOrgLabelLower());
-        }
-
         if (availableTemplates.isEmpty()) {
             return i18n.get("request.landing.certificate.placeholder.none", system.getOrgLabelLower());
         }

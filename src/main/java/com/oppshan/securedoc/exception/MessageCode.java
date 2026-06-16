@@ -48,7 +48,6 @@ public enum MessageCode {
     TEMPLATE_PREVIEW_ID_INVALID("template.preview.id.invalid"),
 
     // -- Resident request flow -----------------------------------
-    REQUEST_LANDING_ORGANIZATION_REQUIRED("request.landing.organization.required"),
     REQUEST_LANDING_CERTIFICATE_REQUIRED("request.landing.certificate.required"),
     REQUEST_EMAIL_REQUIRED("request.email.required"),
     REQUEST_EMAIL_INVALID("request.email.invalid"),

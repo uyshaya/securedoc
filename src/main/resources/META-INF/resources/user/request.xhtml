@@ -9,6 +9,13 @@
         <title>#{msg['page.request.title']}</title>
     </ui:define>
 
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="orgCode" value="#{requestBean.urlOrgCode}"/>
+            <f:viewAction action="#{requestBean.initFromUrl}" onPostback="false"/>
+        </f:metadata>
+    </ui:define>
+
     <ui:define name="content">
 
         <!-- ============================================================
@@ -54,35 +61,18 @@
 
                     <hr class="div"/>
 
-                    <h:form id="landingForm">
-                        <div class="fwrap">
-                            <label class="flabel" for="orgPicker">#{systemConfigBean.orgLabel}</label>
-                            <p:autoComplete id="orgPicker"
-                                            value="#{requestBean.selectedOrganization}"
-                                            completeMethod="#{requestBean.completeOrganization}"
-                                            converter="organizationConverter"
-                                            var="organization"
-                                            itemLabel="#{organization.name}"
-                                            itemValue="#{organization}"
-                                            forceSelection="true"
-                                            minQueryLength="2"
-                                            queryDelay="200"
-                                            placeholder="#{i18n.get('register.placeholder.organization', systemConfigBean.orgLabelLower)}">
-                                <p:ajax event="itemSelect"
-                                        listener="#{requestBean.onOrganizationSelected}"
-                                        update="certTypeWrap"/>
-                                <p:ajax event="clear"
-                                        listener="#{requestBean.onOrganizationSelected}"
-                                        update="certTypeWrap"/>
-                            </p:autoComplete>
-                            <span class="cert-hint">#{msg['landing.org.hint']}</span>
+                    <div class="org-pin">
+                        <div class="org-pin-label">#{i18n.get('landing.org.pinned.label', systemConfigBean.orgLabel)}</div>
+                        <div class="org-pin-name" id="landingOrgName">
+                            <h:outputText value="#{requestBean.selectedOrganization.name}"/>
                         </div>
+                    </div>
 
+                    <h:form id="landingForm">
                         <h:panelGroup layout="block" styleClass="fwrap" id="certTypeWrap">
                             <label class="flabel" for="certType">#{msg['landing.cert.label']}</label>
                             <h:selectOneMenu id="certType"
-                                             value="#{requestBean.selectedTemplateId}"
-                                             disabled="#{requestBean.selectedOrganization == null}">
+                                             value="#{requestBean.selectedTemplateId}">
                                 <f:selectItem itemValue="#{null}"
                                               itemLabel="#{requestBean.certTypePlaceholder}"
                                               noSelectionOption="true"/>
@@ -119,13 +109,7 @@
         <div class="page" id="p-email">
             <div class="card">
                 <div class="hd-nav">
-                    <button type="button" class="btn-back" onclick="goTo('p-landing')">
-                        <i class="pi pi-angle-left"></i>
-                        #{msg['nav.back']}
-                    </button>
-                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
-                    </div>
+                    <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                 </div>
 
                 <div class="steps">
@@ -176,6 +160,13 @@
 
                         <p:messages globalOnly="true" showSummary="true" showDetail="false"/>
                     </h:form>
+
+                    <div class="back-row">
+                        <button type="button" class="btn-back-bottom" onclick="goTo('p-landing')">
+                            <i class="pi pi-angle-left"></i>
+                            #{msg['nav.back']}
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
@@ -187,13 +178,7 @@
         <div class="page" id="p-otp">
             <div class="card">
                 <div class="hd-nav">
-                    <button type="button" class="btn-back" onclick="goTo('p-email')">
-                        <i class="pi pi-angle-left"></i>
-                        #{msg['nav.back']}
-                    </button>
-                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
-                    </div>
+                    <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                 </div>
 
                 <div class="steps">
@@ -249,6 +234,13 @@
                             </button>
                             <span id="resendTimer"></span></p>
                     </div>
+
+                    <div class="back-row">
+                        <button type="button" class="btn-back-bottom" onclick="goTo('p-email')">
+                            <i class="pi pi-angle-left"></i>
+                            #{msg['nav.back']}
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
@@ -260,13 +252,7 @@
         <div class="page" id="p-form">
             <div class="card">
                 <div class="hd-nav">
-                    <button type="button" class="btn-back" onclick="goTo('p-otp')">
-                        <i class="pi pi-angle-left"></i>
-                        #{msg['nav.back']}
-                    </button>
-                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
-                    </div>
+                    <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                 </div>
 
                 <div class="steps">
@@ -462,6 +448,12 @@
                         </div>
                     </h:form>
 
+                    <div class="back-row">
+                        <button type="button" class="btn-back-bottom" onclick="goTo('p-otp')">
+                            <i class="pi pi-angle-left"></i>
+                            #{msg['nav.back']}
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
@@ -473,13 +465,7 @@
         <div class="page" id="p-review">
             <div class="card">
                 <div class="hd-nav">
-                    <button type="button" class="btn-back" onclick="goTo('p-form')">
-                        <i class="pi pi-angle-left"></i>
-                        #{msg['nav.back']}
-                    </button>
-                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
-                    </div>
+                    <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                 </div>
 
                 <div class="steps">
@@ -530,6 +516,13 @@
                                              oncomplete="if (args &amp;&amp; !args.validationFailed) goTo('p-confirm');"/>
                         </div>
                     </h:form>
+
+                    <div class="back-row">
+                        <button type="button" class="btn-back-bottom" onclick="goTo('p-form')">
+                            <i class="pi pi-angle-left"></i>
+                            #{msg['nav.back']}
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="footer">#{msg['app.footer']}</div>
@@ -627,13 +620,7 @@
         <div class="page" id="p-track">
             <div class="card">
                 <div class="hd-nav">
-                    <button type="button" class="btn-back" onclick="goTo('p-landing')">
-                        <i class="pi pi-angle-left"></i>
-                        #{msg['nav.back']}
-                    </button>
-                    <div style="flex:1;display:flex;justify-content:center;padding-right:52px">
-                        <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
-                    </div>
+                    <div class="brand-name">#{msg['app.brand.prefix']}<em>#{msg['app.brand.suffix']}</em></div>
                 </div>
 
                 <h:form id="trackForm" styleClass="bd">
@@ -711,6 +698,13 @@
                             </div>
                         </div>
                     </h:panelGroup>
+
+                    <div class="back-row">
+                        <button type="button" class="btn-back-bottom" onclick="goTo('p-landing')">
+                            <i class="pi pi-angle-left"></i>
+                            #{msg['nav.back']}
+                        </button>
+                    </div>
                 </h:form>
             </div>
             <div class="footer">#{msg['app.footer']}</div>

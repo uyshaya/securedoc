@@ -6,19 +6,23 @@ function goTo(id) {
 }
 
 /* Called from the JSF p:commandButton oncomplete on the landing scene.
-   Pulls the picked cert + org from the JSF-rendered DOM and writes them
-   into the static display elements on the later Details scene. */
+   Pulls the picked cert + pinned org name from the JSF-rendered DOM and
+   writes them into the static display elements on the later Details scene.
+   The org name comes from the URL-pinned display, not a user-editable input. */
 function populateFromLanding() {
-  const sel = document.getElementById('landingForm:certType');
-  if (sel) {
-    const opt = sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
-    if (opt && opt.value) {
-      document.getElementById('formCertName').textContent = opt.text;
+  const certSelect = document.getElementById('landingForm:certType');
+  if (certSelect) {
+    const option = certSelect.selectedIndex >= 0 ? certSelect.options[certSelect.selectedIndex] : null;
+    if (option && option.value) {
+      document.getElementById('formCertName').textContent = option.text;
     }
   }
-  const orgInput = document.getElementById('landingForm:orgPicker_input');
-  if (orgInput && orgInput.value) {
-    document.getElementById('formCertCat').textContent = orgInput.value;
+  const orgName = document.getElementById('landingOrgName');
+  if (orgName) {
+    const text = (orgName.textContent || '').trim();
+    if (text) {
+      document.getElementById('formCertCat').textContent = text;
+    }
   }
 }
 

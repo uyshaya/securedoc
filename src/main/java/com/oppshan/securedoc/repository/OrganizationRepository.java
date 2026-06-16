@@ -7,6 +7,7 @@ import jakarta.data.repository.Query;
 import jakarta.data.repository.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -41,4 +42,10 @@ public interface OrganizationRepository
             ORDER BY name
             """)
     List<Organization> searchByTypeAndQuery(Organization.Type type, String query);
+
+    @Query("""
+            FROM Organization
+            WHERE code = :code AND type = :type AND active = TRUE
+            """)
+    Optional<Organization> findActiveByCodeAndType(String code, Organization.Type type);
 }

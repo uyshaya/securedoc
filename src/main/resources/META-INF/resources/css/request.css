@@ -40,6 +40,7 @@
     padding: 22px 40px 16px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 14px;
 }
 
@@ -72,24 +73,27 @@
     margin-top: 3px;
 }
 
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: rgba(255, 255, 255, 0.09);
-    border: 0.5px solid rgba(255, 255, 255, 0.16);
-    border-radius: 7px;
-    padding: 6px 11px;
-    color: rgba(255, 255, 255, 0.8);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
+.back-row {
+    display: flex;
 }
 
-.btn-back:hover {
-    background: rgba(255, 255, 255, 0.16);
+.btn-back-bottom {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 8px 0;
+    color: var(--tx-m);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.btn-back-bottom:hover {
+    color: var(--navy);
 }
 
 /* - STEPS - */
@@ -200,6 +204,38 @@ hr.div {
     display: flex;
     gap: 11px;
     align-items: flex-start;
+}
+
+.notice-icon {
+    color: #185FA5;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.org-pin {
+    background: var(--blue-tint);
+    border: 0.5px solid var(--blue-bdr);
+    border-left: 3px solid var(--navy-mid);
+    border-radius: var(--r-sm);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.org-pin-label {
+    font-size: 11.5px;
+    color: #0C447C;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.org-pin-name {
+    font-size: 16px;
+    color: var(--navy);
+    font-weight: 600;
 }
 
 .notice-text {

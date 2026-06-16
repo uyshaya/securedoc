@@ -151,10 +151,6 @@ public class BusinessException extends RuntimeException {
 
     // -- Resident request flow -----------------------------------
 
-    public static BusinessException landingOrganizationRequired(Object orgLabel) {
-        return new BusinessException(MessageCode.REQUEST_LANDING_ORGANIZATION_REQUIRED, orgLabel);
-    }
-
     public static BusinessException landingCertificateRequired() {
         return new BusinessException(MessageCode.REQUEST_LANDING_CERTIFICATE_REQUIRED);
     }

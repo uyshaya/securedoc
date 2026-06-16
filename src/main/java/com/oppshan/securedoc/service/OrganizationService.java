@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -57,5 +58,12 @@ public class OrganizationService {
     public OrganizationView findById(@NotNull UUID id) {
         logger.tracef("Looking up organization by id %s", id);
         return organizationRepo.findById(id).map(Organization::toView).orElse(null);
+    }
+
+    @Transactional
+    public Optional<OrganizationView> findActiveByCodeAndType(@NotNull String code,
+                                                              @NotNull Organization.Type type) {
+        logger.tracef("Looking up %s organization by code '%s'", type, code);
+        return organizationRepo.findActiveByCodeAndType(code, type).map(Organization::toView);
     }
 }

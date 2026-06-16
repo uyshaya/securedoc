@@ -1,6 +1,7 @@
 package com.oppshan.securedoc.bean;
 
 import com.oppshan.securedoc.common.I18n;
+import com.oppshan.securedoc.dto.DocumentTemplateView;
 import com.oppshan.securedoc.dto.OrganizationView;
 import com.oppshan.securedoc.dto.RequestCreate;
 import com.oppshan.securedoc.dto.RequestSubmissionView;
@@ -107,18 +108,6 @@ class RequestBeanTest {
 
         assertThat(outcome, is(nullValue()));
         assertThat(capturedMessages.isEmpty(), is(true));
-    }
-
-    @Test
-    void shouldRejectProceedFromLandingWhenOrganizationMissing() {
-        bean.setSelectedOrganization(null);
-        bean.setSelectedTemplateId(UUID.randomUUID());
-
-        bean.proceedFromLanding();
-
-        assertThat(capturedMessages.getFirst().getSummary(),
-                containsString("request.landing.organization.required"));
-        then(facesContext).should().validationFailed();
     }
 
     @Test
@@ -229,5 +218,90 @@ class RequestBeanTest {
 
         assertThat(bean.getTrackedResult(), is(nullValue()));
         assertThat(bean.isTrackingNotFound(), is(true));
+    }
+
+    @Test
+    void shouldInitFromUrlPinningOrganizationAndLoadingTemplates() {
+        final var orgId = UUID.randomUUID();
+        final var resolved = new OrganizationView()
+                .setId(orgId)
+                .setCode("san-isidro")
+                .setName("Barangay San Isidro");
+        given(system.findOrganizationByCode("san-isidro")).willReturn(Optional.of(resolved));
+        final var templates = List.of(new DocumentTemplateView());
+        given(templateManagementService.listByOrganization(orgId)).willReturn(templates);
+
+        bean.setUrlOrgCode("san-isidro");
+        bean.initFromUrl();
+
+        assertThat(bean.getSelectedOrganization(), is(resolved));
+        assertThat(bean.getAvailableTemplates(), is(templates));
+    }
+
+    @Test
+    void shouldInitFromUrlBeIdempotentForSameSlug() {
+        final var orgId = UUID.randomUUID();
+        final var existing = new OrganizationView()
+                .setId(orgId)
+                .setCode("san-isidro")
+                .setName("Barangay San Isidro");
+        bean.setSelectedOrganization(existing);
+        bean.setEmail("resident@example.test");
+
+        bean.setUrlOrgCode("san-isidro");
+        bean.initFromUrl();
+
+        then(system).should(org.mockito.Mockito.never()).findOrganizationByCode(anyString());
+        then(templateManagementService).should(org.mockito.Mockito.never())
+                .listByOrganization(any(UUID.class));
+        assertThat(bean.getEmail(), is("resident@example.test"));
+    }
+
+    @Test
+    void shouldInitFromUrlResetWizardStateWhenSlugChanges() {
+        final var firstOrg = new OrganizationView()
+                .setId(UUID.randomUUID())
+                .setCode("apas")
+                .setName("Barangay Apas");
+        bean.setSelectedOrganization(firstOrg);
+        bean.setEmail("resident@example.test");
+        bean.setFirstName("Jane");
+        bean.setSelectedTemplateId(UUID.randomUUID());
+        final var secondOrgId = UUID.randomUUID();
+        final var secondOrg = new OrganizationView()
+                .setId(secondOrgId)
+                .setCode("san-isidro")
+                .setName("Barangay San Isidro");
+        given(system.findOrganizationByCode("san-isidro")).willReturn(Optional.of(secondOrg));
+        given(templateManagementService.listByOrganization(secondOrgId)).willReturn(List.of());
+
+        bean.setUrlOrgCode("san-isidro");
+        bean.initFromUrl();
+
+        assertThat(bean.getSelectedOrganization(), is(secondOrg));
+        assertThat(bean.getEmail(), is(nullValue()));
+        assertThat(bean.getFirstName(), is(nullValue()));
+        assertThat(bean.getSelectedTemplateId(), is(nullValue()));
+    }
+
+    @Test
+    void shouldInitFromUrlNoOpWhenSlugIsMissing() {
+        bean.setUrlOrgCode(null);
+        bean.initFromUrl();
+
+        then(system).should(org.mockito.Mockito.never()).findOrganizationByCode(anyString());
+        assertThat(bean.getSelectedOrganization(), is(nullValue()));
+    }
+
+    @Test
+    void shouldInitFromUrlNoOpWhenSlugDoesNotResolve() {
+        given(system.findOrganizationByCode("unknown")).willReturn(Optional.empty());
+
+        bean.setUrlOrgCode("unknown");
+        bean.initFromUrl();
+
+        assertThat(bean.getSelectedOrganization(), is(nullValue()));
+        then(templateManagementService).should(org.mockito.Mockito.never())
+                .listByOrganization(any(UUID.class));
     }
 }

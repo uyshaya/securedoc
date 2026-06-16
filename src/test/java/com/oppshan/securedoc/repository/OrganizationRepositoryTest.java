@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Repository-layer integration test for {@link OrganizationRepository}.
@@ -66,5 +67,62 @@ class OrganizationRepositoryTest {
         assertEquals("Smoke Test Barangay", reloaded.getName());
         assertEquals(Organization.Type.BARANGAY, reloaded.getType());
         assertTrue(reloaded.isActive());
+    }
+
+    @Test
+    @Transactional
+    void shouldFindActiveByCodeAndTypeReturnRowWhenAllPredicatesMatch() {
+        final var code = "FIND-" + System.nanoTime();
+        final var organization = new Organization()
+                .setType(Organization.Type.BARANGAY)
+                .setName("Findable Barangay")
+                .setCode(code)
+                .setActive(true);
+        organizationRepository.insertWithSession(organization);
+        entityManager.flush();
+
+        final var resolved = organizationRepository
+                .findActiveByCodeAndType(code, Organization.Type.BARANGAY);
+
+        assertTrue(resolved.isPresent(), "Active matching-type slug should resolve");
+        assertEquals(code, resolved.get().getCode());
+    }
+
+    @Test
+    @Transactional
+    void shouldFindActiveByCodeAndTypeRejectMismatchedType() {
+        final var code = "MISMATCH-" + System.nanoTime();
+        final var organization = new Organization()
+                .setType(Organization.Type.BARANGAY)
+                .setName("Mismatched Barangay")
+                .setCode(code)
+                .setActive(true);
+        organizationRepository.insertWithSession(organization);
+        entityManager.flush();
+
+        final var resolved = organizationRepository
+                .findActiveByCodeAndType(code, Organization.Type.SCHOOL);
+
+        assertFalse(resolved.isPresent(),
+                "A barangay slug must not resolve when looking up against SCHOOL type");
+    }
+
+    @Test
+    @Transactional
+    void shouldFindActiveByCodeAndTypeRejectInactiveRow() {
+        final var code = "INACTIVE-" + System.nanoTime();
+        final var organization = new Organization()
+                .setType(Organization.Type.BARANGAY)
+                .setName("Inactive Barangay")
+                .setCode(code)
+                .setActive(false);
+        organizationRepository.insertWithSession(organization);
+        entityManager.flush();
+
+        final var resolved = organizationRepository
+                .findActiveByCodeAndType(code, Organization.Type.BARANGAY);
+
+        assertFalse(resolved.isPresent(),
+                "Inactive rows must not surface via the public slug filter");
     }
 }

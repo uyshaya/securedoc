@@ -10,6 +10,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Named
@@ -52,6 +53,14 @@ public class SystemConfigBean {
     public OrganizationView findOrganizationById(UUID id) {
         logger.tracef("Start organization lookup for id %s", id);
         return organizationService.findById(id);
+    }
+
+    public Optional<OrganizationView> findOrganizationByCode(String code) {
+        logger.tracef("Start organization lookup for code '%s' under active type %s", code, activeOrgType);
+        if (code == null || code.isBlank()) {
+            return Optional.empty();
+        }
+        return organizationService.findActiveByCodeAndType(code, activeOrgType);
     }
 
     public Organization.Type getActiveOrgType() {
