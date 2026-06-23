@@ -17,20 +17,21 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Routes {@code /user/*} so the resident-portal request page is reachable
- * only through an org-scoped slug. A {@code GET /user/{slug}/request.xhtml}
- * with a slug resolving to an active org of the active type is forwarded
- * to {@code /user/request.xhtml?orgCode={slug}}; everything else 404s to
- * {@code /user/not-found.xhtml}. POSTs to {@code /user/request.xhtml} pass
- * through unchanged because JSF emits form actions without round-tripping
- * {@code <f:viewParam>}, so wizard postbacks always arrive without the slug.
+ * Routes {@code /request/*} so the resident-portal wizard is reachable only
+ * through an org-scoped slug. {@code GET /request/{slug}} (with or without a
+ * trailing slash), where the slug resolves to an active org of the active
+ * type, is forwarded to {@code /request/portal.xhtml?orgCode={slug}};
+ * everything else 404s to {@code /request/not-found.xhtml}. POSTs to
+ * {@code /request/portal.xhtml} pass through unchanged because JSF emits the
+ * form action with {@code orgCode} round-tripped from {@code <f:viewParam>},
+ * so wizard postbacks always arrive carrying the slug as a query parameter.
  */
-@WebFilter(urlPatterns = "/user/*")
-public class ResidentScopeFilter implements Filter {
+@WebFilter(urlPatterns = "/request/*")
+public class RequestPortalFilter implements Filter {
 
-    private static final String USER_PREFIX = "/user/";
-    private static final String REQUEST_PAGE = "/user/request.xhtml";
-    private static final String NOT_FOUND_PAGE = "/user/not-found.xhtml";
+    private static final String REQUEST_PREFIX = "/request/";
+    private static final String PORTAL_PAGE = "/request/portal.xhtml";
+    private static final String NOT_FOUND_PAGE = "/request/not-found.xhtml";
     private static final String ORG_CODE_PARAM = "orgCode";
     private static final String METHOD_POST = "POST";
 
@@ -38,12 +39,12 @@ public class ResidentScopeFilter implements Filter {
     private final Logger logger;
 
     @Inject
-    public ResidentScopeFilter(SystemConfigBean systemConfig, Logger logger) {
+    public RequestPortalFilter(SystemConfigBean systemConfig, Logger logger) {
         this.systemConfig = systemConfig;
         this.logger = logger;
     }
 
-    protected ResidentScopeFilter() {
+    protected RequestPortalFilter() {
         this(null, null);
     }
 
@@ -54,17 +55,19 @@ public class ResidentScopeFilter implements Filter {
         final var request = (HttpServletRequest) servletRequest;
         final var response = (HttpServletResponse) servletResponse;
         final var path = request.getServletPath();
-        logger.tracef("Filtering resident-portal request for %s", path);
+        logger.tracef("Filtering request-portal request for %s", path);
 
+        // Match the internal pages by exact path before extracting a slug, so a
+        // hypothetical org with code "portal" or "not-found" can't shadow them.
         if (NOT_FOUND_PAGE.equals(path)) {
             chain.doFilter(request, response);
             return;
         }
 
-        if (REQUEST_PAGE.equals(path)) {
+        if (PORTAL_PAGE.equals(path)) {
             // POSTs are JSF postbacks against the already-pinned session bean
-            // and arrive without an orgCode; GETs must carry one (set by the
-            // slug forward below).
+            // and may arrive without an orgCode in the query string; GETs must
+            // carry one (set by the slug forward below).
             if (METHOD_POST.equalsIgnoreCase(request.getMethod()) || hasOrgCodeParam(request)) {
                 chain.doFilter(request, response);
                 return;
@@ -76,7 +79,7 @@ public class ResidentScopeFilter implements Filter {
 
         final var slug = extractSlug(path);
         if (slug == null) {
-            logger.debugf("Path %s does not match /user/{slug}/request.xhtml -- forwarding to not-found", path);
+            logger.debugf("Path %s does not match /request/{slug} -- forwarding to not-found", path);
             forwardToNotFound(request, response);
             return;
         }
@@ -88,28 +91,25 @@ public class ResidentScopeFilter implements Filter {
             return;
         }
 
-        final var forwardTarget = REQUEST_PAGE + "?" + ORG_CODE_PARAM + "=" + urlEncode(slug);
+        final var forwardTarget = PORTAL_PAGE + "?" + ORG_CODE_PARAM + "=" + urlEncode(slug);
         request.getRequestDispatcher(forwardTarget).forward(request, response);
     }
 
     private static String extractSlug(String path) {
-        if (!path.startsWith(USER_PREFIX)) {
+        if (!path.startsWith(REQUEST_PREFIX)) {
             return null;
         }
 
-        final var afterPrefix = path.substring(USER_PREFIX.length());
-        final var slashIndex = afterPrefix.indexOf('/');
-        if (slashIndex <= 0) {
+        var remainder = path.substring(REQUEST_PREFIX.length());
+        if (remainder.endsWith("/")) {
+            remainder = remainder.substring(0, remainder.length() - 1);
+        }
+
+        if (remainder.isBlank() || remainder.indexOf('/') >= 0) {
             return null;
         }
 
-        final var slug = afterPrefix.substring(0, slashIndex);
-        final var remainder = afterPrefix.substring(slashIndex);
-        if (!"/request.xhtml".equals(remainder)) {
-            return null;
-        }
-
-        return slug;
+        return remainder;
     }
 
     private static boolean hasOrgCodeParam(HttpServletRequest request) {

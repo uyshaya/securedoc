@@ -32,7 +32,7 @@ import java.util.UUID;
 
 /**
  * Per-organization issuable document template. The dropdown on
- * /user/request.xhtml lists the active rows scoped to the picked
+ * /request/{slug} lists the active rows scoped to the picked
  * organization; the {@code template_data} BLOB is only read at
  * issuance time and by the preview servlet. See the field's
  * comment for why it's eagerly fetched.

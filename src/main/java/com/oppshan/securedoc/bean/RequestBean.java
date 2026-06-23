@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 /**
  * Backs the multi-scene resident document-request flow on
- * /user/{slug}/request.xhtml. Session-scoped because the user walks through
+ * /request/{slug}. Session-scoped because the user walks through
  * scenes (landing -> email -> otp -> details -> review -> confirm) via JS
  * scene transitions, and the picked organization/template selections
  * must persist across them. Anonymous flow -- no login required. The

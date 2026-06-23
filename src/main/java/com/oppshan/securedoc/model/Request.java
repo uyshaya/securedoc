@@ -33,7 +33,7 @@ import java.util.UUID;
 
 /**
  * A resident's document request. Created with status PENDING by the
- * resident-facing flow on /user/request.xhtml; flows through staff review
+ * resident-facing flow on /request/{slug}; flows through staff review
  * states ({@link Status#UNDER_REVIEW}, {@link Status#PROCESSING}) before
  * either COMPLETED (a {@code documents} row exists) or REJECTED.
  *

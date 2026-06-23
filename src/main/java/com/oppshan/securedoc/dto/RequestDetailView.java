@@ -162,7 +162,7 @@ public class RequestDetailView implements Serializable {
 
     /**
      * MIME type sniffed from the first few bytes of {@link #idImageData}.
-     * The upload form on {@code /user/request.xhtml} accepts JPEG, PNG, and
+     * The upload form on {@code /request/{slug}} accepts JPEG, PNG, and
      * PDF; anything else falls back to {@code application/octet-stream} so
      * the XHTML can render a generic download link instead of a broken
      * {@code <img>}.

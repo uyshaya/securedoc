@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Form payload submitted from /user/request.xhtml. Bundles every
+ * Form payload submitted from /request/{slug}. Bundles every
  * field the resident filled in across the verify + details scenes
  * so {@code RequestService.submitRequest} takes one argument
  * instead of a long positional list. Built by {@code RequestBean}

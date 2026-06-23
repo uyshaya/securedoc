@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * Narrow projection returned by {@code RequestService.submitRequest} after a
  * resident submission succeeds. Carries just what the confirmation scene on
- * /user/request.xhtml renders -- the generated UUID reference plus the row id
+ * /request/{slug} renders -- the generated UUID reference plus the row id
  * for any future status-tracking lookup. Built by
  * {@link Request#toSubmissionView()}.
  */
