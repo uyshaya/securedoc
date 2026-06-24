@@ -1,6 +1,7 @@
 package com.oppshan.securedoc.bean;
 
 import com.oppshan.securedoc.common.I18n;
+import com.oppshan.securedoc.dto.OrganizationView;
 import com.oppshan.securedoc.model.Staff.Role;
 import com.oppshan.securedoc.service.AdminAuthService;
 import jakarta.enterprise.context.SessionScoped;
@@ -10,14 +11,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.jboss.logging.Logger;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Drives the admin sign-in flow on /admin/login
+ * Drives the admin sign-in flow on /admin/{slug}/login.xhtml
  * <p>
- * email + password -> email otp -> /admin/dashboard
+ * URL slug -> email + password -> email OTP -> /admin/{slug}/dashboard.xhtml.
+ * The slug pins the tenant before authentication so the (org_id, email)
+ * composite key uniquely identifies a staff row.
  */
 @Named("authBean")
 @SessionScoped
@@ -35,6 +39,10 @@ public class AdminAuthBean implements Serializable {
     private final I18n i18n;
 
     private final Logger logger;
+
+    private String urlSlug;
+
+    private OrganizationView pendingOrganization;
 
     private String email;
 
@@ -68,10 +76,40 @@ public class AdminAuthBean implements Serializable {
         this(null, null, null, null, null);
     }
 
+    // -- step 0: pin tenant from URL slug --------------------------
+
+    /**
+     * Resolves the {@code <f:viewParam name="slug">} into an
+     * {@link OrganizationView} and caches it for {@link #signIn()}.
+     * The filter has already validated the slug before this fires, so a
+     * blank or unresolvable slug here is defensive only.
+     */
+    public void initLoginFromUrl() {
+        if (urlSlug == null || urlSlug.isBlank()) {
+            this.pendingOrganization = null;
+            return;
+        }
+
+        if (pendingOrganization != null && urlSlug.equals(pendingOrganization.getCode())) {
+            return;
+        }
+
+        system.findOrganizationByCode(urlSlug)
+                .ifPresentOrElse(
+                        organization -> this.pendingOrganization = organization,
+                        () -> this.pendingOrganization = null);
+    }
+
     // -- step 1: email + password ----------------------------------
     public String signIn() {
-        logger.tracef("Sign-in step 1 starting for %s", email);
+        logger.tracef("Sign-in step 1 starting for %s in slug %s", email, urlSlug);
         final var facesContext = FacesContext.getCurrentInstance();
+
+        if (pendingOrganization == null) {
+            logger.debugf("Rejected sign-in for %s -- no tenant pinned from URL slug", email);
+            facesContext.addMessage(null, error(i18n.get("auth.tenant.missing")));
+            return null;
+        }
 
         if (email == null || email.isBlank() || password == null || password.isBlank()) {
             logger.debugf("Rejected sign-in for %s -- email or password missing", email);
@@ -79,9 +117,10 @@ public class AdminAuthBean implements Serializable {
             return null;
         }
 
-        final var match = authService.authenticate(email, password);
+        final var match = authService.authenticate(pendingOrganization.getId(), email, password);
         if (match.isEmpty()) {
-            logger.debugf("Sign-in failed for %s -- credentials invalid", email);
+            logger.debugf("Sign-in failed for %s in organization %s -- credentials invalid",
+                    email, pendingOrganization.getId());
             facesContext.addMessage(null, error(i18n.get("auth.email.or.password.invalid")));
             return null;
         }
@@ -120,7 +159,7 @@ public class AdminAuthBean implements Serializable {
     }
 
     // -- step 2: OTP -----------------------------------------------
-    public String verifyOtp() {
+    public String verifyOtp() throws IOException {
         logger.tracef("Verifying login OTP for pending staff %s", pendingStaffId);
         final var facesContext = FacesContext.getCurrentInstance();
 
@@ -159,11 +198,21 @@ public class AdminAuthBean implements Serializable {
 
         logger.debugf("Completed sign-in for staff %s (%s) in organization %s",
                 staff.getId(), staff.getRole(), staff.getOrganizationId());
-        return "/admin/dashboard.xhtml?faces-redirect=true";
+
+        // Skip JSF implicit navigation: the slug URL doesn't map to an
+        // on-disk view, so the nav handler can't resolve it. Redirect
+        // directly; the filter will forward the slug URL to the file.
+        final var externalContext = facesContext.getExternalContext();
+        externalContext.redirect(externalContext.getRequestContextPath()
+                + "/admin/" + organizationBean.getActiveCode() + "/dashboard.xhtml");
+        return null;
     }
 
-    public String signOut() {
+    public String signOut() throws IOException {
         logger.tracef("Signing out staff %s", authenticatedId);
+        // Capture the slug before clearing the org-bean so we can build the
+        // tenant-scoped login URL post-clear.
+        final var slugBeforeClear = organizationBean.getActiveCode();
         this.email = null;
         this.password = null;
         this.otpInput = null;
@@ -172,9 +221,16 @@ public class AdminAuthBean implements Serializable {
         this.authenticatedId = null;
         this.role = null;
         this.fullName = null;
+        this.pendingOrganization = null;
         organizationBean.clear();
-        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-        return "/admin/login.xhtml?faces-redirect=true";
+
+        final var externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.invalidateSession();
+        final var target = slugBeforeClear == null
+                ? "/"
+                : "/admin/" + slugBeforeClear + "/login.xhtml";
+        externalContext.redirect(externalContext.getRequestContextPath() + target);
+        return null;
     }
 
     public boolean isAuthenticated() {
@@ -233,7 +289,28 @@ public class AdminAuthBean implements Serializable {
         return role == Role.ADMIN ? "Admin" : "Staff";
     }
 
+    /**
+     * Slug of the authenticated staff's organization, used by JSF EL in
+     * {@code admin-layout.xhtml} to build slug-aware nav links. Returns
+     * null when no organization is in session.
+     */
+    public String getOrgCode() {
+        return organizationBean.getActiveCode();
+    }
+
     // -- getters / setters -----------------------------------------
+    public String getUrlSlug() {
+        return urlSlug;
+    }
+
+    public void setUrlSlug(String urlSlug) {
+        this.urlSlug = urlSlug;
+    }
+
+    public OrganizationView getPendingOrganization() {
+        return pendingOrganization;
+    }
+
     public String getEmail() {
         return email;
     }

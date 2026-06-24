@@ -1,8 +1,14 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-auth-layout.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="slug" value="#{registerBean.urlSlug}"/>
+        <f:viewAction action="#{registerBean.initRegisterFromUrl}" onPostback="false"/>
+    </f:metadata>
 
     <ui:define name="pageTitle">
         <title>#{msg['page.register.title']}</title>
@@ -10,6 +16,11 @@
 
     <ui:define name="formContent">
         <h:form id="registerForm">
+
+            <!-- JSF's <f:viewParam> does not round-trip into form action URLs,
+                 only into bookmarkable links. The postback needs the slug
+                 so the filter can resolve the tenant on submit. -->
+            <input type="hidden" name="slug" value="#{registerBean.urlSlug}"/>
 
             <p:outputPanel id="registerPanel"
                            layout="block"
@@ -21,6 +32,12 @@
                         #{msg['register.step.sub']}
                     </div>
                 </div>
+
+                <h:panelGroup layout="block"
+                              styleClass="af-tenant-banner"
+                              rendered="#{registerBean.pinnedOrganization ne null}">
+                    #{i18n.get('register.org.pinned.label', registerBean.pinnedOrganization.name)}
+                </h:panelGroup>
 
                 <p:outputLabel for="firstName"
                                styleClass="af-label"
@@ -55,25 +72,6 @@
                              required="true"
                              requiredMessage="#{msg['register.required.email']}"/>
                 <p:message for="email"/>
-
-                <p:outputLabel for="organization"
-                               styleClass="af-label"
-                               value="#{systemConfigBean.orgLabel}"/>
-                <p:autoComplete id="organization"
-                                value="#{registerBean.selectedOrganization}"
-                                completeMethod="#{registerBean.completeOrganization}"
-                                converter="organizationConverter"
-                                var="o"
-                                itemLabel="#{o.name}"
-                                itemValue="#{o}"
-                                forceSelection="true"
-                                minQueryLength="2"
-                                queryDelay="200"
-                                placeholder="#{i18n.get('register.placeholder.organization', systemConfigBean.orgLabelLower)}"
-                                styleClass="ui-inputfield"
-                                required="true"
-                                requiredMessage="#{i18n.get('register.select.organization', systemConfigBean.orgLabelLower)}"/>
-                <p:message for="organization"/>
 
                 <p:outputLabel for="password"
                                styleClass="af-label"

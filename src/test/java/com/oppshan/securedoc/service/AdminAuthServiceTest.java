@@ -63,7 +63,7 @@ class AdminAuthServiceTest {
         final var plaintext = "horse-correct-battery";
         seedStaff(organization, email, plaintext);
 
-        final var match = adminAuthService.authenticate(email, plaintext);
+        final var match = adminAuthService.authenticate(organization.getId(), email, plaintext);
 
         assertThat(match.isPresent(), is(true));
         assertThat(match.orElseThrow().getEmail(), is(email));
@@ -76,24 +76,64 @@ class AdminAuthServiceTest {
         final var email = "auth.wp+" + System.nanoTime() + "@example.test";
         seedStaff(organization, email, "right-password");
 
-        final var match = adminAuthService.authenticate(email, "wrong-password");
+        final var match = adminAuthService.authenticate(organization.getId(), email, "wrong-password");
 
         assertThat(match.isEmpty(), is(true));
     }
 
     @Test
     @Transactional
-    void shouldNotAuthenticateWhenEmailMissing() {
-        // authenticate() declares @NotBlank on email + password, so missing
-        // input now surfaces as a method-validation ConstraintViolationException
-        // rather than Optional.empty(). The caller (AdminAuthBean) gates on
-        // blank input before calling the service, so this is the safety net.
+    void shouldNotAuthenticateWhenEmailExistsInDifferentOrganization() {
+        // The composite (org_id, email) is the authoritative login key. An
+        // email valid in orgA must not authenticate against orgB.
+        final var orgA = seedOrganization("AUTH-XA-");
+        final var orgB = seedOrganization("AUTH-XB-");
+        final var email = "alice+" + System.nanoTime() + "@example.test";
+        final var plaintext = "horse-correct-battery";
+        seedStaff(orgA, email, plaintext);
+
+        final var match = adminAuthService.authenticate(orgB.getId(), email, plaintext);
+
+        assertThat(match.isEmpty(), is(true));
+    }
+
+    @Test
+    @Transactional
+    void shouldAuthenticateInCorrectOrgWhenSameEmailExistsInTwoOrgs() {
+        final var orgA = seedOrganization("AUTH-2A-");
+        final var orgB = seedOrganization("AUTH-2B-");
+        final var email = "alice+" + System.nanoTime() + "@example.test";
+        seedStaff(orgA, email, "passwordA");
+        seedStaff(orgB, email, "passwordB");
+
+        final var matchInA = adminAuthService.authenticate(orgA.getId(), email, "passwordA");
+        final var matchInB = adminAuthService.authenticate(orgB.getId(), email, "passwordB");
+        final var crossA = adminAuthService.authenticate(orgA.getId(), email, "passwordB");
+
+        assertThat(matchInA.isPresent(), is(true));
+        assertThat(matchInB.isPresent(), is(true));
+        assertThat(matchInA.orElseThrow().getOrganizationId(), is(orgA.getId()));
+        assertThat(matchInB.orElseThrow().getOrganizationId(), is(orgB.getId()));
+        assertThat(crossA.isEmpty(), is(true));
+    }
+
+    @Test
+    @Transactional
+    void shouldNotAuthenticateWhenRequiredArgumentsMissing() {
+        // authenticate() declares @NotNull on orgId and @NotBlank on email +
+        // password, so missing input surfaces as a method-validation
+        // ConstraintViolationException rather than Optional.empty(). The
+        // caller (AdminAuthBean) gates on blank input before calling the
+        // service, so this is the safety net.
+        final var orgId = UUID.randomUUID();
         assertThrows(ConstraintViolationException.class,
-                () -> adminAuthService.authenticate(null, "anything"));
+                () -> adminAuthService.authenticate(null, "hello@example.test", "anything"));
         assertThrows(ConstraintViolationException.class,
-                () -> adminAuthService.authenticate("", "anything"));
+                () -> adminAuthService.authenticate(orgId, null, "anything"));
         assertThrows(ConstraintViolationException.class,
-                () -> adminAuthService.authenticate("  ", "anything"));
+                () -> adminAuthService.authenticate(orgId, "", "anything"));
+        assertThrows(ConstraintViolationException.class,
+                () -> adminAuthService.authenticate(orgId, "  ", "anything"));
     }
 
     @Test

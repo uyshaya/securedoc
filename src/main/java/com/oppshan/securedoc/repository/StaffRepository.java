@@ -15,12 +15,6 @@ import java.util.UUID;
 public interface StaffRepository
         extends CrudRepository<Staff, UUID>, StatefulWriteRepository<Staff> {
 
-    @Query("""
-            FROM Staff
-            WHERE email = :email
-            """)
-    Optional<Staff> findByEmail(String email);
-
     // Hits uc_staff_organization_email UNIQUE (organization_id, email).
     @Query("""
             FROM Staff

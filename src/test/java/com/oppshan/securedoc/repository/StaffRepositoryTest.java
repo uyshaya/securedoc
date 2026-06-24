@@ -72,64 +72,46 @@ class StaffRepositoryTest {
 
     @Test
     @Transactional
-    void shouldFindByEmailWhenEmailExists() {
-        final var organization = seedOrganization("FBE-");
-        final var email = "find.by.email+" + System.nanoTime() + "@example.test";
-        final var staff = newStaff(organization, email);
-        staffRepository.insertWithSession(staff);
-        entityManager.flush();
-
-        final var found = staffRepository.findByEmail(email);
-
-        assertThat(found.isPresent(), is(true));
-        assertThat(found.orElseThrow().getEmail(), is(email));
-    }
-
-    @Test
-    @Transactional
-    void shouldReturnEmptyFromFindByEmailWhenEmailMissing() {
-        final var found = staffRepository.findByEmail("nobody+" + System.nanoTime() + "@example.test");
-
-        assertThat(found.isEmpty(), is(true));
-    }
-
-    @Test
-    @Transactional
     void shouldFindByEmailAndOrganizationIdScopedToOrg() {
-        // NOTE: the intent of this test is "same email in two orgs resolves to
-        // the correct row". V1 declares UNIQUE (organization_id, email) so this
-        // SHOULD work, but V2's column-type swap on organization_id appears to
-        // have dropped the composite unique without re-adding it, causing a
-        // (currently undiagnosed) duplicate-key violation when the same email
-        // is inserted under two distinct orgs. Tracking as a follow-up; this
-        // test uses unique-per-org emails to prove the scoping clause works
-        // (right email + wrong org returns empty) without triggering the
-        // schema bug.
+        // Same email under two orgs resolves to the correct row -- relies on
+        // V6 restoring the (organization_id, email) composite unique that V2's
+        // PK type swap silently dropped.
         final var orgA = seedOrganization("SCA-");
         final var orgB = seedOrganization("SCB-");
-        final var nano = System.nanoTime();
-        final var emailInA = "alice+" + nano + "@example.test";
-        final var emailInB = "bob+" + nano + "@example.test";
+        final var sharedEmail = "alice+" + System.nanoTime() + "@example.test";
 
-        final var staffInA = newStaff(orgA, emailInA).setFirstName("Alice");
-        final var staffInB = newStaff(orgB, emailInB).setFirstName("Bob");
+        final var staffInA = newStaff(orgA, sharedEmail).setFirstName("AliceA");
+        final var staffInB = newStaff(orgB, sharedEmail).setFirstName("AliceB");
         staffRepository.insertWithSession(staffInA);
         staffRepository.insertWithSession(staffInB);
         entityManager.flush();
 
-        // Right email + right org returns the row.
-        final var foundInA = staffRepository.findByEmailAndOrganizationId(emailInA, orgA.getId());
-        final var foundInB = staffRepository.findByEmailAndOrganizationId(emailInB, orgB.getId());
+        final var foundInA = staffRepository.findByEmailAndOrganizationId(sharedEmail, orgA.getId());
+        final var foundInB = staffRepository.findByEmailAndOrganizationId(sharedEmail, orgB.getId());
         assertThat(foundInA.isPresent(), is(true));
-        assertThat(foundInA.orElseThrow().getFirstName(), is("Alice"));
+        assertThat(foundInA.orElseThrow().getFirstName(), is("AliceA"));
         assertThat(foundInB.isPresent(), is(true));
-        assertThat(foundInB.orElseThrow().getFirstName(), is("Bob"));
+        assertThat(foundInB.orElseThrow().getFirstName(), is("AliceB"));
+    }
 
-        // Right email + wrong org returns empty -- proves the scoping clause.
-        final var crossA = staffRepository.findByEmailAndOrganizationId(emailInA, orgB.getId());
-        final var crossB = staffRepository.findByEmailAndOrganizationId(emailInB, orgA.getId());
-        assertThat(crossA.isEmpty(), is(true));
-        assertThat(crossB.isEmpty(), is(true));
+    @Test
+    @Transactional
+    void shouldRejectDuplicateEmailWithinSameOrganization() {
+        final var organization = seedOrganization("DUP-");
+        final var email = "dup+" + System.nanoTime() + "@example.test";
+
+        staffRepository.insertWithSession(newStaff(organization, email).setFirstName("First"));
+        entityManager.flush();
+
+        staffRepository.insertWithSession(newStaff(organization, email).setFirstName("Second"));
+
+        try {
+            entityManager.flush();
+            throw new AssertionError("Expected constraint violation for duplicate (org, email)");
+        } catch (jakarta.persistence.PersistenceException expected) {
+            // V6 restored uc_staff_organization_email; a duplicate (org, email)
+            // pair must fail at flush rather than silently succeed.
+        }
     }
 
     @Test

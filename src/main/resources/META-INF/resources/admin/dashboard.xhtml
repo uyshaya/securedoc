@@ -1,4 +1,5 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-layout.xhtml">
 
@@ -11,6 +12,19 @@
     </ui:define>
 
     <ui:define name="content">
+
+        <h:panelGroup layout="block"
+                      styleClass="dashboard-banner-info"
+                      rendered="#{param.wrongTenant == '1'}">
+            #{msg['dashboard.wrongTenant.banner']}
+        </h:panelGroup>
+
+        <h:panelGroup layout="block"
+                      styleClass="dashboard-banner-error"
+                      rendered="#{param.denied == '1'}">
+            #{msg['dashboard.denied.banner']}
+        </h:panelGroup>
+
         <p>#{msg['page.dashboard.placeholder']}</p>
     </ui:define>
 

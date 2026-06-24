@@ -13,19 +13,18 @@ import jakarta.inject.Named;
 import jakarta.validation.ConstraintViolationException;
 import org.jboss.logging.Logger;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
 
 /**
- * Backs /admin/register.xhtml. Self-service staff registration:
- * collects basic fields + the applicant's organization, validates, hashes
- * the password (via {@link AdminAuthService} -> PasswordService), and
- * persists the Staff row with {@code active = false}.
+ * Backs /admin/{slug}/register.xhtml. Self-service staff registration:
+ * collects basic fields, validates, hashes the password (via
+ * {@link AdminAuthService} -> PasswordService), and persists the Staff
+ * row with {@code active = false}.
  *
- * <p>The organization picker is a {@code <p:autoComplete>} backed by
- * {@link #completeOrganization(String)}; the bean holds the full
- * {@link OrganizationView} so JSF can re-render the chosen label after
- * validation failures.
+ * <p>The organization is pinned by the URL slug rather than picked from a
+ * dropdown -- the view-action {@link #initRegisterFromUrl()} resolves
+ * {@code <f:viewParam name="slug">} into {@link #pinnedOrganization}
+ * before the form renders.
  *
  * <p>An admin must approve the account (flip the flag) before sign-in
  * is allowed; that's enforced in {@code AdminAuthBean.signIn}.
@@ -39,10 +38,12 @@ public class AdminRegistrationBean {
     private final I18n i18n;
     private final Logger logger;
 
+    private String urlSlug;
+    private OrganizationView pinnedOrganization;
+
     private String firstName;
     private String lastName;
     private String email;
-    private OrganizationView selectedOrganization;
     private String password;
     private String confirmPassword;
 
@@ -61,27 +62,41 @@ public class AdminRegistrationBean {
         this(null, null, null, null);
     }
 
-    /** Called by {@code <p:autoComplete completeMethod>} as the user types. */
-    public List<OrganizationView> completeOrganization(String query) {
-        return system.searchOrganizations(query);
+    /**
+     * Resolves the {@code <f:viewParam name="slug">} into an
+     * {@link OrganizationView} and caches it for {@link #register()}.
+     * The filter has already validated the slug before this fires, so a
+     * blank or unresolvable slug here is defensive only.
+     */
+    public void initRegisterFromUrl() {
+        if (urlSlug == null || urlSlug.isBlank()) {
+            this.pinnedOrganization = null;
+            return;
+        }
+
+        system.findOrganizationByCode(urlSlug)
+                .ifPresentOrElse(
+                        organization -> this.pinnedOrganization = organization,
+                        () -> this.pinnedOrganization = null);
     }
 
-    public String register() {
-        logger.tracef("Submitting staff registration for %s in organization %s",
-                email, selectedOrganization == null ? null : selectedOrganization.getId());
+    public String register() throws IOException {
+        logger.tracef("Submitting staff registration for %s in slug %s", email, urlSlug);
         final var facesContext = FacesContext.getCurrentInstance();
         final var orgLabelLower = system.getOrgLabelLower();
-        final UUID organizationId = selectedOrganization != null ? selectedOrganization.getId() : null;
 
-        // Cross-field checks the DTO can't express on its own. Required-field
-        // and email-format / password-length checks live on StaffRegistrationCreate
-        // and fire when authService.createStaff(form) runs.
-        if (organizationId == null) {
-            logger.debugf("Rejected registration for %s -- no organization selected", email);
-            facesContext.addMessage(null, error(i18n.get("register.select.organization", orgLabelLower)));
+        if (pinnedOrganization == null) {
+            logger.debugf("Rejected registration for %s -- no tenant pinned from URL slug", email);
+            facesContext.addMessage(null, error(i18n.get("auth.tenant.missing")));
             return null;
         }
 
+        final var organizationId = pinnedOrganization.getId();
+
+        // Cross-field check the DTO can't express on its own. Required-field
+        // and email-format / password-length checks live on
+        // StaffRegistrationCreate and fire when authService.createStaff(form)
+        // runs.
         if (password != null && !password.equals(confirmPassword)) {
             logger.debugf("Rejected registration for %s -- password and confirmation do not match", email);
             facesContext.addMessage(null, error(i18n.get("register.passwords.do.not.match")));
@@ -128,7 +143,26 @@ public class AdminRegistrationBean {
         facesContext.getExternalContext().getFlash().setKeepMessages(true);
         facesContext.addMessage(null,
                 info(i18n.get("register.submitted.for.approval", orgLabelLower)));
-        return "/admin/login.xhtml?faces-redirect=true";
+
+        // Skip JSF implicit navigation: the slug URL doesn't map to an
+        // on-disk view, so the nav handler can't resolve it. Redirect
+        // directly; the filter will forward the slug URL to the file.
+        final var externalContext = facesContext.getExternalContext();
+        externalContext.redirect(externalContext.getRequestContextPath()
+                + "/admin/" + pinnedOrganization.getCode() + "/login.xhtml?registered=1");
+        return null;
+    }
+
+    public String getUrlSlug() {
+        return urlSlug;
+    }
+
+    public void setUrlSlug(String urlSlug) {
+        this.urlSlug = urlSlug;
+    }
+
+    public OrganizationView getPinnedOrganization() {
+        return pinnedOrganization;
     }
 
     public String getFirstName() {
@@ -153,14 +187,6 @@ public class AdminRegistrationBean {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public OrganizationView getSelectedOrganization() {
-        return selectedOrganization;
-    }
-
-    public void setSelectedOrganization(OrganizationView selectedOrganization) {
-        this.selectedOrganization = selectedOrganization;
     }
 
     public String getPassword() {

@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/WEB-INF/templates/admin-auth-layout.xhtml">
+
+    <ui:define name="pageTitle">
+        <title>#{msg['page.admin.notFound.title']}</title>
+    </ui:define>
+
+    <ui:define name="formContent">
+
+        <p:outputPanel layout="block" styleClass="auth-panel">
+
+            <div>
+                <div class="auth-step-title">#{msg['admin.notFound.title']}</div>
+                <div class="auth-step-sub">
+                    #{msg['admin.notFound.subtitle']}
+                </div>
+            </div>
+
+            <p:outputPanel layout="block" styleClass="af-notice">
+                <strong>#{msg['admin.notFound.help.heading']}</strong>
+                <p>#{msg['admin.notFound.help.body']}</p>
+            </p:outputPanel>
+
+            <div class="auth-footer-link">
+                <h:link outcome="/index">#{msg['admin.notFound.back.home']}</h:link>
+            </div>
+
+        </p:outputPanel>
+
+    </ui:define>
+
+</ui:composition>

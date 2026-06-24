@@ -63,21 +63,27 @@ public class AdminAuthService {
     // -- Step 1: email + password ---------------------------------
 
     /**
-     * Finds the staff by email and verifies the password in one call so
-     * the entity (and its hash) never leaves the service. Returns the
-     * DTO on success, empty otherwise. Does NOT check {@code isActive} --
-     * caller decides how to message that case.
+     * Finds the staff by (organization, email) and verifies the password
+     * in one call so the entity (and its hash) never leaves the service.
+     * The org scope is set by the URL slug at /admin/{slug}/login; the same
+     * email may legitimately belong to staff in multiple tenants.
+     * Returns the DTO on success, empty otherwise. Does NOT check
+     * {@code isActive} -- caller decides how to message that case.
      */
     @Transactional
-    public Optional<StaffView> authenticate(@NotBlank String email, @NotBlank String password) {
-        logger.tracef("Authenticating staff with email %s", email);
-        final var match = staffRepo.findByEmail(email);
+    public Optional<StaffView> authenticate(@NotNull UUID organizationId,
+                                            @NotBlank String email,
+                                            @NotBlank String password) {
+        logger.tracef("Authenticating staff with email %s in organization %s", email, organizationId);
+        final var match = staffRepo.findByEmailAndOrganizationId(email, organizationId);
         if (match.isEmpty() || !passwordService.verify(password, match.get().getPasswordHash())) {
-            logger.debugf("Sign-in failed for %s -- email or password invalid", email);
+            logger.debugf("Sign-in failed for %s in organization %s -- email or password invalid",
+                    email, organizationId);
             return Optional.empty();
         }
 
-        logger.debugf("Sign-in credentials accepted for %s (staff %s)", email, match.get().getId());
+        logger.debugf("Sign-in credentials accepted for %s (staff %s) in organization %s",
+                email, match.get().getId(), organizationId);
         return Optional.of(match.get().toView());
     }
 

@@ -1,8 +1,14 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="jakarta.faces.facelets"
                 template="/WEB-INF/templates/admin-auth-layout.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="slug" value="#{authBean.urlSlug}"/>
+        <f:viewAction action="#{authBean.initLoginFromUrl}" onPostback="false"/>
+    </f:metadata>
 
     <ui:define name="pageTitle">
         <title>#{msg['page.login.title']}</title>
@@ -11,6 +17,11 @@
     <ui:define name="formContent">
         <h:form id="loginForm">
 
+            <!-- JSF's <f:viewParam> does not round-trip into form action URLs,
+                 only into bookmarkable links. AJAX postbacks would otherwise
+                 reach the filter without a slug and 404 to not-found. -->
+            <input type="hidden" name="slug" value="#{authBean.urlSlug}"/>
+
             <!-- == Sign-in panel == -->
             <p:outputPanel id="signinPanel"
                            rendered="#{not authBean.otpSent}"
@@ -18,11 +29,19 @@
                            styleClass="auth-panel">
 
                 <div>
-                    <div class="auth-step-title">#{msg['login.step.title']}</div>
+                    <div class="auth-step-title">
+                        #{i18n.get('login.step.title', authBean.pendingOrganization.name)}
+                    </div>
                     <div class="auth-step-sub">
                         #{msg['login.step.sub']}
                     </div>
                 </div>
+
+                <h:panelGroup layout="block"
+                              styleClass="af-info"
+                              rendered="#{param.registered == '1'}">
+                    #{i18n.get('register.submitted.for.approval', systemConfigBean.orgLabelLower)}
+                </h:panelGroup>
 
                 <h:panelGroup layout="block"
                               styleClass="af-error"
@@ -83,6 +102,7 @@
                     <p:commandButton styleClass="auth-back-link"
                                      icon="pi pi-angle-left"
                                      value="#{msg['login.button.back']}"
+                                     type="button"
                                      action="#{authBean.cancelOtp}"
                                      update="loginForm"
                                      ajax="true"
@@ -159,6 +179,7 @@
                 <div class="otp-resend">
                     #{msg['login.otp.resend.prompt']}&#160;
                     <p:commandButton value="#{msg['login.otp.resend']}"
+                                     type="button"
                                      style="background:none;border:none;
                                         color:var(--navy-mid);font-weight:500;
                                         font-size:12px;text-decoration:underline;

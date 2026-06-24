@@ -54,44 +54,57 @@
 
             <nav class="console-nav">
                 <ui:insert name="navItems">
-                    <h:link outcome="/admin/dashboard" styleClass="console-nav-item">
+                    <!-- Sidebar links use <h:outputLink> (literal href) rather
+                         than <h:link outcome="...">: the slug-shaped URL has
+                         no matching on-disk view, so JSF's NavigationHandler
+                         refuses to emit an href and the link renders inert.
+                         The filter takes care of forwarding the slug URL to
+                         the actual file at request time. -->
+                    <h:outputLink value="#{request.contextPath}/admin/#{authBean.orgCode}/dashboard.xhtml"
+                                  styleClass="console-nav-item">
                         <span class="console-nav-icon">
                             <i class="pi pi-home"></i>
                         </span>
                         #{msg['nav.dashboard']}
-                    </h:link>
-                    <h:link outcome="/admin/requests" styleClass="console-nav-item">
+                    </h:outputLink>
+                    <h:outputLink value="#{request.contextPath}/admin/#{authBean.orgCode}/requests.xhtml"
+                                  styleClass="console-nav-item">
                         <span class="console-nav-icon">
                             <i class="pi pi-inbox"></i>
                         </span>
                         #{msg['nav.requests']}
-                    </h:link>
-                    <h:link outcome="/admin/templates" styleClass="console-nav-item">
+                    </h:outputLink>
+                    <h:outputLink value="#{request.contextPath}/admin/#{authBean.orgCode}/templates.xhtml"
+                                  styleClass="console-nav-item">
                         <span class="console-nav-icon">
                             <i class="pi pi-file-edit"></i>
                         </span>
                         #{msg['nav.templates']}
-                    </h:link>
-                    <h:link outcome="/admin/audit" styleClass="console-nav-item">
+                    </h:outputLink>
+                    <h:outputLink value="#{request.contextPath}/admin/#{authBean.orgCode}/audit.xhtml"
+                                  styleClass="console-nav-item">
                         <span class="console-nav-icon">
                             <i class="pi pi-history"></i>
                         </span>
                         #{msg['nav.audit']}
-                    </h:link>
-                    <h:link outcome="/admin/residents/residents-management" styleClass="console-nav-item"
+                    </h:outputLink>
+                    <h:outputLink
+                            value="#{request.contextPath}/admin/#{authBean.orgCode}/residents/residents-management.xhtml"
+                            styleClass="console-nav-item"
                             rendered="#{authBean.admin}">
                         <span class="console-nav-icon">
                             <i class="pi pi-id-card"></i>
                         </span>
                         #{msg['nav.residents']}
-                    </h:link>
-                    <h:link outcome="/admin/staff/staff-management" styleClass="console-nav-item"
-                            rendered="#{authBean.admin}">
+                    </h:outputLink>
+                    <h:outputLink value="#{request.contextPath}/admin/#{authBean.orgCode}/staff/staff-management.xhtml"
+                                  styleClass="console-nav-item"
+                                  rendered="#{authBean.admin}">
                         <span class="console-nav-icon">
                             <i class="pi pi-users"></i>
                         </span>
                         #{msg['nav.staff']}
-                    </h:link>
+                    </h:outputLink>
                 </ui:insert>
             </nav>
 
@@ -109,6 +122,9 @@
                         </span>
                     </h:panelGroup>
                     <h:form id="signOutForm">
+                        <!-- Postbacks need the slug; without it the filter
+                             can't resolve the tenant and 404s. -->
+                        <input type="hidden" name="slug" value="#{authBean.orgCode}"/>
                         <p:commandButton value="#{msg['nav.signout']}"
                                          icon="pi pi-sign-out"
                                          action="#{authBean.signOut}"

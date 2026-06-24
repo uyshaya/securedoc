@@ -21,8 +21,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,10 +38,14 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class AdminRegistrationBeanTest {
+
+    private static final String TENANT_SLUG = "apas";
+    private static final UUID TENANT_ID = UUID.randomUUID();
 
     @Mock
     private AdminAuthService authService;
@@ -78,6 +84,9 @@ class AdminRegistrationBeanTest {
         given(i18n.get(anyString(), any(Object[].class)))
                 .willAnswer(invocation -> invocation.getArgument(0));
 
+        given(system.findOrganizationByCode(TENANT_SLUG))
+                .willReturn(Optional.of(tenantView()));
+
         bean = new AdminRegistrationBean(authService, system, i18n, logger);
 
         capturedMessages = new ArrayList<>();
@@ -88,6 +97,7 @@ class AdminRegistrationBeanTest {
 
         given(facesContext.getExternalContext()).willReturn(externalContext);
         given(externalContext.getFlash()).willReturn(flash);
+        given(externalContext.getRequestContextPath()).willReturn("");
 
         facesContextMock = mockStatic(FacesContext.class);
         facesContextMock.when(FacesContext::getCurrentInstance).thenReturn(facesContext);
@@ -99,20 +109,37 @@ class AdminRegistrationBeanTest {
     }
 
     @Test
-    void shouldRejectRegisterWhenAnyFieldMissing() {
+    void shouldPinOrganizationFromUrlSlug() {
+        bean.setUrlSlug(TENANT_SLUG);
+
+        bean.initRegisterFromUrl();
+
+        assertThat(bean.getPinnedOrganization(), is(tenantView()));
+    }
+
+    @Test
+    void shouldRejectRegisterWhenTenantNotPinned() throws IOException {
+        primeAllFieldsValid();
+        // No view-action firing -- pinnedOrganization stays null.
+
+        final var outcome = bean.register();
+
+        assertThat(outcome, is(nullValue()));
+        assertThat(capturedMessages.getFirst().getSummary(),
+                containsString("auth.tenant.missing"));
+    }
+
+    @Test
+    void shouldRejectRegisterWhenAnyFieldMissing() throws IOException {
         // The bean no longer carries an explicit "all fields required" check --
         // required-field validation now lives on StaffRegistrationCreate and is
         // surfaced via ConstraintViolationException when the service runs.
-        // Drive that path: omit lastName, ensure org is selected so we get past
-        // the org-null gate, and assert the violation message is surfaced.
+        pinTenant();
         bean.setFirstName("Alice");
         // lastName intentionally omitted
         bean.setEmail("alice@example.test");
         bean.setPassword("hunter2hunter2");
         bean.setConfirmPassword("hunter2hunter2");
-        bean.setSelectedOrganization(new OrganizationView()
-                .setId(UUID.randomUUID())
-                .setName("Barangay 1"));
 
         given(violation.getMessage()).willReturn("must not be empty");
         willThrow(new jakarta.validation.ConstraintViolationException(java.util.Set.of(violation)))
@@ -126,19 +153,8 @@ class AdminRegistrationBeanTest {
     }
 
     @Test
-    void shouldRejectRegisterWhenOrganizationNotSelected() {
-        primeAllFieldsValid();
-        bean.setSelectedOrganization(null);
-
-        final var outcome = bean.register();
-
-        assertThat(outcome, is(nullValue()));
-        assertThat(capturedMessages.getFirst().getSummary(),
-                containsString("register.select.organization"));
-    }
-
-    @Test
-    void shouldRejectRegisterWhenPasswordsMismatch() {
+    void shouldRejectRegisterWhenPasswordsMismatch() throws IOException {
+        pinTenant();
         primeAllFieldsValid();
         bean.setPassword("hunter2hunter2");
         bean.setConfirmPassword("hunter3hunter3");
@@ -151,11 +167,8 @@ class AdminRegistrationBeanTest {
     }
 
     @Test
-    void shouldRejectRegisterWhenPasswordTooShort() {
-        // The bean no longer applies a length check directly -- @Size on
-        // StaffRegistrationCreate.password fires inside createStaff and
-        // surfaces as a ConstraintViolationException, which the bean catches
-        // and adds the violation message to FacesMessages.
+    void shouldRejectRegisterWhenPasswordTooShort() throws IOException {
+        pinTenant();
         primeAllFieldsValid();
         bean.setPassword("short");
         bean.setConfirmPassword("short");
@@ -172,10 +185,10 @@ class AdminRegistrationBeanTest {
     }
 
     @Test
-    void shouldRejectRegisterWhenEmailAlreadyTakenInOrganization() {
+    void shouldRejectRegisterWhenEmailAlreadyTakenInOrganization() throws IOException {
+        pinTenant();
         primeAllFieldsValid();
-        final var orgId = bean.getSelectedOrganization().getId();
-        given(authService.emailTakenInOrganization(bean.getEmail(), orgId)).willReturn(true);
+        given(authService.emailTakenInOrganization(bean.getEmail(), TENANT_ID)).willReturn(true);
 
         final var outcome = bean.register();
 
@@ -185,23 +198,26 @@ class AdminRegistrationBeanTest {
     }
 
     @Test
-    void shouldNavigateToLoginAfterSuccessfulRegister() {
+    void shouldRedirectToSlugScopedLoginAfterSuccessfulRegister() throws IOException {
+        pinTenant();
         primeAllFieldsValid();
         given(authService.emailTakenInOrganization(anyString(), any(UUID.class))).willReturn(false);
 
         final var outcome = bean.register();
 
-        assertThat(outcome, is("/admin/login.xhtml?faces-redirect=true"));
+        assertThat(outcome, is(nullValue()));
+        verify(externalContext).redirect("/admin/" + TENANT_SLUG + "/login.xhtml?registered=1");
         final var captor = ArgumentCaptor.forClass(StaffRegistrationCreate.class);
         then(authService).should().createStaff(captor.capture());
         final var form = captor.getValue();
         assertThat(form.getFirstName(), is("Alice"));
         assertThat(form.getEmail(), is("alice@example.test"));
-        assertThat(form.getOrganizationId(), is(bean.getSelectedOrganization().getId()));
+        assertThat(form.getOrganizationId(), is(TENANT_ID));
     }
 
     @Test
-    void shouldSurfaceBusinessExceptionMessageWhenCreateStaffFails() {
+    void shouldSurfaceBusinessExceptionMessageWhenCreateStaffFails() throws IOException {
+        pinTenant();
         primeAllFieldsValid();
         given(authService.emailTakenInOrganization(anyString(), any(UUID.class))).willReturn(false);
         willThrow(BusinessException.unknownOrganization(UUID.randomUUID()))
@@ -214,15 +230,23 @@ class AdminRegistrationBeanTest {
                 containsString("template.unknown.organization"));
     }
 
+    private static OrganizationView tenantView() {
+        return new OrganizationView()
+                .setId(TENANT_ID)
+                .setCode(TENANT_SLUG)
+                .setName("Barangay Apas");
+    }
+
+    private void pinTenant() {
+        bean.setUrlSlug(TENANT_SLUG);
+        bean.initRegisterFromUrl();
+    }
+
     private void primeAllFieldsValid() {
-        final var organizationView = new OrganizationView()
-                .setId(UUID.randomUUID())
-                .setName("Barangay 1");
         bean.setFirstName("Alice");
         bean.setLastName("Anderson");
         bean.setEmail("alice@example.test");
         bean.setPassword("hunter2hunter2");
         bean.setConfirmPassword("hunter2hunter2");
-        bean.setSelectedOrganization(organizationView);
     }
 }
